@@ -61,9 +61,11 @@ class Assets(unittest.TestCase):
                                       "pardal-brasil-radares.zip", "catalogo.json", "SHA256SUMS.txt"])
             with zipfile.ZipFile(os.path.join(out, "pardal-GO.zip")) as z:
                 self.assertEqual(sorted(z.namelist()),
-                                 ["GO/estruturas.csv", "GO/limites.csv", "GO/radares.csv", "GO/radares.gpx"])
+                                 ["GO/LICENCA-DADOS.txt", "GO/estruturas.csv", "GO/limites.csv", "GO/radares.csv",
+                                  "GO/radares.gpx"])
             with zipfile.ZipFile(os.path.join(out, "pardal-brasil-radares.zip")) as z:
-                self.assertEqual(sorted(z.namelist()), ["brasil/radares.csv", "brasil/radares.kml"])
+                self.assertEqual(sorted(z.namelist()),
+                                 ["brasil/LICENCA-DADOS.txt", "brasil/radares.csv", "brasil/radares.kml"])
             with open(os.path.join(out, "SHA256SUMS.txt"), encoding="utf-8") as fh:
                 self.assertEqual(len(fh.read().splitlines()), 5)
 
@@ -83,9 +85,31 @@ class Assets(unittest.TestCase):
             out = os.path.join(repo, "_out")
             rel.build_assets(repo, out, dist)
             with zipfile.ZipFile(os.path.join(out, "pardal-SP.zip")) as z:
-                self.assertEqual(sorted(z.namelist()), ["SP/limites_trechos.csv", "SP/radares.csv"])
+                self.assertEqual(sorted(z.namelist()),
+                                 ["SP/LICENCA-DADOS.txt", "SP/limites_trechos.csv", "SP/radares.csv"])
                 self.assertEqual(z.read("SP/radares.csv"), b"x")   # o publicado, não o do build
 
+
+
+class LicenseInEveryZip(unittest.TestCase):
+    """Quem baixa só o zip recebe a licença e a atribuição (ODbL, OpenStreetMap, fontes)."""
+
+    CAT = {"built_at": "2026-11-08T15:46:58Z",
+           "ufs": {"GO": {"coverage": {"sources": ["OSM", "DNIT", "DER-GO"]}},
+                   "SE": {"coverage": {"sources": ["DER-SE", "OSM"]}},
+                   "BR": {"coverage": {"sources": ["GO+SE"]}}}}
+
+    def test_state_text_names_its_sources_and_the_license(self):
+        t = rel.license_text(self.CAT, "GO", "https://github.com/x/y")
+        for must in ("ODbL 1.0", "© colaboradores do OpenStreetMap", "openstreetmap.org/copyright",
+                     "DER-GO, DNIT, OSM", "estado GO", "2026-11-08 15:46:58 UTC", "https://github.com/x/y"):
+            self.assertIn(must, t)
+        self.assertNotIn("DER-SE", t)
+
+    def test_brazil_text_joins_the_sources_of_every_state(self):
+        t = rel.license_text(self.CAT, None, "u")
+        self.assertIn("DER-GO, DER-SE, DNIT, OSM", t)
+        self.assertNotIn("GO+SE", t)   # a entrada BR não é fonte
 
 
 class DailyRelease(unittest.TestCase):

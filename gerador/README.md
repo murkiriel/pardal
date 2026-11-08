@@ -135,7 +135,8 @@ nem compactado couber o build registra falha e o `publish.py` não monta.
 
 Cada publicação vira também uma **release** (`dados-AAAA-MM-DD`), com a nota das contagens por
 estado (e a diferença para a geração anterior) e os anexos `pardal-<UF>.zip`, `pardal-brasil.zip`,
-`pardal-brasil-radares.zip`, `catalogo.json` e `SHA256SUMS.txt` (`scripts/release.py`; roda também
+`pardal-brasil-radares.zip`, `catalogo.json` e `SHA256SUMS.txt`; cada zip leva o `LICENCA-DADOS.txt` (ODbL, ©
+colaboradores do OpenStreetMap e as fontes do pacote) (`scripts/release.py`; roda também
 à mão depois de um `publish.py --commit`). O link
 `https://github.com/Murkiriel/pardal/releases/latest/download/pardal-SP.zip` sempre aponta para a
 versão mais recente. Releases com mais de 90 dias são apagadas, menos as semanais (as que foram

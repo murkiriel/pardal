@@ -16,6 +16,7 @@ dados-AAAA-MM-DD (data de geração do catalogo.json, UTC) apontando para o comm
 Anexos:
     pardal-<UF>.zip               um estado: todos os arquivos dele, inclusive os limites em trechos
                                   (limites_trechos.csv, que só existe aqui)
+    (cada zip leva o LICENCA-DADOS.txt: ODbL, © colaboradores do OpenStreetMap e as fontes)
     pardal-brasil.zip             o Brasil inteiro (os mesmos arquivos de brasil/)
     pardal-brasil-radares.zip     só os radares do Brasil, nos quatro formatos (para GPS e apps)
     catalogo.json                  o índice dos pacotes
@@ -61,10 +62,56 @@ def _counts(cat: Optional[dict], uf: str) -> Dict[str, int]:
     return ((cat or {}).get("ufs", {}).get(uf) or {}).get("counts") or {}
 
 
-def _zip(path: str, files: List[str], arcdir: str) -> None:
+LICENSE_FILE = "LICENCA-DADOS.txt"
+
+
+def license_text(cat: dict, uf: Optional[str], repo_url: str) -> str:
+    """O aviso de licença e atribuição que vai dentro de cada zip (quem baixa só o zip também precisa
+    dele): ODbL, © colaboradores do OpenStreetMap e as fontes. `uf` None = o Brasil inteiro (as fontes
+    de todos os estados). Puro, testado."""
+    ufs = cat.get("ufs") or {}
+    if uf is None:
+        sources = sorted({s for k, e in ufs.items() if k != "BR"
+                          for s in ((e.get("coverage") or {}).get("sources") or [])})
+        where = "Brasil inteiro"
+    else:
+        sources = sorted((ufs.get(uf, {}).get("coverage") or {}).get("sources") or [])
+        where = f"estado {uf}"
+    built = str(cat.get("built_at", ""))
+    return "\n".join([
+        "Pardal: radares e limites de velocidade do Brasil",
+        f"Pacote: {where}. Gerado em {built.replace('T', ' ').replace('Z', ' UTC')}.",
+        "",
+        "LICENÇA DOS DADOS: Open Database License (ODbL) 1.0",
+        "https://opendatacommons.org/licenses/odbl/1-0/",
+        "",
+        "Base derivada do OpenStreetMap: © colaboradores do OpenStreetMap",
+        "https://www.openstreetmap.org/copyright",
+        "",
+        "Ao usar ou redistribuir estes dados:",
+        "- cite \"© colaboradores do OpenStreetMap\" e as fontes abaixo;",
+        "- uma base derivada que você publicar precisa manter a ODbL 1.0.",
+        "",
+        f"Fontes dos radares deste pacote: {', '.join(sources) if sources else '(nenhuma informada)'}.",
+        "Demais bases: limites, estruturas, lombadas, pedágios e pontos de atenção do OpenStreetMap;",
+        "quilometragem das rodovias federais (SNV) e buracos (ICM) do DNIT; praças de pedágio e placas",
+        "da ANTT; trechos de radar portátil, multas e acidentes da PRF; situação dos medidores do",
+        "Inmetro; malha das UFs e endereços (CNEFE) do IBGE.",
+        "",
+        "Dados abertos de órgãos públicos (Lei 12.527/2011). Nenhum desses órgãos endossa este conjunto.",
+        "Não é fonte oficial: a sinalização da via sempre prevalece.",
+        "",
+        f"Tabela completa das fontes e colunas: {repo_url} (README).",
+        "",
+    ])
+
+
+def _zip(path: str, files: List[str], arcdir: str, license: Optional[str] = None) -> None:
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
         for f in files:
             z.write(f, f"{arcdir}/{os.path.basename(f)}")
+        if license is not None:
+            z.writestr(f"{arcdir}/{LICENSE_FILE}", license)
 
 
 def _sha(path: str) -> str:
@@ -83,10 +130,14 @@ def _release_only(dist: Optional[str], uf: str) -> List[str]:
     return [os.path.join(d, f) for f in os.listdir(d) if _RELEASE_ONLY_NAME.match(f)]
 
 
-def build_assets(repo: str, out: str, dist: Optional[str] = None) -> List[str]:
+def build_assets(repo: str, out: str, dist: Optional[str] = None,
+                 repo_url: str = "https://github.com/murkiriel/pardal") -> List[str]:
     """Monta os zips em out/ a partir de brasil/ e estados/ do repositório, mais os arquivos de cada
-    estado que vão só na release (do build em `dist`). Devolve os anexos."""
+    estado que vão só na release (do build em `dist`); cada zip leva o LICENCA-DADOS.txt. Devolve os
+    anexos."""
     os.makedirs(out, exist_ok=True)
+    with open(_catalog_path(repo), encoding="utf-8") as f:
+        catalog = json.load(f)
     assets: List[str] = []
     est = os.path.join(repo, "estados")
     for uf in sorted(os.listdir(est)):
@@ -95,13 +146,14 @@ def build_assets(repo: str, out: str, dist: Optional[str] = None) -> List[str]:
                        + _release_only(dist, uf), key=os.path.basename)
         if files:
             assets.append(os.path.join(out, f"pardal-{uf}.zip"))
-            _zip(assets[-1], files, uf)
+            _zip(assets[-1], files, uf, license_text(catalog, uf, repo_url))
     br = os.path.join(repo, "brasil")
     files = sorted(os.path.join(br, f) for f in os.listdir(br) if os.path.isfile(os.path.join(br, f)))
     assets.append(os.path.join(out, "pardal-brasil.zip"))
-    _zip(assets[-1], files, "brasil")
+    _zip(assets[-1], files, "brasil", license_text(catalog, None, repo_url))
     assets.append(os.path.join(out, "pardal-brasil-radares.zip"))
-    _zip(assets[-1], [f for f in files if os.path.basename(f) in CAMERA_FILES], "brasil")
+    _zip(assets[-1], [f for f in files if os.path.basename(f) in CAMERA_FILES], "brasil",
+         license_text(catalog, None, repo_url))
     cat = os.path.join(out, "catalogo.json")
     with open(_catalog_path(repo), "rb") as fi, open(cat, "wb") as fo:
         fo.write(fi.read())
@@ -163,6 +215,9 @@ def release_notes(cat: dict, previous: Optional[dict], warnings: List[str], repo
           "- `pardal-brasil-radares.zip` — só os radares do Brasil, nos quatro formatos (GPS e apps)",
           "- `catalogo.json` — índice dos pacotes; `SHA256SUMS.txt` — para conferir os arquivos",
           "",
+          "Cada zip traz o `LICENCA-DADOS.txt`: os dados são ODbL 1.0 (© colaboradores do OpenStreetMap); "
+          "cite as fontes e mantenha a licença em bases derivadas.",
+          "",
           f"Link fixo para a versão mais recente: `{repo_url}/releases/latest/download/pardal-SP.zip` "
           "(troque a sigla do estado, ou use `pardal-brasil.zip`).",
           "", "## Por estado", ""]
@@ -193,7 +248,7 @@ def main(argv=None) -> int:
     ap.add_argument("--dist", default=os.path.join(GENERATOR_DIR, "data", "dist"),
                     help="saída do build, de onde vêm os arquivos que vão só na release (limites_trechos.csv)")
     ap.add_argument("--create", action="store_true", help="cria a release no GitHub (gh)")
-    ap.add_argument("--repo-url", default="https://github.com/Murkiriel/pardal")
+    ap.add_argument("--repo-url", default="https://github.com/murkiriel/pardal")
     ap.add_argument("--release-only", action="store_true",
                     help="dados só na release, sem commit no repositório (dias que não são domingo)")
     ap.add_argument("--skip-if-same", action="store_true",
@@ -214,7 +269,7 @@ def main(argv=None) -> int:
     if args.skip_if_same and previous and data_fingerprint(cat) == data_fingerprint(previous):
         print("Os dados são os mesmos da geração anterior: sem release.")
         return 0
-    assets = build_assets(args.repo, args.out, args.dist)
+    assets = build_assets(args.repo, args.out, args.dist, args.repo_url)
     notes_path = os.path.join(args.out, "NOTAS.md")
     with open(notes_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(release_notes(cat, previous, warnings, args.repo_url, in_repo=not args.release_only))

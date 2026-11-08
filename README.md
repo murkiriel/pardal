@@ -347,6 +347,7 @@ Os **dados** são uma base derivada do OpenStreetMap, distribuída sob a
 
 - Cite "© colaboradores do OpenStreetMap" e as fontes da tabela acima.
 - Se você publicar uma base derivada deste conjunto, ela precisa manter a ODbL.
+- Cada zip da release traz um `LICENCA-DADOS.txt` com este aviso e as fontes daquele pacote.
 
 O **código** (pasta `gerador/` e `scripts/`) é MIT ([`gerador/LICENSE`](gerador/LICENSE)).
 
