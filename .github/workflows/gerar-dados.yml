@@ -27,9 +27,10 @@ name: Gerar dados
 # mão, só publica se "publish" for marcado; sem isso, gera e confere (o log e a auditoria ficam
 # nos artefatos).
 #
-# O DNIT e o Inmetro não aceitam conexão de fora do Brasil, e o portal de dados da ANTT às vezes
-# devolve uma página de bloqueio em vez dos dados; as máquinas do Actions ficam nos EUA. O
-# tráfego para esses servidores (e só para eles) sai por um túnel WireGuard com saída no Brasil,
+# O DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO e o DER-SE não aceitam conexão de fora do
+# Brasil, e o portal de dados da ANTT às vezes devolve uma página de bloqueio em vez dos dados; as
+# máquinas do Actions ficam nos EUA. O tráfego para esses servidores (e só para eles; lista em
+# TUNNEL_HOSTS) sai por um túnel WireGuard com saída no Brasil,
 # configurado no segredo MULLVAD_WG_CONF (arquivo .conf da VPN, nunca impresso). Se o túnel não
 # subir, o job avisa e segue sem ele: essas fontes caem nas cópias guardadas (ou na edição).
 #
@@ -112,7 +113,11 @@ jobs:
       EVENT: ${{ github.event_name }}
       ACCEPT_FAILURES: ${{ inputs.accept_failures == true }}
       ACCEPT_DROP: ${{ inputs.accept_drop == true }}
-      TUNNEL_HOSTS: servicos.dnit.gov.br servicos.rbmlq.gov.br dados.antt.gov.br am.i.mullvad.net
+      # servidores que não aceitam conexão de fora do Brasil (medido no Actions em 2026-11-08: IBGE, AGETO-TO
+      # e DER-SE davam ConnectTimeout); am.i.mullvad.net só confere a saída do túnel
+      TUNNEL_HOSTS: >-
+        servicos.dnit.gov.br servicos.rbmlq.gov.br dados.antt.gov.br servicodados.ibge.gov.br
+        www.to.gov.br der.se.gov.br am.i.mullvad.net
       PYTHONUNBUFFERED: "1"
     steps:
       - name: Código e dados publicados
@@ -150,13 +155,13 @@ jobs:
           sudo mkswap /mnt/swap-pardal >/dev/null && sudo swapon /mnt/swap-pardal
           free -h
 
-      - name: Túnel para DNIT, Inmetro e ANTT (saída no Brasil)
+      - name: Túnel para os servidores que só aceitam o Brasil (DNIT, Inmetro, ANTT, IBGE, AGETO-TO, DER-SE)
         env:
           WG_CONF: ${{ secrets.MULLVAD_WG_CONF }}
         run: |
-          # Sem túnel o build segue: DNIT, Inmetro e ANTT falham daqui e caem nas cópias guardadas ou na
+          # Sem túnel o build segue: as fontes de TUNNEL_HOSTS falham daqui e caem nas cópias guardadas ou na
           # edição publicada (aviso).
-          down() { echo "::warning::$1; seguindo sem o túnel (DNIT, Inmetro e ANTT usam as cópias guardadas)"
+          down() { echo "::warning::$1; seguindo sem o túnel (as fontes de TUNNEL_HOSTS usam as cópias guardadas)"
                    sudo wg-quick down wg0 >/dev/null 2>&1 || true; exit 0; }
           if [ -z "$WG_CONF" ]; then down "segredo MULLVAD_WG_CONF não configurado"; fi
           sudo apt-get install -y -qq wireguard-tools >/dev/null

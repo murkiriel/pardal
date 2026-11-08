@@ -138,12 +138,12 @@ estado (e a diferença para a geração anterior) e os anexos `pardal-<UF>.zip`,
 `https://github.com/Murkiriel/pardal/releases/latest/download/pardal-SP.zip` sempre aponta para a
 versão mais recente.
 
-As máquinas do Actions ficam nos EUA, e o DNIT e o Inmetro não aceitam conexão de fora do Brasil
-(o portal da ANTT às vezes devolve uma página de bloqueio): o tráfego para esses três servidores,
+As máquinas do Actions ficam nos EUA, e o DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO e o DER-SE não aceitam conexão de fora do Brasil
+(o portal da ANTT às vezes devolve uma página de bloqueio): o tráfego para esses servidores (`TUNNEL_HOSTS`),
 e só para eles, sai por um túnel WireGuard com saída no Brasil. A configuração do túnel fica no
 segredo `MULLVAD_WG_CONF` do repositório (Settings → Secrets and variables → Actions). Se o segredo
 faltar ou o túnel não responder (chave revogada, servidor desativado), o job avisa e segue sem
-ele: essas três fontes caem nas cópias guardadas. Para consertar, gere outra configuração
+ele: essas fontes caem nas cópias guardadas (ou na edição publicada). Para consertar, gere outra configuração
 WireGuard na conta da Mullvad (servidor no Brasil) e troque o segredo. Testado em 2026-09-30: build completo em ~30 min, mesmos números do build
 local.
 
