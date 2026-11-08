@@ -93,8 +93,13 @@ class Edition:
         return [lim for code in codes for lim in self._limits.get(code, [])]
 
     def _rows(self, name: str):
+        """Linhas de brasil/<name>, ou de brasil/<name>.gz quando o arquivo passou do teto e foi
+        publicado compactado (build_brazil.compress_oversized)."""
         path = os.path.join(self.root, "brasil", name)
-        if not os.path.exists(path):
-            return
-        with open(path, encoding="utf-8", newline="") as f:
-            yield from csv.DictReader(f)
+        if os.path.exists(path):
+            with open(path, encoding="utf-8", newline="") as f:
+                yield from csv.DictReader(f)
+        elif os.path.exists(path + ".gz"):
+            import gzip
+            with gzip.open(path + ".gz", "rt", encoding="utf-8", newline="") as f:
+                yield from csv.DictReader(f)

@@ -303,7 +303,10 @@ def main(argv=None) -> int:
     if ufs_entry is not None:
         print(f"[build] contornos das UFs: {ufs_entry['file']} ({ufs_entry['bytes'] / 1000:.0f} KB)")
 
-    from datakit.build_brazil import MAX_FILE_BYTES, oversized
+    from datakit.build_brazil import MAX_FILE_BYTES, compress_oversized, oversized
+    for name, before, after in compress_oversized(args.dist):
+        print(f"[build] {name}: {before / 1e6:.1f} MB passa do teto de {MAX_FILE_BYTES / 1e6:.0f} MB; "
+              f"publicado compactado ({name}.gz, {after / 1e6:.1f} MB)")
     for name, size in oversized(args.dist):
         failures.record(f"tamanho {name}", ValueError(
             f"{size / 1e6:.1f} MB passa do teto de {MAX_FILE_BYTES / 1e6:.0f} MB por arquivo"))

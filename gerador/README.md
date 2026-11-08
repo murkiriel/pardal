@@ -109,8 +109,8 @@ O `publish.py` não monta os arquivos se:
 
 ## Publicação automática
 
-O workflow `.github/workflows/gerar-dados.yml` gera e publica os dados todo dia numa máquina do
-GitHub Actions: às 03:17 e às 09:17 em Brasília, confere a data de geração dos dados publicados
+O workflow `.github/workflows/gerar-dados.yml` gera e publica os dados toda semana, aos domingos,
+numa máquina do GitHub Actions: às 03:17 e às 09:17 em Brasília, confere a data de geração dos dados publicados
 (`built_at` do `catalogo.json`) e só gera se ela não for de hoje — se o build falhar ou o GitHub
 pular um disparo, o seguinte tenta de novo. Também pode ser disparado à mão (Actions → Gerar
 dados → Run workflow; só publica com "publish" marcado; "accept_failures" e "accept_drop" passam
@@ -121,8 +121,14 @@ dado novo (só a data do catálogo mudou) não vira commit nem release. O log do
 das junções e o catálogo ficam nos artefatos da execução por 30 dias.
 
 As cópias das fontes (`data/raw/` sem os extratos do OSM) ficam no cache do Actions e são salvas
-logo depois do build, mesmo quando o build ou a publicação falham. Com a geração diária o cache é
-usado todo dia; o GitHub apaga um cache que fica 7 dias sem uso.
+logo depois do build, mesmo quando o build ou a publicação falham. O GitHub apaga um cache que
+fica 7 dias sem uso, então de um domingo para o outro ele pode sumir; nesse caso as fontes que
+falharem caem na edição publicada.
+
+Arquivo publicado acima de 95 MB (o GitHub recusa a partir de 100 MB) sai compactado: o build
+grava `<arquivo>.gz` no lugar dele e o catálogo aponta para o `.gz`, com `bytes` e `sha256` do
+compactado e `uncompressed_bytes` com o tamanho original (`build_brazil.compress_oversized`). Só se
+nem compactado couber o build registra falha e o `publish.py` não monta.
 
 Cada publicação vira também uma **release** (`dados-AAAA-MM-DD`), com a nota das contagens por
 estado (e a diferença para a geração anterior) e os anexos `pardal-<UF>.zip`, `pardal-brasil.zip`,

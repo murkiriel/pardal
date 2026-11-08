@@ -2,19 +2,26 @@ name: Gerar dados
 
 # Gera brasil/, estados/ e catalogo.json do zero (fontes oficiais + OpenStreetMap) e publica.
 #
-# Todo dia: às 03:17 e às 09:17 em Brasília, o job "interval" lê a data de geração dos dados
-# publicados (built_at do catalogo.json) e só segue para o build se ela não for de hoje (1 dia,
-# arredondado). Se o build falhar, o disparo seguinte tenta de novo (os dados publicados
-# continuam os de antes).
+# Toda semana, aos domingos: às 03:17 e às 09:17 em Brasília, o job "interval" lê a data de
+# geração dos dados publicados (built_at do catalogo.json) e só segue para o build se ela não for
+# de hoje (1 dia, arredondado). Se o primeiro disparo do domingo falhar, o segundo tenta de novo;
+# se os dois falharem, os dados publicados continuam os de antes até o domingo seguinte (ou até um
+# disparo à mão).
 #
 # Cada fonte atualiza quando dá: a que falha usa a última leitura boa guardada em data/raw/fontes/
 # (datakit/source_cache.py) ou, sem ela, o que a fonte tinha na edição publicada (o checkout do
 # repositório; datakit/edition.py). Vira aviso e não barra a publicação; as outras seguem
-# normalmente. As cópias ficam no cache do Actions, salvo mesmo quando o job falha.
+# normalmente. As cópias ficam no cache do Actions, salvo mesmo quando o job falha. O GitHub apaga
+# um cache que fica 7 dias sem uso, então de um domingo para o outro ele pode sumir: aí vale a
+# edição publicada, que está sempre no checkout.
 # Os horários ficam fora da hora cheia de propósito: é quando o GitHub mais atrasa ou pula os
-# disparos agendados (o das 06:00 UTC de 01/10/2026 não aconteceu). São dois por dia porque um
+# disparos agendados (o das 06:00 UTC de 01/10/2026 não aconteceu). São dois no domingo porque um
 # disparo pulado não avisa ninguém: o segundo cobre o primeiro e, se o primeiro já publicou, só
 # confere a data e para.
+#
+# Arquivo publicado acima de 95 MB (o GitHub recusa a partir de 100 MB) sai compactado (.gz) e o
+# catálogo aponta para o .gz (datakit/build_brazil.compress_oversized). Só se nem compactado couber
+# o build registra falha.
 # Também pode ser disparado à mão (Actions → Gerar dados → Run workflow), a qualquer momento; à
 # mão, só publica se "publish" for marcado; sem isso, gera e confere (o log e a auditoria ficam
 # nos artefatos).
@@ -29,15 +36,16 @@ name: Gerar dados
 # inteiro, só os radares do Brasil, o catálogo e os sha256 (scripts/release.py).
 #
 # O publish.py não monta nada se alguma fonte falhou sem cópia nem edição publicada, se algum estado
-# perdeu mais de 5% dos dados em relação ao publicado ou se algum arquivo passa de 95 MB: nesses
+# perdeu mais de 5% dos dados em relação ao publicado ou se algum arquivo passa de 95 MB mesmo
+# compactado: nesses
 # casos o job falha e o GitHub avisa por e-mail; nada é publicado. À mão, "accept_failures" e
 # "accept_drop" publicam assim mesmo (ex.: uma fonte que nunca foi lida e está fora do ar).
 # Dia sem dado novo (só a data do catálogo mudou) não vira commit nem release.
 
 on:
   schedule:
-    - cron: "17 6 * * *"    # todo dia, 03:17 em Brasília
-    - cron: "17 12 * * *"   # e 09:17 em Brasília, caso o primeiro seja pulado ou falhe
+    - cron: "17 6 * * 0"    # domingo, 03:17 em Brasília
+    - cron: "17 12 * * 0"   # e 09:17 em Brasília, caso o primeiro seja pulado ou falhe
   workflow_dispatch:
     inputs:
       publish:

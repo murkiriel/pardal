@@ -35,9 +35,9 @@ REPO = os.path.dirname(GENERATOR_DIR)
 # Todo arquivo de dado do pacote (datakit/build_pack.py, *_FILE) está aqui ou em _RELEASE_ONLY_NAME:
 # um nome que falte nos dois fica fora de tudo e o catálogo aponta para o nada (testado).
 _PUBLISHED_NAME = re.compile(r"^(radares|limites_estimados|limites|estruturas|lombadas|pedagios|radar_portatil|buracos|acidentes_moto"
-    r"|pontos_atencao|cameras_fiscalizacao|ufs)\.(csv\.gz|csv|geojson|kml|gpx)$")
+    r"|pontos_atencao|cameras_fiscalizacao|ufs)\.(csv|geojson|kml|gpx)(\.gz)?$")
 # Arquivos que vão só no zip do estado na release (scripts/release.py), nunca no commit: grandes e
-# mudando todo dia com o OSM, fariam o repositório crescer GBs por ano. O catálogo publicado aponta
+# mudando a cada geração com o OSM, fariam o repositório crescer GBs por ano. O catálogo publicado aponta
 # para o zip (release_asset/asset_path) em vez de um caminho no repositório.
 _RELEASE_ONLY_NAME = re.compile(r"^limites_trechos\.csv$")
 _MANAGED = ("brasil", "estados")
@@ -202,8 +202,8 @@ def main(argv=None) -> int:
         print("nada mudou")
         return 0
     if staged == [CATALOG]:
-        # só o catálogo mudou (data de geração; os sha256 dos arquivos são os mesmos): com a geração
-        # diária, não vale um commit nem uma release por dia sem dado novo
+        # só o catálogo mudou (data de geração; os sha256 dos arquivos são os mesmos): não vale um
+        # commit nem uma release sem dado novo
         git("reset", "-q", "--", CATALOG)
         git("checkout", "--", CATALOG)
         print("nada mudou nos dados (só a data do catálogo)")

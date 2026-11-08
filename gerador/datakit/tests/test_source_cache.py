@@ -241,6 +241,15 @@ class EditionTest(_Isolated):
         self.assertEqual([(lim.limit_kmh, lim.source) for lim in ed.limits(("RIO",))], [(60, "RIO"), (40, "RIO")])
         self.assertEqual(ed.limits(("OSM:class",)), [])
 
+    def test_limits_from_a_gzipped_edition_file(self):
+        import gzip
+        from datakit.edition import Edition
+        path = os.path.join(self.root, "brasil", "limites.csv")
+        with open(path, "rb") as fi, gzip.open(path + ".gz", "wb") as fo:
+            fo.write(fi.read())
+        os.remove(path)
+        self.assertEqual(len(Edition.open(self.root).limits(("RIO",))), 2)
+
     def test_no_edition_without_catalog_or_brasil(self):
         from datakit.edition import Edition
         self.assertIsNone(Edition.open(None))

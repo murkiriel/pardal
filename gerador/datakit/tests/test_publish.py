@@ -394,6 +394,51 @@ class PublishedNames(unittest.TestCase):
         self.assertEqual(cat["ufs"]["SP"]["limit_lines"], entry)   # o do build fica como estava
 
 
+class CompressOversized(unittest.TestCase):
+    """Arquivo publicado acima do teto sai compactado e o catálogo aponta para o .gz."""
+
+    def test_big_file_becomes_gz_and_the_catalog_follows(self):
+        import gzip
+        import json
+        import shutil
+        import tempfile
+        from datakit import build_brazil
+        dist = tempfile.mkdtemp()
+        try:
+            os.makedirs(os.path.join(dist, "estados", "SP"))
+            big = "lat,lng\n" + "-23.5,-46.6\n" * 2000
+            with open(os.path.join(dist, "estados", "SP", "limites.csv"), "w") as f:
+                f.write(big)
+            with open(os.path.join(dist, "estados", "SP", "radares.csv"), "w") as f:
+                f.write("lat,lng\n-23.5,-46.6\n")
+            with open(os.path.join(dist, "estados", "SP", "radares.csv.gz"), "wb") as f:   # sobra de um build antigo
+                f.write(b"velho")
+            cat = {"ufs": {"SP": {"limits": {"file": "estados/SP/limites.csv", "bytes": len(big), "count": 2000},
+                                  "cameras": {"file": "estados/SP/radares.csv", "count": 1}}}}
+            with open(os.path.join(dist, "catalogo.json"), "w") as f:
+                json.dump(cat, f)
+            done = build_brazil.compress_oversized(dist, limit=1000)
+            self.assertEqual([d[0] for d in done], ["estados/SP/limites.csv"])
+            self.assertFalse(os.path.exists(os.path.join(dist, "estados", "SP", "limites.csv")))
+            self.assertFalse(os.path.exists(os.path.join(dist, "estados", "SP", "radares.csv.gz")))
+            with gzip.open(os.path.join(dist, "estados", "SP", "limites.csv.gz"), "rt") as f:
+                self.assertEqual(f.read(), big)
+            with open(os.path.join(dist, "catalogo.json")) as f:
+                lim = json.load(f)["ufs"]["SP"]["limits"]
+            self.assertEqual(lim["file"], "estados/SP/limites.csv.gz")
+            self.assertEqual((lim["count"], lim["uncompressed_bytes"]), (2000, len(big)))
+            self.assertEqual(lim["sha256"], pub._sha(os.path.join(dist, "estados", "SP", "limites.csv.gz")))
+            self.assertEqual(build_brazil.oversized(dist, limit=1000), [])
+            self.assertIn("estados/SP/limites.csv.gz", pub.published_files(dist))
+        finally:
+            shutil.rmtree(dist, ignore_errors=True)
+
+    def test_any_published_extension_may_be_gzipped(self):
+        for name in ("limites.csv.gz", "radares.geojson.gz", "radares.kml.gz", "lombadas.csv.gz"):
+            self.assertTrue(pub._PUBLISHED_NAME.match(name), name)
+        self.assertIsNone(pub._PUBLISHED_NAME.match("limites.gz"))
+
+
 class CommitDataOnly(unittest.TestCase):
     """publish.py --commit só leva brasil/, estados/ e catalogo.json — nunca o que mais estiver
     pendente no repositório (código do gerador não revisado, arquivos soltos)."""

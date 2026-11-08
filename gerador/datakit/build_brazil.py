@@ -35,7 +35,7 @@ MAX_FILE_BYTES = 95_000_000
 # O mesmo de scripts/publish.py (_PUBLISHED_NAME): só o que vai para o commit. limites_trechos.csv vai
 # só na release (publish._RELEASE_ONLY_NAME) e fica fora do teto de 95 MB do repositório (testado).
 PUBLISHED_NAME = re.compile(r"^(radares|limites_estimados|limites|estruturas|lombadas|pedagios|radar_portatil|buracos|acidentes_moto"
-    r"|pontos_atencao|cameras_fiscalizacao|ufs)\.(csv\.gz|csv|geojson|kml|gpx)$")
+    r"|pontos_atencao|cameras_fiscalizacao|ufs)\.(csv|geojson|kml|gpx)(\.gz)?$")
 MANAGED_DIRS = ("brasil", "estados")
 
 
@@ -47,6 +47,52 @@ def published_files(dist_dir: str) -> List[str]:
             out += [os.path.relpath(os.path.join(d, f), dist_dir).replace(os.sep, "/")
                     for f in fs if PUBLISHED_NAME.match(f)]
     return sorted(out)
+
+
+def compress_oversized(dist_dir: str, limit: int = MAX_FILE_BYTES) -> List[Tuple[str, int, int]]:
+    """Todo arquivo publicado acima do teto sai compactado: <arquivo>.gz no lugar dele, e as entradas do
+    catálogo que apontavam para ele passam a apontar para o .gz (bytes e sha256 do .gz; count igual;
+    "uncompressed_bytes" com o tamanho original). Um .gz que sobrou de um build anterior de um arquivo
+    que agora cabe é apagado. Devolve (caminho original, bytes antes, bytes do .gz). Se nem compactado
+    couber, oversized() acusa e o build registra a falha."""
+    done: List[Tuple[str, int, int]] = []
+    for rel in published_files(dist_dir):
+        if rel.endswith(".gz"):
+            continue
+        path = os.path.join(dist_dir, rel)
+        size = os.path.getsize(path)
+        if size <= limit:
+            if os.path.exists(path + ".gz"):
+                os.remove(path + ".gz")
+            continue
+        with open(path, "rb") as fi, gzip.open(path + ".gz", "wb", compresslevel=9) as fo:
+            for chunk in iter(lambda: fi.read(1 << 20), b""):
+                fo.write(chunk)
+        os.remove(path)
+        done.append((rel, size, os.path.getsize(path + ".gz")))
+    cat_path = os.path.join(dist_dir, "catalogo.json")
+    if done and os.path.exists(cat_path):
+        moved = {rel: (size, rel + ".gz") for rel, size, _ in done}
+        with open(cat_path, encoding="utf-8") as f:
+            catalog = json.load(f)
+
+        def repoint(node) -> None:
+            if isinstance(node, dict):
+                file = node.get("file")
+                target = moved.get(file) if isinstance(file, str) else None
+                if target:
+                    gz = os.path.join(dist_dir, target[1])
+                    node.update(file=target[1], bytes=os.path.getsize(gz), sha256=_sha256(gz),
+                                uncompressed_bytes=target[0])
+                for v in node.values():
+                    repoint(v)
+            elif isinstance(node, list):
+                for v in node:
+                    repoint(v)
+        repoint(catalog)
+        with open(cat_path, "w", encoding="utf-8") as f:
+            json.dump(catalog, f, ensure_ascii=False, indent=2)
+    return done
 
 
 def oversized(dist_dir: str, limit: int = MAX_FILE_BYTES) -> List[Tuple[str, int]]:
