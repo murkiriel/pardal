@@ -4,9 +4,12 @@ name: Gerar dados
 #
 # Todo dia, às 03:17 e às 09:17 em Brasília. O job "interval" só segue para o build se ainda não
 # houve uma execução bem-sucedida deste workflow hoje (UTC): o segundo disparo cobre o primeiro.
-#   - Segunda a sábado: só a release (dados-AAAA-MM-DD), e só se algum arquivo mudou em relação à
-#     última release (sha256; release.py --skip-if-same). Nada vai para o repositório.
-#   - Domingo: commit em brasil/, estados/ e catalogo.json, mais a release (também só com dado novo).
+#   - Todo dia: a release (dados-AAAA-MM-DD), só se algum arquivo mudou em relação à última release
+#     (sha256; release.py --skip-if-same).
+#   - Uma vez por semana: também o commit em brasil/, estados/ e catalogo.json, na primeira geração
+#     que passar a partir do domingo (se o domingo falhar, segunda tenta de novo; scripts/routine.py).
+#   - Releases com mais de 90 dias são apagadas, menos as semanais (as do commit) e a mais nova.
+#   - Falha de uma geração agendada abre a issue "Geração falhando"; a primeira que passar a fecha.
 # O link releases/latest/download/pardal-<UF>.zip traz sempre o dado mais novo (até 1 dia); o
 # repositório, o da semana.
 #
@@ -208,27 +211,38 @@ jobs:
           [ "$ACCEPT_FAILURES" = "true" ] && flags="$flags --accept-failures"
           [ "$ACCEPT_DROP" = "true" ] && flags="$flags --accept-drop"
           repo_lc=$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
-          if [ "$PUBLISH" != "true" ] || [ "$repo_lc" != "murkiriel/pardal" ]; then
-            python scripts/publish.py $flags
-            python scripts/release.py --previous "$prev" --warnings data/dist/catalogo.json
-            echo "Conferido e montado; sem publicar (publish=$PUBLISH, repositório=$GITHUB_REPOSITORY)."
-          elif [ "$EVENT" = "schedule" ] && [ "$(date -u +%u)" != "7" ]; then
-            # segunda a sábado: monta na cópia de trabalho (sem commit) e cria só a release, se houver dado novo
-            python scripts/publish.py $flags
-            python scripts/release.py --previous "$prev" --warnings data/dist/catalogo.json \
-              --release-only --skip-if-same --create
-          else
-            # domingo (ou à mão com publish): commit no repositório e release
-            git -C .. config user.name "Murkiriel"
-            git -C .. config user.email "14956419+Murkiriel@users.noreply.github.com"
-            head_before=$(git -C .. rev-parse HEAD)
-            python scripts/publish.py --commit --push $flags
-            if [ "$(git -C .. rev-parse HEAD)" != "$head_before" ]; then
+          # commit (repositório e release), release (só a release) ou none (só confere): scripts/routine.py
+          # decide pelo catalogo.json do repositório. O commit sai na primeira geração agendada que passar
+          # a partir do domingo; se o domingo falhar, segunda tenta de novo, e assim por diante.
+          mode=$(python scripts/routine.py mode --catalog ../catalogo.json --event "$EVENT" --publish "$PUBLISH")
+          [ "$repo_lc" != "murkiriel/pardal" ] && mode=none
+          echo "modo: $mode"
+          case "$mode" in
+            none)
+              python scripts/publish.py $flags
+              python scripts/release.py --previous "$prev" --warnings data/dist/catalogo.json
+              echo "Conferido e montado; sem publicar (publish=$PUBLISH, repositório=$GITHUB_REPOSITORY)." ;;
+            release)
+              # monta na cópia de trabalho (sem commit) e cria só a release, se houver dado novo
+              python scripts/publish.py $flags
               python scripts/release.py --previous "$prev" --warnings data/dist/catalogo.json \
-                --skip-if-same --create
-            else
-              echo "Nada mudou nos dados do repositório: sem commit e sem release."
-            fi
+                --release-only --skip-if-same --create ;;
+            commit)
+              git -C .. config user.name "Murkiriel"
+              git -C .. config user.email "14956419+Murkiriel@users.noreply.github.com"
+              head_before=$(git -C .. rev-parse HEAD)
+              python scripts/publish.py --commit --push $flags
+              if [ "$(git -C .. rev-parse HEAD)" != "$head_before" ]; then
+                python scripts/release.py --previous "$prev" --warnings data/dist/catalogo.json \
+                  --skip-if-same --create
+              else
+                echo "Nada mudou nos dados do repositório: sem commit e sem release."
+              fi ;;
+          esac
+          # releases com mais de 90 dias saem, menos as semanais (que foram para o repositório) e a mais nova
+          if [ "$mode" != "none" ]; then
+            python scripts/routine.py prune --repo "$GITHUB_REPOSITORY" \
+              || echo "::warning::a limpeza das releases antigas falhou (não bloqueia)"
           fi
 
       - name: Desliga o túnel
@@ -247,3 +261,35 @@ jobs:
             pardal/gerador/data/release/NOTAS.md
           if-no-files-found: ignore
           retention-days: 30
+
+  notify:
+    # Aviso de falha: geração agendada que falhou abre a issue "Geração falhando" (ou comenta nela); a
+    # primeira que passar comenta e fecha (scripts/routine.py notify). Disparo à mão não mexe na issue.
+    needs: [interval, generate]
+    if: always() && github.event_name == 'schedule' && github.repository == 'murkiriel/pardal'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: write
+    steps:
+      - name: Código (só o script da rotina)
+        uses: actions/checkout@v7
+        with:
+          sparse-checkout: gerador/scripts/routine.py
+          sparse-checkout-cone-mode: false
+      - name: Abre, comenta ou fecha a issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          INTERVAL: ${{ needs.interval.result }}
+          GENERATE: ${{ needs.generate.result }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          echo "interval=$INTERVAL generate=$GENERATE"
+          if [ "$INTERVAL" = "failure" ] || [ "$GENERATE" = "failure" ]; then
+            python3 gerador/scripts/routine.py notify --repo "$GITHUB_REPOSITORY" --failed --run-url "$RUN_URL"
+          elif [ "$GENERATE" = "success" ]; then
+            python3 gerador/scripts/routine.py notify --repo "$GITHUB_REPOSITORY" --run-url "$RUN_URL"
+          else
+            echo "nada a fazer (não gerou: já havia geração hoje, ou foi cancelada)"
+          fi

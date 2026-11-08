@@ -354,7 +354,8 @@ O **código** (pasta `gerador/` e `scripts/`) é MIT ([`gerador/LICENSE`](gerado
 
 O conjunto é gerado de novo todo dia. Cada dia com dado novo vira uma release (`dados-AAAA-MM-DD`,
 com os zips; `releases/latest/download/pardal-<UF>.zip` traz sempre a mais nova), e os arquivos do
-repositório (`brasil/`, `estados/`, `catalogo.json`) são atualizados aos domingos. Arquivo que passaria dos 100 MB que o
+repositório (`brasil/`, `estados/`, `catalogo.json`) uma vez por semana, a partir do domingo. As
+releases ficam 90 dias; as semanais (as que foram para o repositório) ficam sempre. Arquivo que passaria dos 100 MB que o
 GitHub aceita sai compactado (`.csv.gz`), e o catálogo aponta para ele. Cada fonte é atualizada
 quando responde; uma fonte fora do
 ar fica com a última leitura boa (ou com o que tinha na edição anterior), e as outras seguem

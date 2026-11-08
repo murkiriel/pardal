@@ -110,9 +110,11 @@ O `publish.py` não monta os arquivos se:
 ## Publicação automática
 
 O workflow `.github/workflows/gerar-dados.yml` gera os dados todo dia numa máquina do GitHub
-Actions. De segunda a sábado, cada dia com dado novo vira só uma release (sem commit; `release.py
---release-only --skip-if-same` compara os sha256 com os da última release); aos domingos, os dados
-vão também para o repositório. Dispara às 03:17 e às 09:17 em Brasília e só gera se ainda não
+Actions. Cada dia com dado novo vira uma release (`release.py --skip-if-same` compara os sha256
+com os da última release). Uma vez por semana os dados vão também para o repositório: na primeira
+geração que passar a partir do domingo (00:00 em Brasília), se o `catalogo.json` do repositório for
+de antes dele; se o domingo falhar, segunda tenta de novo, e assim por diante (`scripts/routine.py
+mode`). Dispara às 03:17 e às 09:17 em Brasília e só gera se ainda não
 houve uma execução bem-sucedida hoje — se o build falhar ou o GitHub pular um disparo, o seguinte
 tenta de novo. Também pode ser disparado à mão (Actions → Gerar
 dados → Run workflow; só publica com "publish" marcado; "accept_failures" e "accept_drop" passam
@@ -136,7 +138,12 @@ estado (e a diferença para a geração anterior) e os anexos `pardal-<UF>.zip`,
 `pardal-brasil-radares.zip`, `catalogo.json` e `SHA256SUMS.txt` (`scripts/release.py`; roda também
 à mão depois de um `publish.py --commit`). O link
 `https://github.com/Murkiriel/pardal/releases/latest/download/pardal-SP.zip` sempre aponta para a
-versão mais recente.
+versão mais recente. Releases com mais de 90 dias são apagadas, menos as semanais (as que foram
+para o repositório) e a mais nova (`scripts/routine.py prune`).
+
+Aviso de falha: uma geração agendada que falha abre a issue "Geração falhando" no repositório (ou
+comenta nela, se já estiver aberta), com a data e o link da execução; a primeira que passar comenta
+e fecha a issue (job `notify`, `scripts/routine.py notify`). Disparos à mão não mexem nela.
 
 As máquinas do Actions ficam nos EUA, e o DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO e o DER-SE não aceitam conexão de fora do Brasil
 (o portal da ANTT às vezes devolve uma página de bloqueio): o tráfego para esses servidores (`TUNNEL_HOSTS`),
