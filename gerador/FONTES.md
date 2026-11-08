@@ -270,7 +270,7 @@ sentido só com GPS preciso, grupos de alerta, dois avisos por radar) estão no 
 
 ### Limites como trechos (2026-11-08)
 
-`<UF>/limites_trechos.csv` no zip `pardal-<UF>.zip` da release semanal (pacote no schema 10; decidido em 2026-11-08: só na
+`<UF>/limites_trechos.csv` no zip `pardal-<UF>.zip` da release (pacote no schema 10; decidido em 2026-11-08: só na
 release, não no repositório, porque somam ~172 MB e mudam a cada geração com o OSM; no zip, SP cai de 29,0 para 6,1 MB, MG de
 30,6 para 7,3 MB, PR de 11,7 para 2,7 MB). No `catalogo.json` publicado, a entrada `limit_lines` traz `release_asset`,
 `asset_path`, `bytes`, `sha256` e `count` (o `publish.rewrite_catalog` troca o `file` do build por esses dois campos). O

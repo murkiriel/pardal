@@ -109,21 +109,22 @@ O `publish.py` não monta os arquivos se:
 
 ## Publicação automática
 
-O workflow `.github/workflows/gerar-dados.yml` gera e publica os dados toda semana, aos domingos,
-numa máquina do GitHub Actions: às 03:17 e às 09:17 em Brasília, confere a data de geração dos dados publicados
-(`built_at` do `catalogo.json`) e só gera se ela não for de hoje — se o build falhar ou o GitHub
-pular um disparo, o seguinte tenta de novo. Também pode ser disparado à mão (Actions → Gerar
+O workflow `.github/workflows/gerar-dados.yml` gera os dados todo dia numa máquina do GitHub
+Actions. De segunda a sábado, cada dia com dado novo vira só uma release (sem commit; `release.py
+--release-only --skip-if-same` compara os sha256 com os da última release); aos domingos, os dados
+vão também para o repositório. Dispara às 03:17 e às 09:17 em Brasília e só gera se ainda não
+houve uma execução bem-sucedida hoje — se o build falhar ou o GitHub pular um disparo, o seguinte
+tenta de novo. Também pode ser disparado à mão (Actions → Gerar
 dados → Run workflow; só publica com "publish" marcado; "accept_failures" e "accept_drop" passam
 as opções de mesmo nome ao `publish.py`). Roda os testes, o build completo e o
 `publish.py --commit --push`, com as mesmas travas: fonte que falhou sem cópia guardada, estado
-que perdeu mais de 5% ou arquivo acima de 95 MB fazem o job falhar sem publicar nada. Dia sem
-dado novo (só a data do catálogo mudou) não vira commit nem release. O log do build, a auditoria
+que perdeu mais de 5% ou arquivo acima de 95 MB mesmo compactado fazem o job falhar sem publicar
+nada. Dia sem dado novo (os mesmos sha256) não vira commit nem release. O log do build, a auditoria
 das junções e o catálogo ficam nos artefatos da execução por 30 dias.
 
 As cópias das fontes (`data/raw/` sem os extratos do OSM) ficam no cache do Actions e são salvas
-logo depois do build, mesmo quando o build ou a publicação falham. O GitHub apaga um cache que
-fica 7 dias sem uso, então de um domingo para o outro ele pode sumir; nesse caso as fontes que
-falharem caem na edição publicada.
+logo depois do build, mesmo quando o build ou a publicação falham. Com o build diário o cache é
+usado todo dia; o GitHub só apaga um cache que fica 7 dias sem uso.
 
 Arquivo publicado acima de 95 MB (o GitHub recusa a partir de 100 MB) sai compactado: o build
 grava `<arquivo>.gz` no lugar dele e o catálogo aponta para o `.gz`, com `bytes` e `sha256` do

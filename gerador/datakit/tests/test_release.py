@@ -87,5 +87,40 @@ class Assets(unittest.TestCase):
                 self.assertEqual(z.read("SP/radares.csv"), b"x")   # o publicado, não o do build
 
 
+
+class DailyRelease(unittest.TestCase):
+    """Release todo dia com dado novo; repositório só aos domingos."""
+
+    def _cat(self, built, sha):
+        return {"built_at": built, "source_dates": {"DNIT": built[:10]},
+                "ufs_geojson": {"file": "brasil/ufs.geojson", "sha256": "u"},
+                "ufs": {"SP": {"built_at": built, "counts": {"cameras": 1},
+                               "cameras": {"file": "estados/SP/radares.csv", "sha256": sha},
+                               "limit_lines": {"asset_path": "SP/limites_trechos.csv", "sha256": "t"}}}}
+
+    def test_same_data_on_another_day_has_the_same_fingerprint(self):
+        a, b = self._cat("2026-11-09T06:40:00Z", "x"), self._cat("2026-11-10T06:40:00Z", "x")
+        self.assertEqual(rel.data_fingerprint(a), rel.data_fingerprint(b))
+        self.assertNotEqual(rel.data_fingerprint(a), rel.data_fingerprint(self._cat("2026-11-10T06:40:00Z", "y")))
+        self.assertIn(("SP/limites_trechos.csv", "t"), rel.data_fingerprint(a))
+        self.assertEqual(rel.data_fingerprint(None), set())
+
+    def test_skip_if_same_builds_nothing(self):
+        with tempfile.TemporaryDirectory() as repo:
+            with open(os.path.join(repo, "catalogo.json"), "w") as fh:
+                json.dump(self._cat("2026-11-10T06:40:00Z", "x"), fh)
+            prev = os.path.join(repo, "anterior.json")
+            with open(prev, "w") as fh:
+                json.dump(self._cat("2026-11-09T06:40:00Z", "x"), fh)
+            out = os.path.join(repo, "_out")
+            self.assertEqual(rel.main(["--repo", repo, "--previous", prev, "--out", out, "--skip-if-same"]), 0)
+            self.assertFalse(os.path.exists(out))
+
+    def test_release_only_notes_say_the_repository_is_weekly(self):
+        cat = self._cat("2026-11-10T06:40:00Z", "x")
+        self.assertIn("só nesta release", rel.release_notes(cat, None, [], "u", in_repo=False))
+        self.assertIn("no commit desta versão", rel.release_notes(cat, None, [], "u"))
+
+
 if __name__ == "__main__":
     unittest.main()

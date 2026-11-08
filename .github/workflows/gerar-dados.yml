@@ -2,20 +2,21 @@ name: Gerar dados
 
 # Gera brasil/, estados/ e catalogo.json do zero (fontes oficiais + OpenStreetMap) e publica.
 #
-# Toda semana, aos domingos: às 03:17 e às 09:17 em Brasília, o job "interval" lê a data de
-# geração dos dados publicados (built_at do catalogo.json) e só segue para o build se ela não for
-# de hoje (1 dia, arredondado). Se o primeiro disparo do domingo falhar, o segundo tenta de novo;
-# se os dois falharem, os dados publicados continuam os de antes até o domingo seguinte (ou até um
-# disparo à mão).
+# Todo dia, às 03:17 e às 09:17 em Brasília. O job "interval" só segue para o build se ainda não
+# houve uma execução bem-sucedida deste workflow hoje (UTC): o segundo disparo cobre o primeiro.
+#   - Segunda a sábado: só a release (dados-AAAA-MM-DD), e só se algum arquivo mudou em relação à
+#     última release (sha256; release.py --skip-if-same). Nada vai para o repositório.
+#   - Domingo: commit em brasil/, estados/ e catalogo.json, mais a release (também só com dado novo).
+# O link releases/latest/download/pardal-<UF>.zip traz sempre o dado mais novo (até 1 dia); o
+# repositório, o da semana.
 #
 # Cada fonte atualiza quando dá: a que falha usa a última leitura boa guardada em data/raw/fontes/
 # (datakit/source_cache.py) ou, sem ela, o que a fonte tinha na edição publicada (o checkout do
 # repositório; datakit/edition.py). Vira aviso e não barra a publicação; as outras seguem
-# normalmente. As cópias ficam no cache do Actions, salvo mesmo quando o job falha. O GitHub apaga
-# um cache que fica 7 dias sem uso, então de um domingo para o outro ele pode sumir: aí vale a
-# edição publicada, que está sempre no checkout.
+# normalmente. As cópias ficam no cache do Actions, salvo mesmo quando o job falha (o GitHub apaga
+# um cache que fica 7 dias sem uso; com o build diário, não chega a isso).
 # Os horários ficam fora da hora cheia de propósito: é quando o GitHub mais atrasa ou pula os
-# disparos agendados (o das 06:00 UTC de 01/10/2026 não aconteceu). São dois no domingo porque um
+# disparos agendados (o das 06:00 UTC de 01/10/2026 não aconteceu). São dois por dia porque um
 # disparo pulado não avisa ninguém: o segundo cobre o primeiro e, se o primeiro já publicou, só
 # confere a data e para.
 #
@@ -44,12 +45,12 @@ name: Gerar dados
 
 on:
   schedule:
-    - cron: "17 6 * * 0"    # domingo, 03:17 em Brasília
-    - cron: "17 12 * * 0"   # e 09:17 em Brasília, caso o primeiro seja pulado ou falhe
+    - cron: "17 6 * * *"    # todo dia, 03:17 em Brasília (domingo: também o commit)
+    - cron: "17 12 * * *"   # e 09:17 em Brasília, caso o primeiro seja pulado ou falhe
   workflow_dispatch:
     inputs:
       publish:
-        description: "Publicar os dados (commit no repositório). Sem marcar: só gera e confere."
+        description: "Publicar os dados (commit no repositório e release). Sem marcar: só gera e confere."
         type: boolean
         default: false
       accept_failures:
@@ -63,6 +64,7 @@ on:
 
 permissions:
   contents: write
+  actions: read      # o job "interval" lista as execuções de hoje
 
 concurrency:
   group: gerar-dados
@@ -71,38 +73,33 @@ concurrency:
 jobs:
   interval:
     # O agendamento só vale no repositório do projeto: um fork com o Actions ligado não gera nem publica
-    # sozinho (leria a data dos dados daqui e não tem o segredo do túnel). À mão, gera onde for disparado.
-    if: github.event_name != 'schedule' || github.repository == 'Murkiriel/pardal'
+    # sozinho (não tem o segredo do túnel). À mão, gera onde for disparado. (A comparação de nomes nas
+    # expressões do GitHub ignora maiúsculas: o repositório hoje é murkiriel/pardal.)
+    if: github.event_name != 'schedule' || github.repository == 'murkiriel/pardal'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
-      run: ${{ steps.age.outputs.run }}
+      run: ${{ steps.today.outputs.run }}
     steps:
-      - name: Idade dos dados publicados
-        id: age
+      - name: Já gerou hoje?
+        id: today
         env:
-          INTERVAL_DAYS: "1"
+          GH_TOKEN: ${{ github.token }}
           EVENT: ${{ github.event_name }}
+          RUN_ID: ${{ github.run_id }}
         run: |
           if [ "$EVENT" != "schedule" ]; then
             echo "disparado à mão: gera"; echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
-          built=""
-          for name in catalogo.json catalog.json; do   # catalog.json: nome antigo, enquanto existir
-            built=$(curl -sf "https://raw.githubusercontent.com/Murkiriel/pardal/main/$name" \
-                    | python3 -c 'import json,sys; print(json.load(sys.stdin)["built_at"])' 2>/dev/null) && break || built=""
-          done
-          if [ -z "$built" ]; then
-            echo "sem a data dos dados publicados: gera"; echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
-          fi
-          # dias arredondados: o horário do build não empurra a geração para o dia seguinte
-          days=$(( ( $(date -u +%s) - $(date -u -d "$built" +%s) + 43200 ) / 86400 ))
-          echo "dados publicados gerados em $built ($days dias)"
-          if [ "$days" -ge "$INTERVAL_DAYS" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
+          today=$(date -u +%F)
+          # execuções deste workflow que terminaram bem hoje (fora esta); sem resposta da API, gera
+          n=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gerar-dados.yml --status success \
+                --created ">=$today" --limit 20 --json databaseId \
+                --jq "[.[] | select(.databaseId != $RUN_ID)] | length" 2>/dev/null || echo 0)
+          if [ "${n:-0}" -gt 0 ]; then
+            echo "run=false" >> "$GITHUB_OUTPUT"; echo "já houve uma geração bem-sucedida hoje ($today)"
           else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "ainda não: gera quando completar $INTERVAL_DAYS dias"
+            echo "run=true" >> "$GITHUB_OUTPUT"; echo "ainda não gerou hoje ($today): gera"
           fi
 
   generate:
@@ -112,6 +109,7 @@ jobs:
     timeout-minutes: 240
     env:
       PUBLISH: ${{ github.event_name == 'schedule' || inputs.publish == true }}
+      EVENT: ${{ github.event_name }}
       ACCEPT_FAILURES: ${{ inputs.accept_failures == true }}
       ACCEPT_DROP: ${{ inputs.accept_drop == true }}
       TUNNEL_HOSTS: servicos.dnit.gov.br servicos.rbmlq.gov.br dados.antt.gov.br am.i.mullvad.net
@@ -120,7 +118,7 @@ jobs:
       - name: Código e dados publicados
         uses: actions/checkout@v7
         with:
-          repository: Murkiriel/pardal
+          repository: murkiriel/pardal
           path: pardal
 
       - uses: actions/setup-python@v7
@@ -197,29 +195,35 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp ../catalogo.json "$RUNNER_TEMP/catalogo_anterior.json" 2>/dev/null \
-            || cp ../catalog.json "$RUNNER_TEMP/catalogo_anterior.json"
-          if [ "$PUBLISH" = "true" ] && [ "$GITHUB_REPOSITORY" = "Murkiriel/pardal" ]; then
+          # a geração anterior: a da última release (sai todo dia com dado novo); sem release, a do repositório
+          prev="$RUNNER_TEMP/catalogo_anterior.json"
+          curl -sfL "https://github.com/$GITHUB_REPOSITORY/releases/latest/download/catalogo.json" -o "$prev" \
+            || cp ../catalogo.json "$prev" 2>/dev/null || cp ../catalog.json "$prev"
+          flags=""
+          [ "$ACCEPT_FAILURES" = "true" ] && flags="$flags --accept-failures"
+          [ "$ACCEPT_DROP" = "true" ] && flags="$flags --accept-drop"
+          repo_lc=$(echo "$GITHUB_REPOSITORY" | tr '[:upper:]' '[:lower:]')
+          if [ "$PUBLISH" != "true" ] || [ "$repo_lc" != "murkiriel/pardal" ]; then
+            python scripts/publish.py $flags
+            python scripts/release.py --previous "$prev" --warnings data/dist/catalogo.json
+            echo "Conferido e montado; sem publicar (publish=$PUBLISH, repositório=$GITHUB_REPOSITORY)."
+          elif [ "$EVENT" = "schedule" ] && [ "$(date -u +%u)" != "7" ]; then
+            # segunda a sábado: monta na cópia de trabalho (sem commit) e cria só a release, se houver dado novo
+            python scripts/publish.py $flags
+            python scripts/release.py --previous "$prev" --warnings data/dist/catalogo.json \
+              --release-only --skip-if-same --create
+          else
+            # domingo (ou à mão com publish): commit no repositório e release
             git -C .. config user.name "Murkiriel"
             git -C .. config user.email "14956419+Murkiriel@users.noreply.github.com"
             head_before=$(git -C .. rev-parse HEAD)
-            flags=""
-            [ "$ACCEPT_FAILURES" = "true" ] && flags="$flags --accept-failures"
-            [ "$ACCEPT_DROP" = "true" ] && flags="$flags --accept-drop"
             python scripts/publish.py --commit --push $flags
             if [ "$(git -C .. rev-parse HEAD)" != "$head_before" ]; then
-              python scripts/release.py --previous "$RUNNER_TEMP/catalogo_anterior.json" \
-                --warnings data/dist/catalogo.json --create
+              python scripts/release.py --previous "$prev" --warnings data/dist/catalogo.json \
+                --skip-if-same --create
             else
-              echo "Nada mudou nos dados: sem commit e sem release."
+              echo "Nada mudou nos dados do repositório: sem commit e sem release."
             fi
-          else
-            flags=""
-            [ "$ACCEPT_FAILURES" = "true" ] && flags="$flags --accept-failures"
-            [ "$ACCEPT_DROP" = "true" ] && flags="$flags --accept-drop"
-            python scripts/publish.py $flags
-            python scripts/release.py --previous "$RUNNER_TEMP/catalogo_anterior.json" --warnings data/dist/catalogo.json
-            echo "Conferido e montado; sem publicar (publish=$PUBLISH, repositório=$GITHUB_REPOSITORY)."
           fi
 
       - name: Desliga o túnel

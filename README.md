@@ -114,7 +114,7 @@ orientação) não entra: se há duas linhas na mesma via, a oficial vale. Uma l
 dois pacotes. Não há versão do Brasil inteiro (somados os estados, ~172 MB; o maior estado, Minas Gerais, tem ~31 MB).
 
 **Onde baixar:** o `limites_trechos.csv` **não fica no repositório** (seriam ~172 MB mudando a cada geração). Ele vai só no zip de
-cada estado da release semanal: `https://github.com/Murkiriel/pardal/releases/latest/download/pardal-<UF>.zip`, dentro dele
+cada estado da release (sai todo dia com dado novo): `https://github.com/Murkiriel/pardal/releases/latest/download/pardal-<UF>.zip`, dentro dele
 `<UF>/limites_trechos.csv` (comprimido, SP cai de 29 MB para ~6 MB). No `catalogo.json`, a entrada `limit_lines` de cada estado
 traz `release_asset` (o nome do zip), `asset_path` (o caminho dentro dele) e `bytes`, `sha256` e `count` do CSV
 descompactado, para conferir depois de extrair (pacote no schema 10).
@@ -352,11 +352,13 @@ O **código** (pasta `gerador/` e `scripts/`) é MIT ([`gerador/LICENSE`](gerado
 
 ## Atualização
 
-O conjunto é gerado de novo toda semana, aos domingos. Arquivo que passaria dos 100 MB que o
+O conjunto é gerado de novo todo dia. Cada dia com dado novo vira uma release (`dados-AAAA-MM-DD`,
+com os zips; `releases/latest/download/pardal-<UF>.zip` traz sempre a mais nova), e os arquivos do
+repositório (`brasil/`, `estados/`, `catalogo.json`) são atualizados aos domingos. Arquivo que passaria dos 100 MB que o
 GitHub aceita sai compactado (`.csv.gz`), e o catálogo aponta para ele. Cada fonte é atualizada
 quando responde; uma fonte fora do
 ar fica com a última leitura boa (ou com o que tinha na edição anterior), e as outras seguem
-normalmente. A data do dado de cada fonte está no campo `source_dates` do `catalogo.json`. Semana sem dado novo não gera commit nem release. A data de cada pacote está no
+normalmente. A data do dado de cada fonte está no campo `source_dates` do `catalogo.json`. Dia sem dado novo não gera release. A data de cada pacote está no
 campo `built_at` do `catalogo.json`.
 
 ## English

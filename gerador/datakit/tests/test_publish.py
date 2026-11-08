@@ -618,4 +618,5 @@ class ForkSchedule(unittest.TestCase):
             text = f.read()
         job = text.split("\n  interval:\n", 1)[1].split("\n  generate:\n", 1)[0]
         guard = [ln.strip() for ln in job.splitlines() if ln.startswith("    if:")]
-        self.assertEqual(guard, ["if: github.event_name != 'schedule' || github.repository == 'Murkiriel/pardal'"])
+        # o repositório passou a murkiriel/pardal (minúsculo); a expressão do GitHub ignora maiúsculas
+        self.assertEqual(guard, ["if: github.event_name != 'schedule' || github.repository == 'murkiriel/pardal'"])

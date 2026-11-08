@@ -2,6 +2,11 @@
 
     python scripts/release.py --previous catalogo_antes.json            # só monta (em data/release/)
     python scripts/release.py --previous catalogo_antes.json --create    # monta e cria a release (gh)
+    ... --release-only --skip-if-same    # dia sem commit: só a release, e só se os dados mudaram
+
+Os dados vão para a release todo dia que houver dado novo, e para o repositório só aos domingos
+(.github/workflows/gerar-dados.yml). --skip-if-same compara os sha256 dos arquivos com os do
+catálogo de --previous (o da última release) e não cria nada se forem os mesmos.
 
 Roda depois do publish.py --commit: os pacotes saem dos arquivos já publicados (brasil/,
 estados/, catalogo.json na raiz do repositório), mais os que vão só na release
@@ -25,7 +30,7 @@ import os
 import subprocess
 import sys
 import zipfile
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Set, Tuple
 
 GENERATOR_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(GENERATOR_DIR)
@@ -113,15 +118,39 @@ def tag_for(cat: dict) -> str:
     return "dados-" + str(cat.get("built_at", ""))[:10]
 
 
-def release_notes(cat: dict, previous: Optional[dict], warnings: List[str], repo_url: str) -> str:
+def data_fingerprint(cat: Optional[dict]) -> set:
+    """(arquivo, sha256) de cada arquivo de dado do catálogo (por estado e do Brasil), sem as datas:
+    dois catálogos com a mesma impressão têm exatamente os mesmos dados. Puro, testado."""
+    out: Set[Tuple[str, str]] = set()
+    if not cat:
+        return out
+
+    def add(value) -> None:
+        if isinstance(value, dict) and value.get("sha256"):
+            out.add((value.get("file") or value.get("asset_path") or "", value["sha256"]))
+    for value in cat.values():
+        add(value)
+    for entry in (cat.get("ufs") or {}).values():
+        if isinstance(entry, dict):
+            for value in entry.values():
+                add(value)
+    return out
+
+
+def release_notes(cat: dict, previous: Optional[dict], warnings: List[str], repo_url: str,
+                  in_repo: bool = True) -> str:
     """Texto da release (Markdown): resumo do Brasil, downloads, tabela por estado com a
-    diferença para a geração anterior, avisos. Puro, testado."""
+    diferença para a geração anterior, avisos. `in_repo`: os mesmos arquivos foram para o
+    repositório nesta geração (domingo) ou só para a release (os outros dias). Puro, testado."""
     d = str(cat.get("built_at", ""))
     data = f"{d[8:10]}/{d[5:7]}/{d[0:4]}"
     br, br0 = _counts(cat, "BR"), _counts(previous, "BR")
+    where = ("Os mesmos arquivos estão em `brasil/`, `estados/` e `catalogo.json` no commit desta versão."
+             if in_repo else
+             "Estes dados estão só nesta release: os arquivos do repositório (`brasil/`, `estados/`, "
+             "`catalogo.json`) são atualizados aos domingos.")
     L = [f"Dados gerados em {data} ({d.replace('T', ' ').replace('Z', ' UTC')}) a partir das fontes "
-         "oficiais e do OpenStreetMap. Os mesmos arquivos estão em `brasil/`, `estados/` e "
-         "`catalogo.json` no commit desta versão.", "",
+         f"oficiais e do OpenStreetMap. {where}", "",
          "## Brasil", "",
          "| | Nesta versão |", "|---|---|"]
     for k, rot in (("cameras", "Radares"), ("limits", "Pontos de limite sinalizado"),
@@ -165,6 +194,10 @@ def main(argv=None) -> int:
                     help="saída do build, de onde vêm os arquivos que vão só na release (limites_trechos.csv)")
     ap.add_argument("--create", action="store_true", help="cria a release no GitHub (gh)")
     ap.add_argument("--repo-url", default="https://github.com/Murkiriel/pardal")
+    ap.add_argument("--release-only", action="store_true",
+                    help="dados só na release, sem commit no repositório (dias que não são domingo)")
+    ap.add_argument("--skip-if-same", action="store_true",
+                    help="não monta nem cria nada se os dados forem os mesmos do catálogo de --previous")
     args = ap.parse_args(argv)
 
     with open(_catalog_path(args.repo), encoding="utf-8") as f:
@@ -178,10 +211,13 @@ def main(argv=None) -> int:
         with open(args.warnings, encoding="utf-8-sig") as f:
             warnings = json.load(f).get("warnings") or []
 
+    if args.skip_if_same and previous and data_fingerprint(cat) == data_fingerprint(previous):
+        print("Os dados são os mesmos da geração anterior: sem release.")
+        return 0
     assets = build_assets(args.repo, args.out, args.dist)
     notes_path = os.path.join(args.out, "NOTAS.md")
     with open(notes_path, "w", encoding="utf-8", newline="\n") as f:
-        f.write(release_notes(cat, previous, warnings, args.repo_url))
+        f.write(release_notes(cat, previous, warnings, args.repo_url, in_repo=not args.release_only))
     tag = tag_for(cat)
     d = str(cat.get("built_at", ""))
     title = f"Dados de {d[8:10]}/{d[5:7]}/{d[0:4]}"
