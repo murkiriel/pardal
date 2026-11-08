@@ -1,6 +1,6 @@
 {
  "schema": 2,
- "built_at": "2026-10-06T13:43:38Z",
+ "built_at": "2026-11-08T15:46:58Z",
  "base_url": "",
  "ufs": {
   "AC": {
@@ -11,8 +11,8 @@
     -7.11,
     -66.62
    ],
-   "built_at": "2026-10-06T13:31:16Z",
-   "artifact_built_at": "2026-10-06T13:31:16Z",
+   "built_at": "2026-11-08T15:35:42Z",
+   "artifact_built_at": "2026-11-08T15:35:42Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -27,9 +27,9 @@
    },
    "limits": {
     "file": "estados/AC/limites.csv",
-    "bytes": 249830,
-    "sha256": "5b2864c285e2955ecbc4241070b126f7465ce0f1d86222a1d2551c95e9e11f68",
-    "count": 6683
+    "bytes": 250137,
+    "sha256": "af787fab7b2ac09bba4ea07d61e792689acd1d691f6fe69b42d8da2f5da83cfd",
+    "count": 6692
    },
    "counts": {
     "cameras": 5,
@@ -37,14 +37,53 @@
     "cameras_inactive": 0,
     "sections": 0,
     "red_lights": 0,
-    "limits": 6683,
-    "structs": 387
+    "limits": 6692,
+    "structs": 388,
+    "bumps": 9,
+    "hazards": 0,
+    "tolls": 0,
+    "portable_radar": 7,
+    "potholes": 179,
+    "moto_accidents": 4,
+    "limit_lines": 1420,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/AC/estruturas.csv",
-    "bytes": 19310,
-    "sha256": "f5995a762240bf12eab1d15f9be0659704b48d3677591bf3eb59c9d99b69323c",
-    "count": 387
+    "bytes": 19359,
+    "sha256": "ed0dda382431543ab0221cb3035216059ecc7519075d4756c7f98b409a8dffb7",
+    "count": 388
+   },
+   "bumps": {
+    "file": "estados/AC/lombadas.csv",
+    "bytes": 251,
+    "sha256": "b1f2686fc0ea2bdecfa63f2fbc4a08335f897240b32cb927a15162d31f105bdc",
+    "count": 9
+   },
+   "portable_radar": {
+    "file": "estados/AC/radar_portatil.csv",
+    "bytes": 2335,
+    "sha256": "21d6041df2398606a414534228ade6cc89f8557d55b993cc5b3afd2a351875e6",
+    "count": 7
+   },
+   "potholes": {
+    "file": "estados/AC/buracos.csv",
+    "bytes": 24813,
+    "sha256": "6b16c6aabf3ea891d38bad209d9cdab1122521dafb725586aefd09605e1e2cc3",
+    "count": 179
+   },
+   "moto_accidents": {
+    "file": "estados/AC/acidentes_moto.csv",
+    "bytes": 711,
+    "sha256": "0918294981d444880d50962e1b666e2bb0cc2d034d1d573bc94667e995eaa8ea",
+    "count": 4
+   },
+   "limit_lines": {
+    "bytes": 342041,
+    "sha256": "f0cf1d6bcd5e97f466a786c021658a7cf0b46039019bfaea8e06963cfea75845",
+    "count": 1420,
+    "release_asset": "pardal-AC.zip",
+    "asset_path": "AC/limites_trechos.csv"
    }
   },
   "AL": {
@@ -55,8 +94,8 @@
     -8.81,
     -35.15
    ],
-   "built_at": "2026-10-06T13:29:16Z",
-   "artifact_built_at": "2026-10-06T13:29:16Z",
+   "built_at": "2026-11-08T15:33:57Z",
+   "artifact_built_at": "2026-11-08T15:33:57Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -72,9 +111,9 @@
    },
    "limits": {
     "file": "estados/AL/limites.csv",
-    "bytes": 981298,
-    "sha256": "80cbe27505b2b1f6af83777fe6aceb50e389113155ec87bd2924e0732c9701d5",
-    "count": 25518
+    "bytes": 983427,
+    "sha256": "b5b009140331bdf373719bc3fc7438c9aef5b337923e251cd1be1595ebbec056",
+    "count": 25572
    },
    "counts": {
     "cameras": 98,
@@ -82,14 +121,59 @@
     "cameras_inactive": 6,
     "sections": 0,
     "red_lights": 0,
-    "limits": 25518,
-    "structs": 940
+    "limits": 25572,
+    "structs": 941,
+    "bumps": 1067,
+    "hazards": 278,
+    "tolls": 0,
+    "portable_radar": 38,
+    "potholes": 29,
+    "moto_accidents": 4,
+    "limit_lines": 5887,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/AL/estruturas.csv",
-    "bytes": 46267,
-    "sha256": "ca40da5d71008b0de63a6ad25a24debc54dd621e7a53583181ea5018a8984f29",
-    "count": 940
+    "bytes": 46316,
+    "sha256": "aa73cbd7be77aa88d6a34d5f0443bfed2d19c661c77186ad811f80679061165a",
+    "count": 941
+   },
+   "bumps": {
+    "file": "estados/AL/lombadas.csv",
+    "bytes": 27818,
+    "sha256": "c547fb1695253274553479cbd272ae31186a8340123d633a6d9accfc2fdf4652",
+    "count": 1067
+   },
+   "hazards": {
+    "file": "estados/AL/pontos_atencao.csv",
+    "bytes": 9985,
+    "sha256": "821f1ce60db14fee4924cb31209ac5ff1f5fb39d6722e2a4f605a37b5a0a58a5",
+    "count": 278
+   },
+   "portable_radar": {
+    "file": "estados/AL/radar_portatil.csv",
+    "bytes": 13956,
+    "sha256": "00214f17acb49c37c0dfc064da4ca64125c867fb43f84535843da1d432513bb8",
+    "count": 38
+   },
+   "potholes": {
+    "file": "estados/AL/buracos.csv",
+    "bytes": 3791,
+    "sha256": "42229b891d140a948ef6b098fe4cdf82692a9dfa566490d09b0c548a06bd1ec9",
+    "count": 29
+   },
+   "moto_accidents": {
+    "file": "estados/AL/acidentes_moto.csv",
+    "bytes": 475,
+    "sha256": "801bd5a4ab32b73c8e5ea541f94d09249e08d4d13f578b14296ee42dd10dd6fe",
+    "count": 4
+   },
+   "limit_lines": {
+    "bytes": 1796634,
+    "sha256": "052f607733a10a20d1eba263598c1ea475a865db35d95350d3356698ab7d5f98",
+    "count": 5887,
+    "release_asset": "pardal-AL.zip",
+    "asset_path": "AL/limites_trechos.csv"
    }
   },
   "AM": {
@@ -100,8 +184,8 @@
     2.25,
     -56.1
    ],
-   "built_at": "2026-10-06T13:31:21Z",
-   "artifact_built_at": "2026-10-06T13:31:21Z",
+   "built_at": "2026-11-08T15:35:45Z",
+   "artifact_built_at": "2026-11-08T15:35:45Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -118,9 +202,9 @@
    },
    "limits": {
     "file": "estados/AM/limites.csv",
-    "bytes": 755802,
-    "sha256": "8aa91b8b32e787c941b0a3b9536943f4451bfe797fc9327b34556a6a740f8ac6",
-    "count": 20487
+    "bytes": 755074,
+    "sha256": "336b018eb23693d3b41aecded73dbf4c7306ddc4f70f42737792be72ea645975",
+    "count": 20464
    },
    "counts": {
     "cameras": 22,
@@ -128,14 +212,53 @@
     "cameras_inactive": 2,
     "sections": 0,
     "red_lights": 0,
-    "limits": 20487,
-    "structs": 672
+    "limits": 20464,
+    "structs": 677,
+    "bumps": 208,
+    "hazards": 5,
+    "tolls": 0,
+    "portable_radar": 12,
+    "potholes": 37,
+    "moto_accidents": 0,
+    "limit_lines": 4104,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/AM/estruturas.csv",
-    "bytes": 32943,
-    "sha256": "f55fb251474ebc5431c930e2212639860df0dd38629789d035583b65c8a3075b",
-    "count": 672
+    "bytes": 33188,
+    "sha256": "1807112dc86ffd2e3bec624096242aa828fe5ad1b6059b69ef14f83f86376566",
+    "count": 677
+   },
+   "bumps": {
+    "file": "estados/AM/lombadas.csv",
+    "bytes": 5516,
+    "sha256": "2af52ddb9fdeddaea89abe61c765ad0e6ec7ee8a64b17cd081dd78df0f7c563e",
+    "count": 208
+   },
+   "hazards": {
+    "file": "estados/AM/pontos_atencao.csv",
+    "bytes": 167,
+    "sha256": "ade7365fb68d9e129cce1aae570228ed30107beb5c662114efe584305a096d95",
+    "count": 5
+   },
+   "portable_radar": {
+    "file": "estados/AM/radar_portatil.csv",
+    "bytes": 2332,
+    "sha256": "d4d74eb942840ef626f358f33e4f7445acb27034b9193900411e4b2d22f30089",
+    "count": 12
+   },
+   "potholes": {
+    "file": "estados/AM/buracos.csv",
+    "bytes": 5055,
+    "sha256": "01cd964c1d0727a70b76587a11f40f181e9a641c9dd12c6cf4fb8272b1a849ba",
+    "count": 37
+   },
+   "limit_lines": {
+    "bytes": 1044856,
+    "sha256": "8bbfa9f70d11920d36680c8092ea7876349448724ffeba9efb73cd0b3a58170b",
+    "count": 4104,
+    "release_asset": "pardal-AM.zip",
+    "asset_path": "AM/limites_trechos.csv"
    }
   },
   "AP": {
@@ -146,8 +269,8 @@
     4.44,
     -49.87
    ],
-   "built_at": "2026-10-06T13:31:22Z",
-   "artifact_built_at": "2026-10-06T13:31:22Z",
+   "built_at": "2026-11-08T15:35:46Z",
+   "artifact_built_at": "2026-11-08T15:35:46Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -157,30 +280,75 @@
    },
    "cameras": {
     "file": "estados/AP/radares.csv",
-    "bytes": 562,
-    "sha256": "9d6427662182f3b54c609644037972a9bc9ac3bfda95ad3c3a4c83d0105d7682",
-    "count": 12
+    "bytes": 478,
+    "sha256": "f5d538d5afb197757bd80bec3e23526815ca30b73c8b2cb6ee0b4e64982414bc",
+    "count": 10
    },
    "limits": {
     "file": "estados/AP/limites.csv",
-    "bytes": 191540,
-    "sha256": "c92bb12ebd8c3a14bd8bae7526d1b457393dac685b73dce8b4b000938c0b90c1",
-    "count": 4926
+    "bytes": 192730,
+    "sha256": "84899b50765b0926ea7e9b69f75c2e5dc2d87fef5ff4d8ee9ac41244f123f06c",
+    "count": 4957
    },
    "counts": {
-    "cameras": 12,
-    "cameras_with_limit": 12,
+    "cameras": 10,
+    "cameras_with_limit": 10,
     "cameras_inactive": 0,
     "sections": 0,
     "red_lights": 0,
-    "limits": 4926,
-    "structs": 169
+    "limits": 4957,
+    "structs": 170,
+    "bumps": 2,
+    "hazards": 45,
+    "tolls": 0,
+    "portable_radar": 28,
+    "potholes": 25,
+    "moto_accidents": 2,
+    "limit_lines": 771,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/AP/estruturas.csv",
-    "bytes": 8036,
-    "sha256": "d79ccef18e175aa81af3e55b00302f731a071a92e02f1871249181ca88657432",
-    "count": 169
+    "bytes": 8083,
+    "sha256": "be540eeef6a1ecac45119ae0bd7a31afc26aea10d06b1952237d228a8bff3c14",
+    "count": 170
+   },
+   "bumps": {
+    "file": "estados/AP/lombadas.csv",
+    "bytes": 66,
+    "sha256": "596bb0ebf37ddb311050fc92113097003bd440e2cdcca8f72386eb42cef1a1ec",
+    "count": 2
+   },
+   "hazards": {
+    "file": "estados/AP/pontos_atencao.csv",
+    "bytes": 1598,
+    "sha256": "7a38d1d91ae9df4a451a992d742dc3afe74c812362594222d7ecf610f249e5d3",
+    "count": 45
+   },
+   "portable_radar": {
+    "file": "estados/AP/radar_portatil.csv",
+    "bytes": 10304,
+    "sha256": "6fb3f2ac027f1a80524526d086a23dfb04f6278fd8d837afc1e456c9bf509ce6",
+    "count": 28
+   },
+   "potholes": {
+    "file": "estados/AP/buracos.csv",
+    "bytes": 3128,
+    "sha256": "618e7ff4812938ca52629a1ff846d5243ec985ad138faaae7736e4c8501246d2",
+    "count": 25
+   },
+   "moto_accidents": {
+    "file": "estados/AP/acidentes_moto.csv",
+    "bytes": 306,
+    "sha256": "a6a2282215a4f9b32e255910d9f671aea9b2a399e843a86d26a1bdd47158e6fa",
+    "count": 2
+   },
+   "limit_lines": {
+    "bytes": 228942,
+    "sha256": "a1adfe8f4628d1e4b88ffdbba2f79cef8cddd32e1e24bc54d7f62c8239890a7e",
+    "count": 771,
+    "release_asset": "pardal-AP.zip",
+    "asset_path": "AP/limites_trechos.csv"
    }
   },
   "BA": {
@@ -191,43 +359,96 @@
     -8.53,
     -37.34
    ],
-   "built_at": "2026-10-06T13:29:41Z",
-   "artifact_built_at": "2026-10-06T13:29:41Z",
+   "built_at": "2026-11-08T15:34:12Z",
+   "artifact_built_at": "2026-11-08T15:34:12Z",
    "coverage": {
-    "level": "federal",
+    "level": "federal+state+municipal",
     "sources": [
      "ANTT",
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "SEINFRA-BA",
+     "TRANSALVADOR"
     ]
    },
    "cameras": {
     "file": "estados/BA/radares.csv",
-    "bytes": 19218,
-    "sha256": "ab1ccef7fc052bb279ab8a577ce095d3fd445751c7d57c105bb3da46b47e106e",
-    "count": 463
+    "bytes": 27034,
+    "sha256": "7d2b40dc51eac1e4cbc7561e4cc5d42eef3f3fd987c80cb903ed6a2a7fadb116",
+    "count": 619
    },
    "limits": {
     "file": "estados/BA/limites.csv",
-    "bytes": 7910444,
-    "sha256": "663c9b329bd5bb892c57625a5f900d5acdbe9796c1945242ce2dbe9f6c0cff98",
-    "count": 202914
+    "bytes": 7911536,
+    "sha256": "5a20fe68678737efafff9ec5b14668011c138a18e7d24841c4beef5ee36f12b9",
+    "count": 202950
    },
    "counts": {
-    "cameras": 463,
-    "cameras_with_limit": 387,
-    "cameras_inactive": 22,
-    "sections": 0,
+    "cameras": 619,
+    "cameras_with_limit": 545,
+    "cameras_inactive": 21,
+    "sections": 1,
     "red_lights": 6,
-    "limits": 202914,
-    "structs": 6243
+    "limits": 202950,
+    "structs": 6280,
+    "bumps": 5466,
+    "hazards": 1238,
+    "tolls": 19,
+    "portable_radar": 249,
+    "potholes": 341,
+    "moto_accidents": 37,
+    "limit_lines": 34403,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/BA/estruturas.csv",
-    "bytes": 317828,
-    "sha256": "9a6fa0398cd02e6b4e31a81b3832ea16e29eb4453fb0c7f1f0dacdbfe227ff35",
-    "count": 6243
+    "bytes": 319711,
+    "sha256": "2cb3630352127e23541b890a5d150d973289eaa49a2021d0940e66cb7c95bee0",
+    "count": 6280
+   },
+   "bumps": {
+    "file": "estados/BA/lombadas.csv",
+    "bytes": 147808,
+    "sha256": "d39c38d0dde9f567b3f611be5f8e257af664a22359e6feb09a516b6176e1e912",
+    "count": 5466
+   },
+   "hazards": {
+    "file": "estados/BA/pontos_atencao.csv",
+    "bytes": 44791,
+    "sha256": "f465dcac0d9c77eae32a532c60c87a1f4242de59d7bc8693b240b591f4be80ba",
+    "count": 1238
+   },
+   "tolls": {
+    "file": "estados/BA/pedagios.csv",
+    "bytes": 652,
+    "sha256": "0db3747888da53aa65f0b2056ecc1ba642ae081080311764e6916cac046185e1",
+    "count": 19
+   },
+   "portable_radar": {
+    "file": "estados/BA/radar_portatil.csv",
+    "bytes": 76883,
+    "sha256": "265c6ecd303e39d730c40d45ecd422b5395462ffca27a41f2bec2aac07a0f669",
+    "count": 249
+   },
+   "potholes": {
+    "file": "estados/BA/buracos.csv",
+    "bytes": 45618,
+    "sha256": "781574457352c17b8885a72b21d8f9be051f02108692fa9c1cf03224e3a9b2ad",
+    "count": 341
+   },
+   "moto_accidents": {
+    "file": "estados/BA/acidentes_moto.csv",
+    "bytes": 5519,
+    "sha256": "f309b21527220032c5b9dd43b8ebd1b0a6e074cceb90efa197138561a9fa069c",
+    "count": 37
+   },
+   "limit_lines": {
+    "bytes": 13344273,
+    "sha256": "e989ea229627c1343bb86d00067e00e54295f8a62aa68ff28aceb0a1aeb52d23",
+    "count": 34403,
+    "release_asset": "pardal-BA.zip",
+    "asset_path": "BA/limites_trechos.csv"
    }
   },
   "CE": {
@@ -238,8 +459,8 @@
     -2.78,
     -37.25
    ],
-   "built_at": "2026-10-06T13:29:56Z",
-   "artifact_built_at": "2026-10-06T13:29:56Z",
+   "built_at": "2026-11-08T15:34:23Z",
+   "artifact_built_at": "2026-11-08T15:34:23Z",
    "coverage": {
     "level": "federal+municipal",
     "sources": [
@@ -251,30 +472,75 @@
    },
    "cameras": {
     "file": "estados/CE/radares.csv",
-    "bytes": 32222,
-    "sha256": "53ae7fb2aea2d770e318b6474651559e1985281ef1152f06edf7cde2d482e5eb",
-    "count": 770
+    "bytes": 32241,
+    "sha256": "25f2673aa5b0facb041c5966f05a725e5a2e2e7f76617325e65bc42b1ffa6b1e",
+    "count": 771
    },
    "limits": {
     "file": "estados/CE/limites.csv",
-    "bytes": 2575355,
-    "sha256": "0f91d343d2ad18a078816bc97e6a5644e278bed7c84ee1cc8f2b5a3ff35d46ec",
-    "count": 68756
+    "bytes": 2582575,
+    "sha256": "bf0d21731e7026478799314551894b06d5c570e5976fc2ec59d8a1c32f85f628",
+    "count": 68981
    },
    "counts": {
-    "cameras": 770,
-    "cameras_with_limit": 524,
-    "cameras_inactive": 12,
-    "sections": 53,
+    "cameras": 771,
+    "cameras_with_limit": 528,
+    "cameras_inactive": 14,
+    "sections": 51,
     "red_lights": 114,
-    "limits": 68756,
-    "structs": 3173
+    "limits": 68981,
+    "structs": 3185,
+    "bumps": 1876,
+    "hazards": 1227,
+    "tolls": 0,
+    "portable_radar": 73,
+    "potholes": 214,
+    "moto_accidents": 10,
+    "limit_lines": 15846,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/CE/estruturas.csv",
-    "bytes": 155502,
-    "sha256": "6e6709bf64feae1e77cf13314a96af767aba839e024ce9c163b52844b67ed0c6",
-    "count": 3173
+    "bytes": 156090,
+    "sha256": "b77447c324d029ad19494e53474961a4a4b6c8e0534f54e51d4b5cb72bc7b9e0",
+    "count": 3185
+   },
+   "bumps": {
+    "file": "estados/CE/lombadas.csv",
+    "bytes": 49476,
+    "sha256": "a7c1e26df90fe935fd886c92723b6931101a557af19d418c700e03d49a2737e4",
+    "count": 1876
+   },
+   "hazards": {
+    "file": "estados/CE/pontos_atencao.csv",
+    "bytes": 43694,
+    "sha256": "a8c7d7d58912507896b3573c37b29ed42c7f9fdf6c28e326ef07e62e91507e51",
+    "count": 1227
+   },
+   "portable_radar": {
+    "file": "estados/CE/radar_portatil.csv",
+    "bytes": 18902,
+    "sha256": "037153236bbc0f32cd9d7e142ce5d34be1be0048200123e5a29a23e67979ab9b",
+    "count": 73
+   },
+   "potholes": {
+    "file": "estados/CE/buracos.csv",
+    "bytes": 29653,
+    "sha256": "14172d4fa73026a5603658eaaaab0ae0fb5689054a35f9d8fe0933c59b5b5324",
+    "count": 214
+   },
+   "moto_accidents": {
+    "file": "estados/CE/acidentes_moto.csv",
+    "bytes": 1401,
+    "sha256": "e0fe01dd2cb2d0ac77d68e0e4e333b4bf2bed76d9bcaa429b20242e8284193cf",
+    "count": 10
+   },
+   "limit_lines": {
+    "bytes": 4423798,
+    "sha256": "dd9af45449b68937ffa3cdad4a359cb0a7bfe872fab472bfd792f265195448f5",
+    "count": 15846,
+    "release_asset": "pardal-CE.zip",
+    "asset_path": "CE/limites_trechos.csv"
    }
   },
   "DF": {
@@ -285,8 +551,8 @@
     -15.5,
     -47.31
    ],
-   "built_at": "2026-10-06T13:25:39Z",
-   "artifact_built_at": "2026-10-06T13:25:39Z",
+   "built_at": "2026-11-08T15:30:11Z",
+   "artifact_built_at": "2026-11-08T15:30:11Z",
    "coverage": {
     "level": "federal+state",
     "sources": [
@@ -304,9 +570,9 @@
    },
    "limits": {
     "file": "estados/DF/limites.csv",
-    "bytes": 973782,
-    "sha256": "f2454be80220c0b90c8fbf4866dcff053dc89becea55bfed08ee6c33f08d2f65",
-    "count": 26992
+    "bytes": 975127,
+    "sha256": "7cc65df96b19ce14895e2f28e4ec160d4ac220e07783f056509b19258f55c919",
+    "count": 27025
    },
    "counts": {
     "cameras": 2493,
@@ -314,14 +580,59 @@
     "cameras_inactive": 0,
     "sections": 0,
     "red_lights": 0,
-    "limits": 26992,
-    "structs": 728
+    "limits": 27025,
+    "structs": 735,
+    "bumps": 972,
+    "hazards": 38,
+    "tolls": 0,
+    "portable_radar": 17,
+    "potholes": 3,
+    "moto_accidents": 16,
+    "limit_lines": 11415,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/DF/estruturas.csv",
-    "bytes": 37153,
-    "sha256": "f32330210762e6bfdcc715e61874995c27a8a0b31f7b48bf59014f3bab496545",
-    "count": 728
+    "bytes": 37510,
+    "sha256": "5272721261033d843b1114b977aa99850d19b02ccc46e3cbb2bbda284b8bcc50",
+    "count": 735
+   },
+   "bumps": {
+    "file": "estados/DF/lombadas.csv",
+    "bytes": 26292,
+    "sha256": "7cffad5a59b323ba16bfd79798d87edd86fba0ace76f714ad9a5ce885a3a7d6f",
+    "count": 972
+   },
+   "hazards": {
+    "file": "estados/DF/pontos_atencao.csv",
+    "bytes": 1411,
+    "sha256": "de2ee846bb13e5dad1f2e64a7bdce6f06f69f7d657155c6c783ee852e0254330",
+    "count": 38
+   },
+   "portable_radar": {
+    "file": "estados/DF/radar_portatil.csv",
+    "bytes": 4249,
+    "sha256": "d47ee091aba7761797e74f251109f11cc44c11fe08bd70cb1b0956b74b71493d",
+    "count": 17
+   },
+   "potholes": {
+    "file": "estados/DF/buracos.csv",
+    "bytes": 392,
+    "sha256": "601486d71d028eeb1ff9c22e434af6409d627038ff2b1cabb26e0976df8a29f2",
+    "count": 3
+   },
+   "moto_accidents": {
+    "file": "estados/DF/acidentes_moto.csv",
+    "bytes": 1895,
+    "sha256": "953f17f1f5c0fc12057725e271861813097775d07d6ead3218676f9a0787f37e",
+    "count": 16
+   },
+   "limit_lines": {
+    "bytes": 1696147,
+    "sha256": "db8c32a3758d2baccfa92c233d34c0297c68d5efb4813f3c40c15b8c7f8b05d4",
+    "count": 11415,
+    "release_asset": "pardal-DF.zip",
+    "asset_path": "DF/limites_trechos.csv"
    }
   },
   "ES": {
@@ -332,8 +643,8 @@
     -17.89,
     -39.66
    ],
-   "built_at": "2026-10-06T13:36:19Z",
-   "artifact_built_at": "2026-10-06T13:36:19Z",
+   "built_at": "2026-11-08T15:40:58Z",
+   "artifact_built_at": "2026-11-08T15:40:58Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -345,30 +656,81 @@
    },
    "cameras": {
     "file": "estados/ES/radares.csv",
-    "bytes": 13561,
-    "sha256": "ddcd8a01823d33b4d6626dbfb1ab8b7c37934b66b2eaa050bcb79522710d3af2",
-    "count": 319
+    "bytes": 13643,
+    "sha256": "27e899cd02f248ba84e4fb7a1389c51bde2eab9449afdc71cc481df4f6885c34",
+    "count": 321
    },
    "limits": {
     "file": "estados/ES/limites.csv",
-    "bytes": 4089166,
-    "sha256": "35f23d05d9debc724defe31b6d8bb24b94d7a6f67a61079c533b5b2e5cfc0ff1",
-    "count": 114540
+    "bytes": 4094119,
+    "sha256": "f7ff59fc923eefbb58bd1469d1e80626ce354a46e5133df1c0803025ed3b05e6",
+    "count": 114665
    },
    "counts": {
-    "cameras": 319,
-    "cameras_with_limit": 274,
-    "cameras_inactive": 36,
+    "cameras": 321,
+    "cameras_with_limit": 273,
+    "cameras_inactive": 96,
     "sections": 5,
     "red_lights": 4,
-    "limits": 114540,
-    "structs": 7329
+    "limits": 114665,
+    "structs": 7348,
+    "bumps": 2094,
+    "hazards": 726,
+    "tolls": 7,
+    "portable_radar": 54,
+    "potholes": 52,
+    "moto_accidents": 29,
+    "limit_lines": 21492,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/ES/estruturas.csv",
-    "bytes": 373804,
-    "sha256": "144ffc39524b1049307fa2866b2d02670ab76b25788074132e941d24442f2a83",
-    "count": 7329
+    "bytes": 374773,
+    "sha256": "536ef0e2bc3360fc9bc914d3119e5b46909ca6aa7329074901b02a81f172b61c",
+    "count": 7348
+   },
+   "bumps": {
+    "file": "estados/ES/lombadas.csv",
+    "bytes": 56674,
+    "sha256": "c6f50591e61c76c6bcb2466c8e076b2a59bb4df49ae7a14e88b1b045a4389c53",
+    "count": 2094
+   },
+   "hazards": {
+    "file": "estados/ES/pontos_atencao.csv",
+    "bytes": 25886,
+    "sha256": "abf0facc3f59e549045551beb41f1ed43cce64c5ce0542c5b14fa8d5ad391699",
+    "count": 726
+   },
+   "tolls": {
+    "file": "estados/ES/pedagios.csv",
+    "bytes": 367,
+    "sha256": "e570338479efdc7ef125caab5869a7ecbdd62f8f5ab283ed175fd2366fa9d7a2",
+    "count": 7
+   },
+   "portable_radar": {
+    "file": "estados/ES/radar_portatil.csv",
+    "bytes": 29612,
+    "sha256": "517357fe073393e06c87449639c615936d636e7f26b86b1f0a68ee76a744b77c",
+    "count": 54
+   },
+   "potholes": {
+    "file": "estados/ES/buracos.csv",
+    "bytes": 11485,
+    "sha256": "6673af743504d52146a26c13b88c2170162d576d73b082da8e6f88a6c5b822da",
+    "count": 52
+   },
+   "moto_accidents": {
+    "file": "estados/ES/acidentes_moto.csv",
+    "bytes": 5853,
+    "sha256": "27fe674e78c262ca71e199e95238af40fee258df36a0b938b127506c7ec8a3e1",
+    "count": 29
+   },
+   "limit_lines": {
+    "bytes": 8477228,
+    "sha256": "47cdbf741dc2926a6f986b5a36d02ff0114c6202dc0b73d01fb61d83d70b09cb",
+    "count": 21492,
+    "release_asset": "pardal-ES.zip",
+    "asset_path": "ES/limites_trechos.csv"
    }
   },
   "GO": {
@@ -379,8 +741,8 @@
     -12.4,
     -45.9
    ],
-   "built_at": "2026-10-06T13:26:01Z",
-   "artifact_built_at": "2026-10-06T13:26:01Z",
+   "built_at": "2026-11-08T15:30:23Z",
+   "artifact_built_at": "2026-11-08T15:30:23Z",
    "coverage": {
     "level": "federal+state",
     "sources": [
@@ -389,35 +751,87 @@
      "DETRAN-DF",
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "PRF"
     ]
    },
    "cameras": {
     "file": "estados/GO/radares.csv",
-    "bytes": 66832,
-    "sha256": "422ee3850f12038cd2ba9ec101136ffd125e3e1013bec295889c76a46255a83d",
-    "count": 1512
+    "bytes": 67170,
+    "sha256": "077d13e953d4f5478179cde11645e31aa259335f9bac749e3763b45bf2c8003f",
+    "count": 1520
    },
    "limits": {
     "file": "estados/GO/limites.csv",
-    "bytes": 4787202,
-    "sha256": "04a804b45d32927341b666187563a8f099e3197b59ad8faad3332e6521565748",
-    "count": 125480
+    "bytes": 4788627,
+    "sha256": "24a9f07bd4abfa66378d98d76f0fdaedb8c52146f9464b1d1c6f36fc1fd9792f",
+    "count": 125525
    },
    "counts": {
-    "cameras": 1512,
-    "cameras_with_limit": 1463,
-    "cameras_inactive": 2,
+    "cameras": 1520,
+    "cameras_with_limit": 1471,
+    "cameras_inactive": 20,
     "sections": 0,
     "red_lights": 0,
-    "limits": 125480,
-    "structs": 4936
+    "limits": 125525,
+    "structs": 4956,
+    "bumps": 937,
+    "hazards": 487,
+    "tolls": 36,
+    "portable_radar": 128,
+    "potholes": 22,
+    "moto_accidents": 28,
+    "limit_lines": 29804,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/GO/estruturas.csv",
-    "bytes": 251761,
-    "sha256": "24c9f5f90e05f6d824ef0e7d7ec720753de03f6b81ae61febba097cbeba6b741",
-    "count": 4936
+    "bytes": 252781,
+    "sha256": "1f9f2055055a14a10d4651ae6074159e1d6fdcd989a8e99857e3d37ddd48526c",
+    "count": 4956
+   },
+   "bumps": {
+    "file": "estados/GO/lombadas.csv",
+    "bytes": 25364,
+    "sha256": "721ec82c39b5e4acc370b5e6fb3969346b977a4bb7f2aaf8133edddbed79faa9",
+    "count": 937
+   },
+   "hazards": {
+    "file": "estados/GO/pontos_atencao.csv",
+    "bytes": 17947,
+    "sha256": "dfc4b9ca0294ad84c50576ad34dc6c8b21f81479405e678f29e0cf520eddbaf1",
+    "count": 487
+   },
+   "tolls": {
+    "file": "estados/GO/pedagios.csv",
+    "bytes": 1983,
+    "sha256": "46ae6ff72b21845490241b78313fd331130663a7da62d1f3b355e8329b2462c9",
+    "count": 36
+   },
+   "portable_radar": {
+    "file": "estados/GO/radar_portatil.csv",
+    "bytes": 37656,
+    "sha256": "d5da8513b739231fef591f08fe94757c205b707b31087401cf137af9619245ce",
+    "count": 128
+   },
+   "potholes": {
+    "file": "estados/GO/buracos.csv",
+    "bytes": 2694,
+    "sha256": "5b90377945961181c3fbf917410b5bd47975c38bf6c923ff1b0d92c737c50f92",
+    "count": 22
+   },
+   "moto_accidents": {
+    "file": "estados/GO/acidentes_moto.csv",
+    "bytes": 4166,
+    "sha256": "fba830221297067b98faa07813212f8bdbd1d394b156f1b7f850491773c4f6d1",
+    "count": 28
+   },
+   "limit_lines": {
+    "bytes": 6276131,
+    "sha256": "87d2d9d1bb3915a5121d28c711601de1b3139df57dbb4b8583703d03a5ba6257",
+    "count": 29804,
+    "release_asset": "pardal-GO.zip",
+    "asset_path": "GO/limites_trechos.csv"
    }
   },
   "MA": {
@@ -428,11 +842,12 @@
     -1.04,
     -41.8
    ],
-   "built_at": "2026-10-06T13:30:02Z",
-   "artifact_built_at": "2026-10-06T13:30:02Z",
+   "built_at": "2026-11-08T15:34:27Z",
+   "artifact_built_at": "2026-11-08T15:34:27Z",
    "coverage": {
-    "level": "federal",
+    "level": "federal+state",
     "sources": [
+     "DETRAN-MA",
      "DNIT",
      "INMETRO",
      "OSM"
@@ -440,30 +855,75 @@
    },
    "cameras": {
     "file": "estados/MA/radares.csv",
-    "bytes": 5827,
-    "sha256": "b2f17e77934cdee8669613ad4e856964487d9fe396fb745ea3488e3d0ee0c0a5",
-    "count": 145
+    "bytes": 7238,
+    "sha256": "537292d4c45e861e6d9343049291c9a49825b0cba515c85cdcdd57f322ee4d11",
+    "count": 176
    },
    "limits": {
     "file": "estados/MA/limites.csv",
-    "bytes": 2125123,
-    "sha256": "54a2eaa63db706b06a3b2a531e2b24bdb3812e7bd969cc2b985bd83360e81e42",
-    "count": 56181
+    "bytes": 2126754,
+    "sha256": "ac34132dbcaf1d1c23c9e55c1f0e324b07d2d2f35f09d9737751b3e206693501",
+    "count": 56219
    },
    "counts": {
-    "cameras": 145,
-    "cameras_with_limit": 124,
-    "cameras_inactive": 9,
+    "cameras": 176,
+    "cameras_with_limit": 155,
+    "cameras_inactive": 7,
     "sections": 0,
     "red_lights": 0,
-    "limits": 56181,
-    "structs": 1524
+    "limits": 56219,
+    "structs": 1527,
+    "bumps": 847,
+    "hazards": 452,
+    "tolls": 0,
+    "portable_radar": 125,
+    "potholes": 324,
+    "moto_accidents": 15,
+    "limit_lines": 10306,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/MA/estruturas.csv",
-    "bytes": 74701,
-    "sha256": "8a2f97b551faa88db583fde3d73c39e7a245a71e9e077ddd80190c18f38548b2",
-    "count": 1524
+    "bytes": 74848,
+    "sha256": "29636e3475bc9fef2d9fbfff5d6018db9cd98a929833d9944b2b19cbbe1bb65d",
+    "count": 1527
+   },
+   "bumps": {
+    "file": "estados/MA/lombadas.csv",
+    "bytes": 22308,
+    "sha256": "9028e6d0b9364c317f1c1de73841e182778b5dab9d7211485b677e64c4a5a0d4",
+    "count": 847
+   },
+   "hazards": {
+    "file": "estados/MA/pontos_atencao.csv",
+    "bytes": 16220,
+    "sha256": "4b4c2cdd042bfd63f0ab5430b0cdef2650ac8e0a7891fb0f24627e8629ac4944",
+    "count": 452
+   },
+   "portable_radar": {
+    "file": "estados/MA/radar_portatil.csv",
+    "bytes": 25238,
+    "sha256": "1892bb7c67c832a79c11c03e7ee46ca1e950e2ac99382dab429b5ca3fd5c5aae",
+    "count": 125
+   },
+   "potholes": {
+    "file": "estados/MA/buracos.csv",
+    "bytes": 45090,
+    "sha256": "4a7569682501029a785a0b2f859d53241433ca7a0d724984c28249c60837cba5",
+    "count": 324
+   },
+   "moto_accidents": {
+    "file": "estados/MA/acidentes_moto.csv",
+    "bytes": 1862,
+    "sha256": "4045564fda4846288ed39ad4685a859a2bf8adf73a2c1e5b812f38d656b5879f",
+    "count": 15
+   },
+   "limit_lines": {
+    "bytes": 3081342,
+    "sha256": "6923b199f3a0055657666d1f576f02760976e9ad7124aafbebfc7a0a0abc5d31",
+    "count": 10306,
+    "release_asset": "pardal-MA.zip",
+    "asset_path": "MA/limites_trechos.csv"
    }
   },
   "MG": {
@@ -474,44 +934,103 @@
     -14.23,
     -39.86
    ],
-   "built_at": "2026-10-06T13:37:39Z",
-   "artifact_built_at": "2026-10-06T13:37:39Z",
+   "built_at": "2026-11-08T15:41:47Z",
+   "artifact_built_at": "2026-11-08T15:41:47Z",
    "coverage": {
-    "level": "federal+municipal",
+    "level": "federal+state+municipal",
     "sources": [
      "ANTT",
      "BHTRANS",
+     "DER-MG",
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "PRF"
     ]
    },
    "cameras": {
     "file": "estados/MG/radares.csv",
-    "bytes": 79107,
-    "sha256": "f5d639d4c051e5e89b3755c186c8a084b51c0162be27bf6b9550895a57290762",
-    "count": 1868
+    "bytes": 102984,
+    "sha256": "92c56da9be3a074d0e4c7275c1a7028130ed9658c73de4f152bc4d80df74b224",
+    "count": 2421
    },
    "limits": {
     "file": "estados/MG/limites.csv",
-    "bytes": 15484622,
-    "sha256": "d9960a7f49e9117d0972f638f856c566fcf8860daaa85df25b17f8837d89f2f6",
-    "count": 416133
+    "bytes": 15510961,
+    "sha256": "f3a1ca57b55de2c6736a694dcdc6c8ddad16d8527bc01b2188955f0a38476fa5",
+    "count": 416902
    },
    "counts": {
-    "cameras": 1868,
-    "cameras_with_limit": 1491,
-    "cameras_inactive": 18,
+    "cameras": 2421,
+    "cameras_with_limit": 2025,
+    "cameras_inactive": 98,
     "sections": 2,
-    "red_lights": 211,
-    "limits": 416133,
-    "structs": 19723
+    "red_lights": 221,
+    "limits": 416902,
+    "structs": 19775,
+    "bumps": 6136,
+    "hazards": 2483,
+    "tolls": 87,
+    "portable_radar": 334,
+    "potholes": 379,
+    "moto_accidents": 60,
+    "limit_lines": 93197,
+    "enforcement_cameras": 51
    },
    "structs": {
     "file": "estados/MG/estruturas.csv",
-    "bytes": 1005898,
-    "sha256": "7f49ff723d79b8442ca75f2f70cbbed17fe462e5b0bf3e365cea0e789b5510f5",
-    "count": 19723
+    "bytes": 1008550,
+    "sha256": "b27fa5235a5e774963b1bb95c0a3561ea706d97e03edaa10833fdfcea93d02a7",
+    "count": 19775
+   },
+   "bumps": {
+    "file": "estados/MG/lombadas.csv",
+    "bytes": 166564,
+    "sha256": "c28c7639d30277f227c9386ab386b4050d80100e89746603f31ed185396723b0",
+    "count": 6136
+   },
+   "hazards": {
+    "file": "estados/MG/pontos_atencao.csv",
+    "bytes": 90805,
+    "sha256": "89560b707468fc3194168984534cdf6b51cc881354fb7b013c67d63730bae460",
+    "count": 2483
+   },
+   "tolls": {
+    "file": "estados/MG/pedagios.csv",
+    "bytes": 3872,
+    "sha256": "967d8f8b1563197d7a07281bad05c6389beb7f9b46c46052cdce759dc5d50f03",
+    "count": 87
+   },
+   "portable_radar": {
+    "file": "estados/MG/radar_portatil.csv",
+    "bytes": 169457,
+    "sha256": "fdfb6439355736e115d74b022876df2f06765984d2468544b5f24ffd5eba9f18",
+    "count": 334
+   },
+   "potholes": {
+    "file": "estados/MG/buracos.csv",
+    "bytes": 69432,
+    "sha256": "9f175ab447d666f742c71b1802a9124d16cdb9c4b0752709e4b1f52891403b4b",
+    "count": 379
+   },
+   "moto_accidents": {
+    "file": "estados/MG/acidentes_moto.csv",
+    "bytes": 13568,
+    "sha256": "7d8dc800c0417550ae6c504d268ef9f0b36f1629506d1a6620c6c682990d49d2",
+    "count": 60
+   },
+   "limit_lines": {
+    "bytes": 30577949,
+    "sha256": "b1b843269f8a2e2255d8f4d662b57b9cf4146eb8034f55a882e8189cd1425ed9",
+    "count": 93197,
+    "release_asset": "pardal-MG.zip",
+    "asset_path": "MG/limites_trechos.csv"
+   },
+   "enforcement_cameras": {
+    "file": "estados/MG/cameras_fiscalizacao.csv",
+    "bytes": 2294,
+    "sha256": "2342c00f1df9ff33df7a27109e5104aa92bdc995f777b7557c252f87f4f46e19",
+    "count": 51
    }
   },
   "MS": {
@@ -522,43 +1041,95 @@
     -17.16,
     -50.92
    ],
-   "built_at": "2026-10-06T13:26:08Z",
-   "artifact_built_at": "2026-10-06T13:26:08Z",
+   "built_at": "2026-11-08T15:30:29Z",
+   "artifact_built_at": "2026-11-08T15:30:29Z",
    "coverage": {
     "level": "federal",
     "sources": [
      "ANTT",
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "PRF"
     ]
    },
    "cameras": {
     "file": "estados/MS/radares.csv",
-    "bytes": 10228,
-    "sha256": "036b35b2d7b0962e7d263d141d63aef51fff8807716318243c2e4c1f9dbfb28b",
-    "count": 243
+    "bytes": 10436,
+    "sha256": "26bced8df554392f2472407b0698c66bfe88a65ed193396dc3376f6cdc5d7a94",
+    "count": 248
    },
    "limits": {
     "file": "estados/MS/limites.csv",
-    "bytes": 2476983,
-    "sha256": "e2a8c2113c0f5c65bc37ce38b0826bf97ffbca9c6b9aa0926e3b0a053437ca72",
-    "count": 64086
+    "bytes": 2486849,
+    "sha256": "67c2016f9e8de97d0bd1403f15db7edf1ee7f49b9cc0d434e55fa33d6daa4dc2",
+    "count": 64329
    },
    "counts": {
-    "cameras": 243,
-    "cameras_with_limit": 215,
-    "cameras_inactive": 16,
+    "cameras": 248,
+    "cameras_with_limit": 228,
+    "cameras_inactive": 19,
     "sections": 0,
     "red_lights": 0,
-    "limits": 64086,
-    "structs": 2280
+    "limits": 64329,
+    "structs": 2286,
+    "bumps": 2293,
+    "hazards": 598,
+    "tolls": 20,
+    "portable_radar": 257,
+    "potholes": 226,
+    "moto_accidents": 10,
+    "limit_lines": 10614,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/MS/estruturas.csv",
-    "bytes": 116305,
-    "sha256": "531dbf3293594e6deeadd8f76786e15c6a4d930f573c1f56a8d32e27e18e0c04",
-    "count": 2280
+    "bytes": 116611,
+    "sha256": "6cb660a3d1aa2377dff0d1c283cb92a91193c14b598920eb9a93f7e881487134",
+    "count": 2286
+   },
+   "bumps": {
+    "file": "estados/MS/lombadas.csv",
+    "bytes": 63079,
+    "sha256": "b493a0a237980cedd8efcd554ed09b69fcb52f5071e86e68414cd0d3747d5200",
+    "count": 2293
+   },
+   "hazards": {
+    "file": "estados/MS/pontos_atencao.csv",
+    "bytes": 20794,
+    "sha256": "8d51a878eeb0f1808e9aa5f42342b711bc0c877d8fd6388937167329abd3cc28",
+    "count": 598
+   },
+   "tolls": {
+    "file": "estados/MS/pedagios.csv",
+    "bytes": 809,
+    "sha256": "bd1e6dd7906753ac53be8a20c2ea2ff2fb7f34f5d6351e60f7a243d5b65a16af",
+    "count": 20
+   },
+   "portable_radar": {
+    "file": "estados/MS/radar_portatil.csv",
+    "bytes": 52412,
+    "sha256": "946258439296611b38eb0abb9e7b231639d030131eb1dde73d2319129712fbe2",
+    "count": 257
+   },
+   "potholes": {
+    "file": "estados/MS/buracos.csv",
+    "bytes": 27042,
+    "sha256": "5762232507c7c9495abe6e0945fed3f39b9c101e3a2d931a81dc17ee75f5e41d",
+    "count": 226
+   },
+   "moto_accidents": {
+    "file": "estados/MS/acidentes_moto.csv",
+    "bytes": 1158,
+    "sha256": "868995c9fe99ba152b4e211f93886aa3bf9875bf60c14f0d94f3067b967b8990",
+    "count": 10
+   },
+   "limit_lines": {
+    "bytes": 2623627,
+    "sha256": "4fe2db7ca1a3bc6629753697e67e871ab5897f084f5bcaebc9f80babedfd6c3a",
+    "count": 10614,
+    "release_asset": "pardal-MS.zip",
+    "asset_path": "MS/limites_trechos.csv"
    }
   },
   "MT": {
@@ -569,43 +1140,95 @@
     -7.35,
     -50.22
    ],
-   "built_at": "2026-10-06T13:26:17Z",
-   "artifact_built_at": "2026-10-06T13:26:17Z",
+   "built_at": "2026-11-08T15:30:36Z",
+   "artifact_built_at": "2026-11-08T15:30:36Z",
    "coverage": {
     "level": "federal",
     "sources": [
      "ANTT",
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "PRF"
     ]
    },
    "cameras": {
     "file": "estados/MT/radares.csv",
-    "bytes": 12605,
-    "sha256": "786156521d4dd683f875cb1dcbabc82b5cf48cd95db43f5611b87789981f300e",
-    "count": 296
+    "bytes": 12904,
+    "sha256": "c0210c2d620d635168a4d18d3987282e59a47cefad89e1802d072e70e55a5a3f",
+    "count": 303
    },
    "limits": {
     "file": "estados/MT/limites.csv",
-    "bytes": 5057112,
-    "sha256": "2a9e82f2468060e290c9833b016cdce28e9fbff2fb0b1ab5c6c23107fa356598",
-    "count": 132866
+    "bytes": 5061762,
+    "sha256": "38c9b5a7529580db05d3b0997e89e305d6867d678b2537cb64787373e0282a24",
+    "count": 132999
    },
    "counts": {
-    "cameras": 296,
-    "cameras_with_limit": 286,
-    "cameras_inactive": 0,
+    "cameras": 303,
+    "cameras_with_limit": 292,
+    "cameras_inactive": 15,
     "sections": 0,
     "red_lights": 4,
-    "limits": 132866,
-    "structs": 5428
+    "limits": 132999,
+    "structs": 5599,
+    "bumps": 1485,
+    "hazards": 60,
+    "tolls": 38,
+    "portable_radar": 142,
+    "potholes": 133,
+    "moto_accidents": 21,
+    "limit_lines": 19082,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/MT/estruturas.csv",
-    "bytes": 275271,
-    "sha256": "4ad67358afefb10cfeb45e5555d6bb60475d7901e86d3dc4c106f51c1efed9b3",
-    "count": 5428
+    "bytes": 283966,
+    "sha256": "fde956d3c9a752ec78fc74ab1b0f2bba319b813df4eaf5fd34e5f762eb29ebf6",
+    "count": 5599
+   },
+   "bumps": {
+    "file": "estados/MT/lombadas.csv",
+    "bytes": 40429,
+    "sha256": "ae4a074aef38f5a2ef6bcaf1559a2133bb9bea5f8c51e1fd1105fbcf0cf51006",
+    "count": 1485
+   },
+   "hazards": {
+    "file": "estados/MT/pontos_atencao.csv",
+    "bytes": 2222,
+    "sha256": "65082ba538535cd953083ca2dbf7f8637f951831a46654ec67695991b7bca3a7",
+    "count": 60
+   },
+   "tolls": {
+    "file": "estados/MT/pedagios.csv",
+    "bytes": 1524,
+    "sha256": "4d07556ff3a7ad6b4e590fa3ea9247bba3a15162413f4c56c451fd0160acb936",
+    "count": 38
+   },
+   "portable_radar": {
+    "file": "estados/MT/radar_portatil.csv",
+    "bytes": 36481,
+    "sha256": "d8e5eb61327a5cf68854d5a996fa3ca41ed320153dc56e8e1de445b35da661ba",
+    "count": 142
+   },
+   "potholes": {
+    "file": "estados/MT/buracos.csv",
+    "bytes": 15488,
+    "sha256": "4c9db88f2e6bc44d48d76d3dab1cc6749b2c4631c1f75213f981af7a1e6aa884",
+    "count": 133
+   },
+   "moto_accidents": {
+    "file": "estados/MT/acidentes_moto.csv",
+    "bytes": 2653,
+    "sha256": "cb7dd2c02ac5ec0ae365207d13ccdbf48961c1b2379817129b9986e3b1008a0f",
+    "count": 21
+   },
+   "limit_lines": {
+    "bytes": 5408739,
+    "sha256": "d766f24e5fe6f7104531382a742fba25a3c3e00a3c973103beaf98a1c6955cd0",
+    "count": 19082,
+    "release_asset": "pardal-MT.zip",
+    "asset_path": "MT/limites_trechos.csv"
    }
   },
   "PA": {
@@ -616,8 +1239,8 @@
     2.59,
     -46.06
    ],
-   "built_at": "2026-10-06T13:31:28Z",
-   "artifact_built_at": "2026-10-06T13:31:28Z",
+   "built_at": "2026-11-08T15:35:51Z",
+   "artifact_built_at": "2026-11-08T15:35:51Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -629,30 +1252,81 @@
    },
    "cameras": {
     "file": "estados/PA/radares.csv",
-    "bytes": 6425,
-    "sha256": "8cf3bb2a40a01842d9c133d3b289e72c7569437dea7a2fd3639c6dd86e10d5d3",
-    "count": 152
+    "bytes": 6460,
+    "sha256": "4a1560e3b43a1c2917f142255f5d840eaf263a8cd0379f35ce3977cbc16a0921",
+    "count": 153
    },
    "limits": {
     "file": "estados/PA/limites.csv",
-    "bytes": 3052898,
-    "sha256": "fcd46244d30c96dfdea4dc7c4fbcb801a3da8b5e5fd3b5f8f5f054cd16b4f2b0",
-    "count": 80947
+    "bytes": 3052072,
+    "sha256": "1eee5a9a7744e24040dc6cec123ad473fd2627e4065138cac822323b51d0df73",
+    "count": 80931
    },
    "counts": {
-    "cameras": 152,
-    "cameras_with_limit": 152,
-    "cameras_inactive": 0,
+    "cameras": 153,
+    "cameras_with_limit": 153,
+    "cameras_inactive": 21,
     "sections": 2,
     "red_lights": 0,
-    "limits": 80947,
-    "structs": 3781
+    "limits": 80931,
+    "structs": 3785,
+    "bumps": 1401,
+    "hazards": 80,
+    "tolls": 3,
+    "portable_radar": 153,
+    "potholes": 228,
+    "moto_accidents": 10,
+    "limit_lines": 11395,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/PA/estruturas.csv",
-    "bytes": 185292,
-    "sha256": "52709047185716e491cb8a14ae02511c0845dca22206a7a0a12a826dd1414c14",
-    "count": 3781
+    "bytes": 185488,
+    "sha256": "04bf6b925b95c89721a0ac6ea91bca5543ebfa3efba4522cc7bf0ec8d6517270",
+    "count": 3785
+   },
+   "bumps": {
+    "file": "estados/PA/lombadas.csv",
+    "bytes": 36737,
+    "sha256": "6c8916c451577c919085a9e5687315233e947b65c5cd4b07581d75065c086e46",
+    "count": 1401
+   },
+   "hazards": {
+    "file": "estados/PA/pontos_atencao.csv",
+    "bytes": 2886,
+    "sha256": "bc51a0708ae358b4c62ed4c38e2dd32e8d47874b5af60e4d5c7c3aa1439dd3e0",
+    "count": 80
+   },
+   "tolls": {
+    "file": "estados/PA/pedagios.csv",
+    "bytes": 135,
+    "sha256": "c55e6e72ade1c229440bcee3ce75e2ebeae5da88b1bd699c18f7098b26d4ccc8",
+    "count": 3
+   },
+   "portable_radar": {
+    "file": "estados/PA/radar_portatil.csv",
+    "bytes": 40074,
+    "sha256": "ad744409942e91dab0bca8e21150fe211035b40fb4266726ebb8a54ff9183dd6",
+    "count": 153
+   },
+   "potholes": {
+    "file": "estados/PA/buracos.csv",
+    "bytes": 28002,
+    "sha256": "3a96a360ccfd60c3a18a7bfcd52aac1ce2d55f777677a4e6a72c5dee528341b1",
+    "count": 228
+   },
+   "moto_accidents": {
+    "file": "estados/PA/acidentes_moto.csv",
+    "bytes": 1163,
+    "sha256": "da91627cf014aac0c4e7d12bd83d360e7a93f0c0c6d2837c1072467ccc7c1908",
+    "count": 10
+   },
+   "limit_lines": {
+    "bytes": 4512921,
+    "sha256": "656670468f03368a6fee9d7cdf8ec1abd0efa6ec6a7a9609d5d33faa2e746a99",
+    "count": 11395,
+    "release_asset": "pardal-PA.zip",
+    "asset_path": "PA/limites_trechos.csv"
    }
   },
   "PB": {
@@ -663,8 +1337,8 @@
     -6.02,
     -34.79
    ],
-   "built_at": "2026-10-06T13:30:07Z",
-   "artifact_built_at": "2026-10-06T13:30:07Z",
+   "built_at": "2026-11-08T15:34:31Z",
+   "artifact_built_at": "2026-11-08T15:34:31Z",
    "coverage": {
     "level": "federal+municipal",
     "sources": [
@@ -676,30 +1350,75 @@
    },
    "cameras": {
     "file": "estados/PB/radares.csv",
-    "bytes": 11368,
-    "sha256": "6215a4288b93a787b252195a6dbf9b2f7989dd1eba152b2cad5436f1946e1ddd",
-    "count": 270
+    "bytes": 11403,
+    "sha256": "b6744cf20d1f4407d0d7918f9268eda343300906f42727eb82e30844601b63b3",
+    "count": 271
    },
    "limits": {
     "file": "estados/PB/limites.csv",
-    "bytes": 1647377,
-    "sha256": "0b4aed1aad6aaeb2e316b4ef0bec133c1e558d9beccd8eac57f04f2168ac78f4",
-    "count": 46504
+    "bytes": 1649262,
+    "sha256": "1b07110acde96ba7d9997ee793fb8825340ec2404b28822a5f95136618615fda",
+    "count": 46558
    },
    "counts": {
-    "cameras": 270,
-    "cameras_with_limit": 264,
+    "cameras": 271,
+    "cameras_with_limit": 265,
     "cameras_inactive": 8,
     "sections": 0,
     "red_lights": 0,
-    "limits": 46504,
-    "structs": 1377
+    "limits": 46558,
+    "structs": 1387,
+    "bumps": 1082,
+    "hazards": 798,
+    "tolls": 0,
+    "portable_radar": 55,
+    "potholes": 47,
+    "moto_accidents": 14,
+    "limit_lines": 14106,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/PB/estruturas.csv",
-    "bytes": 67498,
-    "sha256": "cfc5a6be76b2b108e8892adcd93d8400279aecce67514b5432b4f176460aa7de",
-    "count": 1377
+    "bytes": 67988,
+    "sha256": "10e4629adcdad7807979977ca0d6f22c68addb3cc705800b992476677eab79ba",
+    "count": 1387
+   },
+   "bumps": {
+    "file": "estados/PB/lombadas.csv",
+    "bytes": 28166,
+    "sha256": "c10a1a660d6179d76f454fd2bd8f63bbd1efe787a47d7b483718f4064e2719e5",
+    "count": 1082
+   },
+   "hazards": {
+    "file": "estados/PB/pontos_atencao.csv",
+    "bytes": 28589,
+    "sha256": "d1a2a20d6fc4ecedfbff23f1fc0129b7cbf66e13b1322d1ccebbf1f6672be7e9",
+    "count": 798
+   },
+   "portable_radar": {
+    "file": "estados/PB/radar_portatil.csv",
+    "bytes": 15291,
+    "sha256": "6a0b90f660d8d481af61f2b27a3317e02a49b885ea1f115b227c277799ecc773",
+    "count": 55
+   },
+   "potholes": {
+    "file": "estados/PB/buracos.csv",
+    "bytes": 5748,
+    "sha256": "2f6e06f600338bb33f55f02b8ef7b3d052bcb79c984fc84728202dcb25c1c87c",
+    "count": 47
+   },
+   "moto_accidents": {
+    "file": "estados/PB/acidentes_moto.csv",
+    "bytes": 2771,
+    "sha256": "c84dba92405dee82a8c4df84ad7aedf27e74366e69352e3cb352d62b58d795fb",
+    "count": 14
+   },
+   "limit_lines": {
+    "bytes": 2782854,
+    "sha256": "7f324cf7a3fa675f904054f18c481df6cafd86cdef1433e66792d06170e39163",
+    "count": 14106,
+    "release_asset": "pardal-PB.zip",
+    "asset_path": "PB/limites_trechos.csv"
    }
   },
   "PE": {
@@ -710,8 +1429,8 @@
     -7.27,
     -34.81
    ],
-   "built_at": "2026-10-06T13:30:17Z",
-   "artifact_built_at": "2026-10-06T13:30:17Z",
+   "built_at": "2026-11-08T15:34:37Z",
+   "artifact_built_at": "2026-11-08T15:34:37Z",
    "coverage": {
     "level": "federal+state+municipal",
     "sources": [
@@ -719,35 +1438,87 @@
      "DNIT",
      "INMETRO",
      "OSM",
-     "PCR"
+     "PCR",
+     "SEINFRA-BA"
     ]
    },
    "cameras": {
     "file": "estados/PE/radares.csv",
-    "bytes": 15638,
-    "sha256": "72df40275381ec6a6ea27ecdf3c7b1cadb2e105d789857322ae78a7cf7d46cab",
-    "count": 386
+    "bytes": 15702,
+    "sha256": "53a4143ececc2d99dc188fa14e31a8d495aa3e77730a37fc74d6315fddffc10e",
+    "count": 387
    },
    "limits": {
     "file": "estados/PE/limites.csv",
-    "bytes": 2371476,
-    "sha256": "55010e3ab91240de5ea3ac01f332981fc92324fe51e4516a887587e2709a5ec2",
-    "count": 63023
+    "bytes": 2374907,
+    "sha256": "4c20a35d64dfe95306412ff6f0aa9eaeee56a18b2e28c3b53e097398e6150af6",
+    "count": 63106
    },
    "counts": {
-    "cameras": 386,
-    "cameras_with_limit": 327,
-    "cameras_inactive": 18,
+    "cameras": 387,
+    "cameras_with_limit": 333,
+    "cameras_inactive": 15,
     "sections": 0,
     "red_lights": 0,
-    "limits": 63023,
-    "structs": 3645
+    "limits": 63106,
+    "structs": 3646,
+    "bumps": 966,
+    "hazards": 849,
+    "tolls": 7,
+    "portable_radar": 87,
+    "potholes": 199,
+    "moto_accidents": 23,
+    "limit_lines": 15979,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/PE/estruturas.csv",
-    "bytes": 178630,
-    "sha256": "c89db6d417a75330fa0bb6b434e51c5ada232c815e65cfa09f1d73f88ad59a93",
-    "count": 3645
+    "bytes": 178679,
+    "sha256": "46d796f14ab03b5a5eb5b10e18e1513fd878626cb9ec5c8b5e70544f20bd9e17",
+    "count": 3646
+   },
+   "bumps": {
+    "file": "estados/PE/lombadas.csv",
+    "bytes": 25738,
+    "sha256": "be83acfaccb4eeb1239f9a747c3c4e6dfc44fc3632ed77b6cbe24a75af73aa2b",
+    "count": 966
+   },
+   "hazards": {
+    "file": "estados/PE/pontos_atencao.csv",
+    "bytes": 30469,
+    "sha256": "552f4773556e79d1b5ef37a5edca5b1f7b425aa06b989cc16ba8315a2bbfb96d",
+    "count": 849
+   },
+   "tolls": {
+    "file": "estados/PE/pedagios.csv",
+    "bytes": 267,
+    "sha256": "13d658349e2345134758bf66bc84dd6ac2b4554f2323462fe27de035bc458eb7",
+    "count": 7
+   },
+   "portable_radar": {
+    "file": "estados/PE/radar_portatil.csv",
+    "bytes": 27182,
+    "sha256": "0357d554e6e34af9d605696f432b256a929f1dde97fa43cd5e16ff0db4748935",
+    "count": 87
+   },
+   "potholes": {
+    "file": "estados/PE/buracos.csv",
+    "bytes": 26241,
+    "sha256": "a1dd0e4f7cc82a84631aff8bed9e9822d3c222cde9561db2e6b498bac2001dc2",
+    "count": 199
+   },
+   "moto_accidents": {
+    "file": "estados/PE/acidentes_moto.csv",
+    "bytes": 4959,
+    "sha256": "cb703ba65ea137d5c18e2e20c6a44aa67eb37fcb62423a08b23d33d15ab6dadc",
+    "count": 23
+   },
+   "limit_lines": {
+    "bytes": 4080932,
+    "sha256": "b2139ec0cf652d7a66a9f88026c3700022fb5d4d04929d3d12e54514a7772337",
+    "count": 15979,
+    "release_asset": "pardal-PE.zip",
+    "asset_path": "PE/limites_trechos.csv"
    }
   },
   "PI": {
@@ -758,8 +1529,8 @@
     -2.74,
     -40.37
    ],
-   "built_at": "2026-10-06T13:30:21Z",
-   "artifact_built_at": "2026-10-06T13:30:21Z",
+   "built_at": "2026-11-08T15:34:40Z",
+   "artifact_built_at": "2026-11-08T15:34:40Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -776,9 +1547,9 @@
    },
    "limits": {
     "file": "estados/PI/limites.csv",
-    "bytes": 2338310,
-    "sha256": "6b31e034a577aaaded01d071dc6c24f2a5688adc3df6369e53ebcb95ec1dc8b3",
-    "count": 62397
+    "bytes": 2339849,
+    "sha256": "8a178c6adebb92deb9ab681ec08ab40d3f1a03459bee9316ccf9c7d32ba506c9",
+    "count": 62437
    },
    "counts": {
     "cameras": 75,
@@ -786,14 +1557,65 @@
     "cameras_inactive": 9,
     "sections": 0,
     "red_lights": 0,
-    "limits": 62397,
-    "structs": 1195
+    "limits": 62437,
+    "structs": 1228,
+    "bumps": 597,
+    "hazards": 321,
+    "tolls": 4,
+    "portable_radar": 110,
+    "potholes": 196,
+    "moto_accidents": 22,
+    "limit_lines": 9715,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/PI/estruturas.csv",
-    "bytes": 58678,
-    "sha256": "7e6380fa03dac60d2e1b190f9b57aeded0f2fef4efeab3a5732643dbf933042a",
-    "count": 1195
+    "bytes": 60295,
+    "sha256": "31b5c0680d4d6b4e3dc4bf23f8c29c396ee30b6fd7ff21eb85baaf99f15f96ce",
+    "count": 1228
+   },
+   "bumps": {
+    "file": "estados/PI/lombadas.csv",
+    "bytes": 15723,
+    "sha256": "f4476f746a743aef01c3e03d2525a5d11f135ca8cbd644b8c19b8e1068117198",
+    "count": 597
+   },
+   "hazards": {
+    "file": "estados/PI/pontos_atencao.csv",
+    "bytes": 11501,
+    "sha256": "acb33e6b782587ade430dfddf7d3c4c170e1234283df8a324215dda0c96e7bfe",
+    "count": 321
+   },
+   "tolls": {
+    "file": "estados/PI/pedagios.csv",
+    "bytes": 153,
+    "sha256": "65a1fc413bcca1c9d28042d1cec5e325922c4f475453b82613f052392f48826b",
+    "count": 4
+   },
+   "portable_radar": {
+    "file": "estados/PI/radar_portatil.csv",
+    "bytes": 28986,
+    "sha256": "7ef716633d6a7914eef8e5ef42661d32265ca4faa4674848e577360e3bcc0fd4",
+    "count": 110
+   },
+   "potholes": {
+    "file": "estados/PI/buracos.csv",
+    "bytes": 26053,
+    "sha256": "75cd35aeb760a2bd2e45207adeecd7b1d319c08b5dac353fa33a2687b98d78f6",
+    "count": 196
+   },
+   "moto_accidents": {
+    "file": "estados/PI/acidentes_moto.csv",
+    "bytes": 3551,
+    "sha256": "9cc0ff76a06fffed754fa5ef0a134d4eedf176706a43f88db354816c684136a0",
+    "count": 22
+   },
+   "limit_lines": {
+    "bytes": 3347555,
+    "sha256": "91394bec1c6d2fdd27844906c02ad2832ac3f6d5c617346eaa3a7aee42de7a59",
+    "count": 9715,
+    "release_asset": "pardal-PI.zip",
+    "asset_path": "PI/limites_trechos.csv"
    }
   },
   "PR": {
@@ -804,8 +1626,8 @@
     -22.52,
     -48.02
    ],
-   "built_at": "2026-10-06T13:42:48Z",
-   "artifact_built_at": "2026-10-06T13:42:48Z",
+   "built_at": "2026-11-08T15:46:04Z",
+   "artifact_built_at": "2026-11-08T15:46:04Z",
    "coverage": {
     "level": "federal+municipal",
     "sources": [
@@ -813,35 +1635,93 @@
      "CURITIBA",
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "PRF"
     ]
    },
    "cameras": {
     "file": "estados/PR/radares.csv",
-    "bytes": 67729,
-    "sha256": "1dcdfb1c79fa16addc58428bcf8bf25b5510bbe7208e2ef75c40c8baab5850ba",
-    "count": 1549
+    "bytes": 68355,
+    "sha256": "94d074aef7af15b89f9ae863945fbf8203eb7d3945210a201dbeae90eac56df1",
+    "count": 1566
    },
    "limits": {
     "file": "estados/PR/limites.csv",
-    "bytes": 6945345,
-    "sha256": "f4c09c5173e4a2c82f013f1fb9b7609798a8d8ed97d49f7fd93ee0261aa941d1",
-    "count": 191818
+    "bytes": 6986863,
+    "sha256": "eb9c94a454f341f504d4ff65ac5bf2f69a69f6dcf369ee85aa2331433fd6620e",
+    "count": 193269
    },
    "counts": {
-    "cameras": 1549,
-    "cameras_with_limit": 1441,
-    "cameras_inactive": 9,
+    "cameras": 1566,
+    "cameras_with_limit": 1448,
+    "cameras_inactive": 39,
     "sections": 30,
     "red_lights": 24,
-    "limits": 191818,
-    "structs": 8919
+    "limits": 193269,
+    "structs": 8920,
+    "bumps": 3257,
+    "hazards": 1710,
+    "tolls": 62,
+    "portable_radar": 215,
+    "potholes": 284,
+    "moto_accidents": 59,
+    "limit_lines": 48808,
+    "enforcement_cameras": 320
    },
    "structs": {
     "file": "estados/PR/estruturas.csv",
-    "bytes": 454894,
-    "sha256": "ab06dca961bc5564b337dcafac0bd4994f7e7d5f9368393b4592e89281a9216b",
-    "count": 8919
+    "bytes": 454945,
+    "sha256": "444b98f24e7bdc083d850bf425620531d75086bd6d195becc2930d45aef34dd8",
+    "count": 8920
+   },
+   "bumps": {
+    "file": "estados/PR/lombadas.csv",
+    "bytes": 88715,
+    "sha256": "9b757b183cc32c46c2a798f7c3e238dd9d50db1cbf6aaf985f2952b937ffd244",
+    "count": 3257
+   },
+   "hazards": {
+    "file": "estados/PR/pontos_atencao.csv",
+    "bytes": 62664,
+    "sha256": "88c93b012ffb0b0e93d7add3a212eea51e7bc6a0d81ff3bf1e6f1d23bab39fe7",
+    "count": 1710
+   },
+   "tolls": {
+    "file": "estados/PR/pedagios.csv",
+    "bytes": 3174,
+    "sha256": "a8c6e379b59c16642f6061ea34549cdcf35093505290b9cf114ef0af8c19999a",
+    "count": 62
+   },
+   "portable_radar": {
+    "file": "estados/PR/radar_portatil.csv",
+    "bytes": 96846,
+    "sha256": "21c42f980ad124bbbbf49f395c8ee7d18a3f22fd4f97ed19286f0d0be260dd63",
+    "count": 215
+   },
+   "potholes": {
+    "file": "estados/PR/buracos.csv",
+    "bytes": 53887,
+    "sha256": "cbce09a7347f0b34fdff303005dac480c1510683415fe609e8b408396ec1b0e5",
+    "count": 284
+   },
+   "moto_accidents": {
+    "file": "estados/PR/acidentes_moto.csv",
+    "bytes": 9965,
+    "sha256": "20ea754daf554420aa4d1f9a557c32fd3a0096834bccfdb635cf4710933fe179",
+    "count": 59
+   },
+   "limit_lines": {
+    "bytes": 11730999,
+    "sha256": "9b600039fb92d6c5c9e2c8d18e6396a265bfec24b2fee054e25fd448f5f7dcb8",
+    "count": 48808,
+    "release_asset": "pardal-PR.zip",
+    "asset_path": "PR/limites_trechos.csv"
+   },
+   "enforcement_cameras": {
+    "file": "estados/PR/cameras_fiscalizacao.csv",
+    "bytes": 16868,
+    "sha256": "f91553a28da86bd8d22a7a8340f908bfb089d13a5e63c156328e2c780430a33d",
+    "count": 320
    }
   },
   "RJ": {
@@ -852,8 +1732,8 @@
     -20.76,
     -40.96
    ],
-   "built_at": "2026-10-06T13:38:09Z",
-   "artifact_built_at": "2026-10-06T13:38:09Z",
+   "built_at": "2026-11-08T15:42:07Z",
+   "artifact_built_at": "2026-11-08T15:42:07Z",
    "coverage": {
     "level": "federal+municipal",
     "sources": [
@@ -861,35 +1741,87 @@
      "DNIT",
      "INMETRO",
      "OSM",
+     "PRF",
      "RIO"
     ]
    },
    "cameras": {
     "file": "estados/RJ/radares.csv",
-    "bytes": 49107,
-    "sha256": "f429e31e2bf0dc405051196fa6da704ee84caf3354a9bb8194c08fb2afcd53fc",
-    "count": 1190
+    "bytes": 49400,
+    "sha256": "1fded86ee0531db3656555480b0b7c894c6ce734d40bede9b14160a18219fb22",
+    "count": 1196
    },
    "limits": {
     "file": "estados/RJ/limites.csv",
-    "bytes": 6467342,
-    "sha256": "434cf7785785ea02269941ebb81872810ba0d4a66a85dac76916d998bd80be96",
-    "count": 188061
+    "bytes": 6473724,
+    "sha256": "b64c3b5239ce83dfc1439d67916243f110fc3e11396fec64133e013dd7f8490d",
+    "count": 188263
    },
    "counts": {
-    "cameras": 1190,
-    "cameras_with_limit": 979,
-    "cameras_inactive": 2,
-    "sections": 2,
+    "cameras": 1196,
+    "cameras_with_limit": 984,
+    "cameras_inactive": 41,
+    "sections": 4,
     "red_lights": 198,
-    "limits": 188061,
-    "structs": 7930
+    "limits": 188263,
+    "structs": 7951,
+    "bumps": 10636,
+    "hazards": 1369,
+    "tolls": 39,
+    "portable_radar": 99,
+    "potholes": 102,
+    "moto_accidents": 64,
+    "limit_lines": 25846,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/RJ/estruturas.csv",
-    "bytes": 404455,
-    "sha256": "9b1daa56910efae660e0b870f9dd3e2b095bcd09b9cf4bf36a4e315467bfa10d",
-    "count": 7930
+    "bytes": 405526,
+    "sha256": "b1c2ef5a1f8951cb17777b9965f0a49d357ee11ebba451445403478a530f2c8d",
+    "count": 7951
+   },
+   "bumps": {
+    "file": "estados/RJ/lombadas.csv",
+    "bytes": 287779,
+    "sha256": "3df56caf65a393a9130b7ce311e17df117e9ffb791b81632da12bc24ba3105eb",
+    "count": 10636
+   },
+   "hazards": {
+    "file": "estados/RJ/pontos_atencao.csv",
+    "bytes": 49129,
+    "sha256": "744ed454db94d07623e4fd4d5409c3a55f8e1cacb9f2bf28a1cfc86d902688a7",
+    "count": 1369
+   },
+   "tolls": {
+    "file": "estados/RJ/pedagios.csv",
+    "bytes": 1693,
+    "sha256": "69c5d0129afd560d4f2f3e57518331b34c3efd620f1931a67663093f0c4822c8",
+    "count": 39
+   },
+   "portable_radar": {
+    "file": "estados/RJ/radar_portatil.csv",
+    "bytes": 60954,
+    "sha256": "22ab75d0b33cf2995210efc95cf9e67d9df188b24fb1038a966194aa3af8ae04",
+    "count": 99
+   },
+   "potholes": {
+    "file": "estados/RJ/buracos.csv",
+    "bytes": 27616,
+    "sha256": "438a1f17b81a803c1761d6350757f2499051e94006a18169f6328c9e2700584f",
+    "count": 102
+   },
+   "moto_accidents": {
+    "file": "estados/RJ/acidentes_moto.csv",
+    "bytes": 13462,
+    "sha256": "72b37ca5914daea087ff09cf94bf1bafc0b62b7f9de40d79024a8f12cf333b33",
+    "count": 64
+   },
+   "limit_lines": {
+    "bytes": 6681172,
+    "sha256": "77cfb711ef635d7b5d1d3f5b26c3bbfb42f2021e5e34c8fe386980c00373fe9d",
+    "count": 25846,
+    "release_asset": "pardal-RJ.zip",
+    "asset_path": "RJ/limites_trechos.csv"
    }
   },
   "RN": {
@@ -900,8 +1832,8 @@
     -4.83,
     -34.96
    ],
-   "built_at": "2026-10-06T13:30:25Z",
-   "artifact_built_at": "2026-10-06T13:30:25Z",
+   "built_at": "2026-11-08T15:34:43Z",
+   "artifact_built_at": "2026-11-08T15:34:43Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -912,30 +1844,81 @@
    },
    "cameras": {
     "file": "estados/RN/radares.csv",
-    "bytes": 6498,
-    "sha256": "c129055d9818f8b4b0e2007085b0031379b5fb52fea04b31ba1e8fdfd558f0fa",
+    "bytes": 6484,
+    "sha256": "e8e39a11fea801c00e6ca215fbf43156a56f879f0245bcd157e8f7a5fc5c90a2",
     "count": 156
    },
    "limits": {
     "file": "estados/RN/limites.csv",
-    "bytes": 1146416,
-    "sha256": "1ba98f940efcea580f552be1a24b32cd90868cdf9cb8b4643d4a191cb77ad35b",
-    "count": 30181
+    "bytes": 1148122,
+    "sha256": "58fc006bd6d9cd63f6a23b1fd048a27c8549787c32c786ea74e332cd955e8f29",
+    "count": 30236
    },
    "counts": {
     "cameras": 156,
-    "cameras_with_limit": 132,
+    "cameras_with_limit": 133,
     "cameras_inactive": 10,
     "sections": 0,
     "red_lights": 0,
-    "limits": 30181,
-    "structs": 808
+    "limits": 30236,
+    "structs": 809,
+    "bumps": 1281,
+    "hazards": 349,
+    "tolls": 1,
+    "portable_radar": 164,
+    "potholes": 97,
+    "moto_accidents": 21,
+    "limit_lines": 8088,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/RN/estruturas.csv",
-    "bytes": 39617,
-    "sha256": "ff1992aeb96206bb4eb9379e60a5ec041c243cb0e355ac992f64662969021a1f",
-    "count": 808
+    "bytes": 39666,
+    "sha256": "d42b5d664f59cf5e85578deeea74c8300c468a582910df2497627b51b4bd8f02",
+    "count": 809
+   },
+   "bumps": {
+    "file": "estados/RN/lombadas.csv",
+    "bytes": 33578,
+    "sha256": "d16316c17a5391b446169e115b7225c7b992b656c63fe4a7ea8651cc0b766520",
+    "count": 1281
+   },
+   "hazards": {
+    "file": "estados/RN/pontos_atencao.csv",
+    "bytes": 12497,
+    "sha256": "561baeaff876628b5b49b9e39541eec654e7941593a0c042327b0f3e82694355",
+    "count": 349
+   },
+   "tolls": {
+    "file": "estados/RN/pedagios.csv",
+    "bytes": 57,
+    "sha256": "6854b87413ccb38b31db6a2185fb3b605845f53433306644bac293d39bb22933",
+    "count": 1
+   },
+   "portable_radar": {
+    "file": "estados/RN/radar_portatil.csv",
+    "bytes": 39593,
+    "sha256": "33175a557f97f1df0790f5d656c2e9d0279e966acaff7375668bd91e75e4fb77",
+    "count": 164
+   },
+   "potholes": {
+    "file": "estados/RN/buracos.csv",
+    "bytes": 11348,
+    "sha256": "384bfd2c9c202865080668defb7ecfc9b30a1cc6cfedec3b3dd53084142511a5",
+    "count": 97
+   },
+   "moto_accidents": {
+    "file": "estados/RN/acidentes_moto.csv",
+    "bytes": 3153,
+    "sha256": "4d86bd1eac544a235ec6ced20821f7f57259fcbb695d7536fca4bde79fe5d93b",
+    "count": 21
+   },
+   "limit_lines": {
+    "bytes": 1626779,
+    "sha256": "0f7ba13fd1bc63674cf76d05ea20afc06dd83ceaa6b1bf688e021fa551aa7126",
+    "count": 8088,
+    "release_asset": "pardal-RN.zip",
+    "asset_path": "RN/limites_trechos.csv"
    }
   },
   "RO": {
@@ -946,42 +1929,94 @@
     -7.97,
     -59.77
    ],
-   "built_at": "2026-10-06T13:31:31Z",
-   "artifact_built_at": "2026-10-06T13:31:31Z",
+   "built_at": "2026-11-08T15:35:53Z",
+   "artifact_built_at": "2026-11-08T15:35:53Z",
    "coverage": {
-    "level": "federal",
+    "level": "federal+municipal",
     "sources": [
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "SEMTRAN-PVH"
     ]
    },
    "cameras": {
     "file": "estados/RO/radares.csv",
-    "bytes": 1534,
-    "sha256": "c4e449e1b5bcd8430a8da92ea0bad544748579e9dc676d729db40ae2f079967e",
-    "count": 35
+    "bytes": 2850,
+    "sha256": "91b925013a3a0716d0e55ac26f67d2cbeb72a13447921940297fe7585a6d4d31",
+    "count": 61
    },
    "limits": {
     "file": "estados/RO/limites.csv",
-    "bytes": 1220030,
-    "sha256": "ffcd4ca8faf596a0188db330e74fc0c9040acbebff0e5778b111114cb7cd0fe5",
-    "count": 32279
+    "bytes": 1220559,
+    "sha256": "4835a7733da0413d2b79c60e6a2425540373679d2a8d21fe97b53999c05e7188",
+    "count": 32295
    },
    "counts": {
-    "cameras": 35,
-    "cameras_with_limit": 34,
-    "cameras_inactive": 0,
+    "cameras": 61,
+    "cameras_with_limit": 35,
+    "cameras_inactive": 1,
     "sections": 0,
     "red_lights": 0,
-    "limits": 32279,
-    "structs": 2173
+    "limits": 32295,
+    "structs": 2176,
+    "bumps": 246,
+    "hazards": 85,
+    "tolls": 7,
+    "portable_radar": 39,
+    "potholes": 63,
+    "moto_accidents": 19,
+    "limit_lines": 5800,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/RO/estruturas.csv",
-    "bytes": 109862,
-    "sha256": "1d66cd8177a24f44a11c35d40d053a82e962f6194004817e7dd9cae10839641e",
-    "count": 2173
+    "bytes": 110013,
+    "sha256": "150b18339ed8b57e9ad22710573fcd7c9f38ca7382fb4684555326aec4dad16d",
+    "count": 2176
+   },
+   "bumps": {
+    "file": "estados/RO/lombadas.csv",
+    "bytes": 6638,
+    "sha256": "22c41547f20aaa64b000ec1d25c91d7b07782f9f4dbaf79cbce7f60774eb836b",
+    "count": 246
+   },
+   "hazards": {
+    "file": "estados/RO/pontos_atencao.csv",
+    "bytes": 3094,
+    "sha256": "ade4c4b6565fd7325cd907133b46d1aaf76f2cb2880e7d262c21fd90f981375e",
+    "count": 85
+   },
+   "tolls": {
+    "file": "estados/RO/pedagios.csv",
+    "bytes": 474,
+    "sha256": "ef11fe382402366dc05ae19a1edc1be520cdeb3ffa8b1a4578e44c5de83baf77",
+    "count": 7
+   },
+   "portable_radar": {
+    "file": "estados/RO/radar_portatil.csv",
+    "bytes": 9704,
+    "sha256": "cb6d49287fad8d1918b31ff93ef3bc66295b78150cbabd61b3209a022b77efcc",
+    "count": 39
+   },
+   "potholes": {
+    "file": "estados/RO/buracos.csv",
+    "bytes": 6883,
+    "sha256": "77fde408b3621cbc93c0896b093299b40bed78e32e88aef32ec5937446b380c0",
+    "count": 63
+   },
+   "moto_accidents": {
+    "file": "estados/RO/acidentes_moto.csv",
+    "bytes": 2871,
+    "sha256": "c2444993db6bf90f167097ab8245f7e7f97b2d79dc43587c5d29c81fc1722477",
+    "count": 19
+   },
+   "limit_lines": {
+    "bytes": 1656518,
+    "sha256": "6256ca24fac87a2c74a9e1aafbe734c30053abd3e7aeb07bf6ae252259ca00be",
+    "count": 5800,
+    "release_asset": "pardal-RO.zip",
+    "asset_path": "RO/limites_trechos.csv"
    }
   },
   "RR": {
@@ -992,8 +2027,8 @@
     5.27,
     -58.89
    ],
-   "built_at": "2026-10-06T13:31:32Z",
-   "artifact_built_at": "2026-10-06T13:31:32Z",
+   "built_at": "2026-11-08T15:35:54Z",
+   "artifact_built_at": "2026-11-08T15:35:54Z",
    "coverage": {
     "level": "federal",
     "sources": [
@@ -1010,9 +2045,9 @@
    },
    "limits": {
     "file": "estados/RR/limites.csv",
-    "bytes": 360616,
-    "sha256": "9e25dfc70def3879dff228cc810ba8f10c0efe174ffef55fbea878ebe45b57b4",
-    "count": 9891
+    "bytes": 361599,
+    "sha256": "6cc552e38f0a10a50c1775c9e9c524a18c2435a94cb0ee6f639b845426b20066",
+    "count": 9916
    },
    "counts": {
     "cameras": 31,
@@ -1020,14 +2055,53 @@
     "cameras_inactive": 0,
     "sections": 0,
     "red_lights": 0,
-    "limits": 9891,
-    "structs": 510
+    "limits": 9916,
+    "structs": 511,
+    "bumps": 127,
+    "hazards": 11,
+    "tolls": 0,
+    "portable_radar": 8,
+    "potholes": 148,
+    "moto_accidents": 0,
+    "limit_lines": 2018,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/RR/estruturas.csv",
-    "bytes": 24005,
-    "sha256": "7a43275aa4892f175464d8169186185e5e68b91740a6990e9da0a30bff07285f",
-    "count": 510
+    "bytes": 24052,
+    "sha256": "e009ffeffbd8451b63cdb4b6fb0f5145596032ea45468dd848ecf1194712a61e",
+    "count": 511
+   },
+   "bumps": {
+    "file": "estados/RR/lombadas.csv",
+    "bytes": 3209,
+    "sha256": "741f660b7b4e3585a925ed28b78260500ca7f782d1214e608476c96c3153be23",
+    "count": 127
+   },
+   "hazards": {
+    "file": "estados/RR/pontos_atencao.csv",
+    "bytes": 323,
+    "sha256": "7c5892fb42b6a394093d81c189ad3e0a2d6970d6c2a5556b431ffc7c211a43be",
+    "count": 11
+   },
+   "portable_radar": {
+    "file": "estados/RR/radar_portatil.csv",
+    "bytes": 1457,
+    "sha256": "da4d8d8f7b77bfa45f1b5853d51246c167960c35e58fa691e900b5cbe28d1b56",
+    "count": 8
+   },
+   "potholes": {
+    "file": "estados/RR/buracos.csv",
+    "bytes": 16105,
+    "sha256": "49d52e37f243fdf03ff6b464925eb20dbf5db5d9c7c5080deb7598ad324ee027",
+    "count": 148
+   },
+   "limit_lines": {
+    "bytes": 438040,
+    "sha256": "5ad308668cddf18e560f0710c20099a3abd0a37c3843f480d6041e9fdc460411",
+    "count": 2018,
+    "release_asset": "pardal-RR.zip",
+    "asset_path": "RR/limites_trechos.csv"
    }
   },
   "RS": {
@@ -1038,8 +2112,8 @@
     -27.08,
     -49.69
    ],
-   "built_at": "2026-10-06T13:43:19Z",
-   "artifact_built_at": "2026-10-06T13:43:19Z",
+   "built_at": "2026-11-08T15:46:24Z",
+   "artifact_built_at": "2026-11-08T15:46:24Z",
    "coverage": {
     "level": "federal+municipal",
     "sources": [
@@ -1052,30 +2126,81 @@
    },
    "cameras": {
     "file": "estados/RS/radares.csv",
-    "bytes": 45967,
-    "sha256": "81fc5ed4b7e21ffe195df5fc4f6df19e8feacc5d5d719cc41e1e422d8a084bea",
-    "count": 1052
+    "bytes": 45388,
+    "sha256": "35e80cd406f2af1ba3ca2bb8e1214368581620fd194aed1e768d6cecc5ce87d9",
+    "count": 1039
    },
    "limits": {
     "file": "estados/RS/limites.csv",
-    "bytes": 8340880,
-    "sha256": "715daa6a11a4a0b6629e05d940474edcf2f096c4d873bb309cda0cd3cf718c20",
-    "count": 227303
+    "bytes": 8344353,
+    "sha256": "839fdc297200c5e45751a395b75165481461fa6826595118481923ca406b61ae",
+    "count": 227401
    },
    "counts": {
-    "cameras": 1052,
-    "cameras_with_limit": 791,
-    "cameras_inactive": 256,
+    "cameras": 1039,
+    "cameras_with_limit": 779,
+    "cameras_inactive": 257,
     "sections": 85,
     "red_lights": 4,
-    "limits": 227303,
-    "structs": 10372
+    "limits": 227401,
+    "structs": 10400,
+    "bumps": 4177,
+    "hazards": 1447,
+    "tolls": 37,
+    "portable_radar": 247,
+    "potholes": 820,
+    "moto_accidents": 37,
+    "limit_lines": 54562,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/RS/estruturas.csv",
-    "bytes": 528997,
-    "sha256": "0323bf5a62b3b349fba96c36a4d7c81f923149783a96d628eb55f34b3032b72c",
-    "count": 10372
+    "bytes": 530425,
+    "sha256": "402c42d7e7da2270f43e3d42e69e58166af0ea95634922c2d49b235f78981bd3",
+    "count": 10400
+   },
+   "bumps": {
+    "file": "estados/RS/lombadas.csv",
+    "bytes": 113685,
+    "sha256": "982a757a98451b4d12ea56bbe50656053e33cb9d360ec94f575fd073965afbbd",
+    "count": 4177
+   },
+   "hazards": {
+    "file": "estados/RS/pontos_atencao.csv",
+    "bytes": 53010,
+    "sha256": "0222108008cebcf4e4627ef771704c1349e577eee8cb23396e566beb9cc019ea",
+    "count": 1447
+   },
+   "tolls": {
+    "file": "estados/RS/pedagios.csv",
+    "bytes": 1513,
+    "sha256": "4d337ebec26b8675a7661a491e31956e14940529eef2c2eb7fb28e16a3af9e19",
+    "count": 37
+   },
+   "portable_radar": {
+    "file": "estados/RS/radar_portatil.csv",
+    "bytes": 104785,
+    "sha256": "166a0bf4c12d0a166a59ad1cb1f264540e5aa4c2e4c9ed6d27995d4ec4b40f41",
+    "count": 247
+   },
+   "potholes": {
+    "file": "estados/RS/buracos.csv",
+    "bytes": 136378,
+    "sha256": "6d940a8ddb69f7758cbdc2e99b4aca0eceb6e4b2ae458f7a54f809eaac9598f6",
+    "count": 820
+   },
+   "moto_accidents": {
+    "file": "estados/RS/acidentes_moto.csv",
+    "bytes": 5937,
+    "sha256": "c9e85ca257cc89b24a9a01dccb387f16e409709a0a9f6c74d8f45c0de2e6dd5d",
+    "count": 37
+   },
+   "limit_lines": {
+    "bytes": 13534208,
+    "sha256": "11740c35c2c2aaa88171be90fb172bc0d340c00d51e1c520acbf633ccb771a0d",
+    "count": 54562,
+    "release_asset": "pardal-RS.zip",
+    "asset_path": "RS/limites_trechos.csv"
    }
   },
   "SC": {
@@ -1086,43 +2211,95 @@
     -25.95,
     -48.35
    ],
-   "built_at": "2026-10-06T13:43:37Z",
-   "artifact_built_at": "2026-10-06T13:43:37Z",
+   "built_at": "2026-11-08T15:46:57Z",
+   "artifact_built_at": "2026-11-08T15:46:57Z",
    "coverage": {
     "level": "federal",
     "sources": [
      "ANTT",
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "PRF"
     ]
    },
    "cameras": {
     "file": "estados/SC/radares.csv",
-    "bytes": 54097,
-    "sha256": "5d23533c9c96c38c05b071e3fe027993cf7dec32463434bcbfc91e4dbe0f5686",
-    "count": 1178
+    "bytes": 55150,
+    "sha256": "431ebeba547b8835b5cdd7fec6b8d09813068eddb0e24bb611acf676ac110d17",
+    "count": 1199
    },
    "limits": {
     "file": "estados/SC/limites.csv",
-    "bytes": 5035113,
-    "sha256": "976bcd0769aba13eb2662762637211da281ef3284213a792bf1e6f31ee978769",
-    "count": 138488
+    "bytes": 5041233,
+    "sha256": "233452c1092a0e29485f92d6a6657ddb1c074abe53fcee6b9fbd931b39bb36b3",
+    "count": 138679
    },
    "counts": {
-    "cameras": 1178,
-    "cameras_with_limit": 1021,
-    "cameras_inactive": 72,
-    "sections": 198,
+    "cameras": 1199,
+    "cameras_with_limit": 1044,
+    "cameras_inactive": 87,
+    "sections": 205,
     "red_lights": 89,
-    "limits": 138488,
-    "structs": 11141
+    "limits": 138679,
+    "structs": 11183,
+    "bumps": 12717,
+    "hazards": 847,
+    "tolls": 15,
+    "portable_radar": 407,
+    "potholes": 321,
+    "moto_accidents": 57,
+    "limit_lines": 37499,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/SC/estruturas.csv",
-    "bytes": 568216,
-    "sha256": "691256ca601fbb56ceecead4171c1b4491ed73e7cf92700bcc563f35ba67b50f",
-    "count": 11141
+    "bytes": 570358,
+    "sha256": "cbe8629ecb9b912724736553f821b4c51897fd32ac64d151852af3d59dc7e774",
+    "count": 11183
+   },
+   "bumps": {
+    "file": "estados/SC/lombadas.csv",
+    "bytes": 348588,
+    "sha256": "7588e6d9d4009d79e5b311784524492887034822cc5316c1caada350f0035d15",
+    "count": 12717
+   },
+   "hazards": {
+    "file": "estados/SC/pontos_atencao.csv",
+    "bytes": 30674,
+    "sha256": "be643e71525b9484fd5b9290ccd1d43d75207fcbd89a7be02c4c4d1767a7522d",
+    "count": 847
+   },
+   "tolls": {
+    "file": "estados/SC/pedagios.csv",
+    "bytes": 640,
+    "sha256": "cca403872d4294d128ca267f0611d70460740b196fdf8e53434acaba7dfffd7e",
+    "count": 15
+   },
+   "portable_radar": {
+    "file": "estados/SC/radar_portatil.csv",
+    "bytes": 148739,
+    "sha256": "6f9d52ba24c18eb87ff40a11fd9ac06bbb185846ec936b51ae94d1b59077784e",
+    "count": 407
+   },
+   "potholes": {
+    "file": "estados/SC/buracos.csv",
+    "bytes": 68290,
+    "sha256": "8b6aa87bc03320e6a22817012b09147f98f38d9fca2fd19fb0af26684c792461",
+    "count": 321
+   },
+   "moto_accidents": {
+    "file": "estados/SC/acidentes_moto.csv",
+    "bytes": 12151,
+    "sha256": "bb63494ff83223d53ef2aa481a181a386b0aaf02a68072a2bc98628f10cca7e7",
+    "count": 57
+   },
+   "limit_lines": {
+    "bytes": 9816300,
+    "sha256": "4df81099c99e198677e970f577baae9c40dad88c5d6c3b04147ed40213b07699",
+    "count": 37499,
+    "release_asset": "pardal-SC.zip",
+    "asset_path": "SC/limites_trechos.csv"
    }
   },
   "SE": {
@@ -1133,11 +2310,12 @@
     -9.51,
     -36.39
    ],
-   "built_at": "2026-10-06T13:30:27Z",
-   "artifact_built_at": "2026-10-06T13:30:27Z",
+   "built_at": "2026-11-08T15:34:45Z",
+   "artifact_built_at": "2026-11-08T15:34:45Z",
    "coverage": {
-    "level": "federal",
+    "level": "federal+state",
     "sources": [
+     "DER-SE",
      "DNIT",
      "INMETRO",
      "OSM"
@@ -1145,30 +2323,75 @@
    },
    "cameras": {
     "file": "estados/SE/radares.csv",
-    "bytes": 5443,
-    "sha256": "71fa41e503ec76e33b65893ef58a51395235bdfccb5ae4e6d6c2d15657ce67a0",
-    "count": 131
+    "bytes": 10794,
+    "sha256": "44f2043b3d535ac64fb3abdc7478b610856e248f8ea84ae636a478393f3255d4",
+    "count": 255
    },
    "limits": {
     "file": "estados/SE/limites.csv",
-    "bytes": 624048,
-    "sha256": "e3371dd2ac7cf520d3ef4997a8d327f7f8b7e09caa43ddf3d36c19545e63df33",
-    "count": 15988
+    "bytes": 623917,
+    "sha256": "3efe95ce488e2e3974f5c27c412977b6e7130d42ae613f7b390b1072af5d9586",
+    "count": 15984
    },
    "counts": {
-    "cameras": 131,
-    "cameras_with_limit": 125,
+    "cameras": 255,
+    "cameras_with_limit": 252,
     "cameras_inactive": 0,
     "sections": 0,
     "red_lights": 0,
-    "limits": 15988,
-    "structs": 990
+    "limits": 15984,
+    "structs": 990,
+    "bumps": 1387,
+    "hazards": 253,
+    "tolls": 0,
+    "portable_radar": 24,
+    "potholes": 72,
+    "moto_accidents": 10,
+    "limit_lines": 4314,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/SE/estruturas.csv",
     "bytes": 50409,
-    "sha256": "908af5168b07243deacfea433c48d7acddf22fbae801f96e28b4e681424971dc",
+    "sha256": "3269798d0bc02ade8918abc2c88ddbd643b24966b6b765bdce94a07d01d9345e",
     "count": 990
+   },
+   "bumps": {
+    "file": "estados/SE/lombadas.csv",
+    "bytes": 37643,
+    "sha256": "2b8616e1a9bf2fbaf72ca4e21350f8ecab37f81fd0a2f1c606cc343772a20a8e",
+    "count": 1387
+   },
+   "hazards": {
+    "file": "estados/SE/pontos_atencao.csv",
+    "bytes": 9354,
+    "sha256": "f5e407ff6e4ac5be8bed5ff690368de5b920de7442d9213e15f56848c1858905",
+    "count": 253
+   },
+   "portable_radar": {
+    "file": "estados/SE/radar_portatil.csv",
+    "bytes": 8356,
+    "sha256": "b45c4a17f5a927fdbe46ddd75d5ab9eb0fb3ae91276fadc7ccf96fd6d1ede829",
+    "count": 24
+   },
+   "potholes": {
+    "file": "estados/SE/buracos.csv",
+    "bytes": 9820,
+    "sha256": "9da8cfcfea5a18553857e3a30e88b53c826c1d7503505f16a319dd84a5be5d3e",
+    "count": 72
+   },
+   "moto_accidents": {
+    "file": "estados/SE/acidentes_moto.csv",
+    "bytes": 1211,
+    "sha256": "2d42d211302c3a39e482c4482142b8f55add74509270f20c7f2396712c5531fb",
+    "count": 10
+   },
+   "limit_lines": {
+    "bytes": 1043391,
+    "sha256": "9c94cfe92bb4f3eb3ed75d88cfc2d3f7a0ecef77ad6ff3c963d8dcc34df2e673",
+    "count": 4314,
+    "release_asset": "pardal-SE.zip",
+    "asset_path": "SE/limites_trechos.csv"
    }
   },
   "SP": {
@@ -1179,8 +2402,8 @@
     -19.78,
     -44.16
    ],
-   "built_at": "2026-10-06T13:39:47Z",
-   "artifact_built_at": "2026-10-06T13:39:47Z",
+   "built_at": "2026-11-08T15:43:10Z",
+   "artifact_built_at": "2026-11-08T15:43:10Z",
    "coverage": {
     "level": "federal+state+municipal",
     "sources": [
@@ -1189,35 +2412,93 @@
      "DER-SP",
      "DNIT",
      "INMETRO",
-     "OSM"
+     "OSM",
+     "PRF"
     ]
    },
    "cameras": {
     "file": "estados/SP/radares.csv",
-    "bytes": 229775,
-    "sha256": "92d7402bd17c1cfced57b18a9d83c006c4e0c6b76c03ad1bbed49f8f6c5c0252",
-    "count": 5234
+    "bytes": 231572,
+    "sha256": "191c9d384552179fcb5e8feaa9fba2a82724be1beee2f5398b921c4f2162185a",
+    "count": 5274
    },
    "limits": {
     "file": "estados/SP/limites.csv",
-    "bytes": 16781438,
-    "sha256": "04b956861cc23badab18137d6a153505f4c7fa21a0c6282d2d21c0b2e17c3e7e",
-    "count": 460796
+    "bytes": 16797373,
+    "sha256": "b4158fdfd145cb5f021b92caed60aab555949271d508f7672036a89ef5a7fd3a",
+    "count": 461290
    },
    "counts": {
-    "cameras": 5234,
-    "cameras_with_limit": 3965,
-    "cameras_inactive": 69,
+    "cameras": 5274,
+    "cameras_with_limit": 4001,
+    "cameras_inactive": 99,
     "sections": 39,
     "red_lights": 81,
-    "limits": 460796,
-    "structs": 20109
+    "limits": 461290,
+    "structs": 20145,
+    "bumps": 34932,
+    "hazards": 3050,
+    "tolls": 282,
+    "portable_radar": 91,
+    "potholes": 3,
+    "moto_accidents": 46,
+    "limit_lines": 159701,
+    "enforcement_cameras": 1306
    },
    "structs": {
     "file": "estados/SP/estruturas.csv",
-    "bytes": 1025584,
-    "sha256": "e4280a948ab3ff913007369ce3dc86f718914b15093a9d5bef0fd29ff5b14684",
-    "count": 20109
+    "bytes": 1027420,
+    "sha256": "67012dbbcce5a0799e2d4905bf1900e62a0fe8efc7050cb161358485c925ddbd",
+    "count": 20145
+   },
+   "bumps": {
+    "file": "estados/SP/lombadas.csv",
+    "bytes": 960712,
+    "sha256": "ebd0d87f9518a83158a485519855c681ba590e41306aef5be977e76170901f5e",
+    "count": 34932
+   },
+   "hazards": {
+    "file": "estados/SP/pontos_atencao.csv",
+    "bytes": 110740,
+    "sha256": "4c1ddfc3cb8ee939c9c36b7e2fa4ab5721a63359f85d584ee68607cec4b896f3",
+    "count": 3050
+   },
+   "tolls": {
+    "file": "estados/SP/pedagios.csv",
+    "bytes": 11606,
+    "sha256": "d5f404b4d6d31fda4dd74cb13bbb87c66a4445ed32594deddad57a50f777602a",
+    "count": 282
+   },
+   "portable_radar": {
+    "file": "estados/SP/radar_portatil.csv",
+    "bytes": 33417,
+    "sha256": "c3d2aa37d49ec689314beb25904b45a9e34bc7b201d2823d816caf6eac3baa02",
+    "count": 91
+   },
+   "potholes": {
+    "file": "estados/SP/buracos.csv",
+    "bytes": 645,
+    "sha256": "d2f6c072eea08f07c74da6b37cf252b40c640f62c1f59b83970e58e7bc4f82f7",
+    "count": 3
+   },
+   "moto_accidents": {
+    "file": "estados/SP/acidentes_moto.csv",
+    "bytes": 7369,
+    "sha256": "60dfdd95cdfbcb76568e61805379c8d07db21a85489ecb277bdf287deee99e3f",
+    "count": 46
+   },
+   "limit_lines": {
+    "bytes": 28999817,
+    "sha256": "1fd67ece686f38764d216b62135d2ab8304c5b712601c05cd2e4204580db58d3",
+    "count": 159701,
+    "release_asset": "pardal-SP.zip",
+    "asset_path": "SP/limites_trechos.csv"
+   },
+   "enforcement_cameras": {
+    "file": "estados/SP/cameras_fiscalizacao.csv",
+    "bytes": 66580,
+    "sha256": "7e1fcb1557b4da47a455bd9c29acfe5041fe221b9cfb9869e37b73136bfc65da",
+    "count": 1306
    }
   },
   "TO": {
@@ -1228,11 +2509,12 @@
     -5.17,
     -45.7
    ],
-   "built_at": "2026-10-06T13:31:35Z",
-   "artifact_built_at": "2026-10-06T13:31:35Z",
+   "built_at": "2026-11-08T15:35:56Z",
+   "artifact_built_at": "2026-11-08T15:35:56Z",
    "coverage": {
-    "level": "federal",
+    "level": "federal+state",
     "sources": [
+     "AGETO-TO",
      "ANTT",
      "DNIT",
      "INMETRO",
@@ -1241,30 +2523,81 @@
    },
    "cameras": {
     "file": "estados/TO/radares.csv",
-    "bytes": 3276,
-    "sha256": "767ecd5f32b69ac4d04b57bf92afe5c8e1e73d485bbd32191e736a7b4f5b5a94",
-    "count": 77
+    "bytes": 5909,
+    "sha256": "a81965efe90ae110dd688cedbe5365b3f41dab00ec9546021e8053872033e372",
+    "count": 136
    },
    "limits": {
     "file": "estados/TO/limites.csv",
-    "bytes": 1848577,
-    "sha256": "c0970f6c6c98023c367e0e12ff2c78933cf7ac5f807e861ff6cc93d1d4c66891",
-    "count": 48609
+    "bytes": 1849014,
+    "sha256": "6b76079aec3b831523090b53c15dcaadc2929d27fa13674e666b245402d29839",
+    "count": 48627
    },
    "counts": {
-    "cameras": 77,
-    "cameras_with_limit": 75,
-    "cameras_inactive": 4,
+    "cameras": 136,
+    "cameras_with_limit": 134,
+    "cameras_inactive": 9,
     "sections": 0,
     "red_lights": 0,
-    "limits": 48609,
-    "structs": 1018
+    "limits": 48627,
+    "structs": 1024,
+    "bumps": 279,
+    "hazards": 175,
+    "tolls": 2,
+    "portable_radar": 35,
+    "potholes": 17,
+    "moto_accidents": 9,
+    "limit_lines": 7459,
+    "enforcement_cameras": 0
    },
    "structs": {
     "file": "estados/TO/estruturas.csv",
-    "bytes": 50847,
-    "sha256": "ca6a6a2f8f3f3b168b6f54723d14aa97869e7a9a1585bc285f89c72e458ac0a7",
-    "count": 1018
+    "bytes": 51147,
+    "sha256": "4cf910cc9bc8c294f436eaedb9340d467fe8bf37fd014cdb64386b468aa2ac73",
+    "count": 1024
+   },
+   "bumps": {
+    "file": "estados/TO/lombadas.csv",
+    "bytes": 7456,
+    "sha256": "2b396aae58ced0e94f1e89e832d1a6565304cfcadbd3868c30aeb2e5d4e1efae",
+    "count": 279
+   },
+   "hazards": {
+    "file": "estados/TO/pontos_atencao.csv",
+    "bytes": 6420,
+    "sha256": "46d66bc3f7fe08fe265664f817458d3eab9f3e6c31cb5390c0784d4c3ca0301b",
+    "count": 175
+   },
+   "tolls": {
+    "file": "estados/TO/pedagios.csv",
+    "bytes": 132,
+    "sha256": "15183fa2249e93ad57d989a19b2bfe89c4575273def8dbb263fa78be2ceda02c",
+    "count": 2
+   },
+   "portable_radar": {
+    "file": "estados/TO/radar_portatil.csv",
+    "bytes": 6205,
+    "sha256": "4efe4f84c042bb2389259483e120b9c83723ac5493a2bf1c13e430eed0576403",
+    "count": 35
+   },
+   "potholes": {
+    "file": "estados/TO/buracos.csv",
+    "bytes": 1952,
+    "sha256": "b7dddbeb977c96c4086950f234dd17178559bdc1b4f53637df33961c6d1deb2e",
+    "count": 17
+   },
+   "moto_accidents": {
+    "file": "estados/TO/acidentes_moto.csv",
+    "bytes": 1096,
+    "sha256": "55d66a583fc9f1d3502075ea15c5ba74339659b7e646993e0436fee0f9893c8c",
+    "count": 9
+   },
+   "limit_lines": {
+    "bytes": 2296126,
+    "sha256": "793c72dafe0042718b8c0313d5d616ea86f41ea46c734fce688243d78fcb4842",
+    "count": 7459,
+    "release_asset": "pardal-TO.zip",
+    "asset_path": "TO/limites_trechos.csv"
    }
   },
   "BR": {
@@ -1275,7 +2608,7 @@
     6.0,
     -32.0
    ],
-   "built_at": "2026-10-06T13:44:12Z",
+   "built_at": "2026-11-08T15:47:17Z",
    "coverage": {
     "level": "bundle",
     "sources": [
@@ -1284,33 +2617,33 @@
    },
    "cameras": {
     "file": "brasil/radares.csv",
-    "bytes": 856664,
-    "sha256": "2385c4b9d35e933bfef9306df5573cbcea919c6bc26bbcf28525c855e50c3fce",
-    "count": 19762
+    "bytes": 903240,
+    "sha256": "24549db7f3163b1d2c8ad63ff3f5d8c1c498a1ed264ebc3b9f0fa6d3f5aa99c8",
+    "count": 20806
    },
    "limits": {
     "file": "brasil/limites.csv",
-    "bytes": 47199903,
-    "sha256": "b666eae453c465f18606efcde2c6584e3d2d5621f310e79f60e40ff5322fc401",
-    "count": 1424524
+    "bytes": 47349304,
+    "sha256": "86c3f45217e80fb3fb54f780aea5e41a8507060962eec637c5be40e3df3f49fa",
+    "count": 1429047
    },
    "limits_estimated": {
     "file": "brasil/limites_estimados.csv",
-    "bytes": 58634980,
-    "sha256": "f0222db0c87376920f5672d6032662f94086d4926e23b67c5ea7e5bcb0aa48c6",
-    "count": 1437280
+    "bytes": 58629979,
+    "sha256": "1275f79fe80c0241c70d49d2608f04eb8908f3dea3044c8cdfc6540c4daf7a77",
+    "count": 1437182
    },
    "structs": {
     "file": "brasil/estruturas.csv",
-    "bytes": 6452662,
-    "sha256": "b59ef2bfc0bb322bb11a5349a72f2453ed37909de62a605d81a88e3430926d7c",
-    "count": 127333
+    "bytes": 6479096,
+    "sha256": "18f7a6c3cf613c47d024f51ae9de65ad32eee1e353a4f516ebbe852590215a12",
+    "count": 127855
    },
    "counts": {
-    "cameras": 19762,
-    "limits": 1424524,
-    "limits_estimated": 1437280,
-    "structs": 127333
+    "cameras": 20806,
+    "limits": 1429047,
+    "limits_estimated": 1437182,
+    "structs": 127855
    },
    "included_ufs": [
     "AC",
@@ -1342,5 +2675,45 @@
     "TO"
    ]
   }
+ },
+ "ufs_geojson": {
+  "file": "brasil/ufs.geojson",
+  "bytes": 132844,
+  "sha256": "90146b229e4bb9b78f34e61ddf8c66f03359e870e75bc8df7eaa1083cc798406"
+ },
+ "source_dates": {
+  "AGETO-TO": "2026-11-08",
+  "ANTT": "2026-11-08",
+  "ANTT (pedágios)": "2026-11-08",
+  "ANTT placas": "2026-11-08",
+  "ANTT placas (trechos)": "2026-11-08",
+  "BHTRANS": "2026-11-08",
+  "BHTRANS (outras câmeras)": "2026-11-08",
+  "CET-SP": "2026-11-08",
+  "CET-SP (outras câmeras)": "2026-11-08",
+  "CET-SP limites": "2026-11-08",
+  "CET-SP limites (linhas)": "2026-11-08",
+  "Curitiba (outras câmeras)": "2026-11-08",
+  "DER-GO": "2026-11-08",
+  "DER-MG": "2026-11-08",
+  "DER-PE": "2026-11-08",
+  "DER-SE": "2026-11-08",
+  "DER-SP": "2026-11-08",
+  "DETRAN-DF": "2026-11-08",
+  "DETRAN-MA": "2026-11-08",
+  "DNIT": "2026-11-08",
+  "DNIT (buracos, ICM)": "2026-11-08",
+  "EPTC": "2026-11-08",
+  "PRF (acidentes com moto)": "2026-11-08",
+  "PRF (multas de velocidade)": "2026-11-08",
+  "PRF (radares das concessões)": "2026-11-08",
+  "PRF (trechos de radar portátil)": "2026-11-08",
+  "RIO": "2026-10-06",
+  "Rio trechos": "2026-10-06",
+  "SEINFRA-BA": "2026-11-08",
+  "SEMTRAN-PVH": "2026-11-08",
+  "SIE-SC (radar portátil)": "2026-11-08",
+  "TRANSALVADOR": "2026-11-08",
+  "capitais": "2026-11-08"
  }
 }

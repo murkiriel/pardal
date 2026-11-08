@@ -6,6 +6,7 @@
 <wpt lat="-6.812355" lon="-44.643713"><name>Radar 50 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-6.755036" lon="-43.018033"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-6.754685" lon="-43.024552"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-5.556061" lon="-47.455899"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-5.540681" lon="-47.468385"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-5.531086" lon="-47.485534"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-5.520949" lon="-47.475560"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
@@ -18,8 +19,19 @@
 <wpt lat="-5.464187" lon="-47.416409"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-5.088364" lon="-42.835873"><name>Radar 40 km/h</name><desc>Fonte: DNIT · sentido 321° (noroeste)</desc><type>FIXED</type></wpt>
 <wpt lat="-5.087786" lon="-42.825557"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-4.944359" lon="-47.471363"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-4.886140" lon="-43.377070"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-4.874900" lon="-43.396128"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-4.844580" lon="-43.350810"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.844200" lon="-43.350500"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.841654" lon="-43.344679"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.841300" lon="-43.344600"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.826809" lon="-43.341917"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.562519" lon="-43.995534"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.506100" lon="-43.910500"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.499200" lon="-43.900500"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.268618" lon="-43.938932"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-4.250624" lon="-43.933348"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
 <wpt lat="-4.222218" lon="-44.785585"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-3.621671" lon="-44.556987"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-3.554467" lon="-44.583415"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -34,6 +46,10 @@
 <wpt lat="-3.305531" lon="-44.422667"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-3.283120" lon="-44.410547"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-3.059500" lon="-44.320659"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-2.961000" lon="-44.303500"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.950400" lon="-44.216600"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.943139" lon="-44.257816"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.942337" lon="-44.241344"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
 <wpt lat="-2.757776" lon="-44.352585"><name>Radar 60 km/h</name><desc>Fonte: DNIT+OSM · sentido 43° (nordeste)</desc><type>FIXED</type></wpt>
 <wpt lat="-2.740129" lon="-44.337845"><name>Radar</name><desc>Fonte: DNIT · sentido 36° (nordeste)</desc><type>FIXED</type></wpt>
 <wpt lat="-2.739240" lon="-44.337171"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -72,6 +88,9 @@
 <wpt lat="-2.560473" lon="-44.314886"><name>Radar</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-2.557680" lon="-44.248978"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.557459" lon="-44.249264"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-2.554668" lon="-44.140804"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.553959" lon="-44.192577"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.553768" lon="-44.192000"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
 <wpt lat="-2.543344" lon="-44.217469"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.542815" lon="-44.217806"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.541415" lon="-44.231907"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -79,11 +98,18 @@
 <wpt lat="-2.537892" lon="-44.270098"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.533669" lon="-44.228983"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.533649" lon="-44.229182"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-2.533007" lon="-44.183483"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.532211" lon="-45.098700"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.531538" lon="-45.097084"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.527800" lon="-44.130700"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
 <wpt lat="-2.524601" lon="-44.250066"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.524548" lon="-44.250180"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-2.523500" lon="-45.071900"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.521791" lon="-45.073393"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
 <wpt lat="-2.521391" lon="-44.270694"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.520954" lon="-44.270431"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.519017" lon="-44.225997"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-2.516300" lon="-44.145900"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
 <wpt lat="-2.515447" lon="-44.269676"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.515380" lon="-44.269526"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.513559" lon="-44.289596"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -94,6 +120,7 @@
 <wpt lat="-2.510886" lon="-44.303627"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.510814" lon="-44.303494"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.510295" lon="-44.274128"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-2.510060" lon="-45.087026"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
 <wpt lat="-2.509910" lon="-44.303463"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.509775" lon="-44.303316"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.505961" lon="-44.295754"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -135,6 +162,12 @@
 <wpt lat="-2.488000" lon="-44.274296"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.479932" lon="-44.230114"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-2.479571" lon="-44.228830"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-2.478933" lon="-44.211433"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-2.478832" lon="-44.211500"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-2.479277" lon="-44.211892"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.478711" lon="-44.211409"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA+OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-2.477476" lon="-44.172461"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.475861" lon="-44.188494"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.475715" lon="-44.188497"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.463992" lon="-44.163183"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.443610" lon="-44.126165"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
+<wpt lat="-2.432400" lon="-44.102600"><name>Radar 60 km/h</name><desc>Fonte: DETRAN-MA</desc><type>FIXED</type></wpt>
 </gpx>

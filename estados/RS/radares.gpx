@@ -82,7 +82,7 @@
 <wpt lat="-30.090800" lon="-51.219750"><name>Radar 60 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.090181" lon="-51.334653"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.089966" lon="-51.334105"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-30.087306" lon="-51.187607"><name>Radar 40 km/h</name><desc>Fonte: EPTC+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-30.087306" lon="-51.187607"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.086833" lon="-51.187982"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.085400" lon="-51.247660"><name>Radar 60 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.085269" lon="-51.190434"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
@@ -116,14 +116,12 @@
 <wpt lat="-30.068200" lon="-51.146020"><name>Radar 60 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.068100" lon="-51.146180"><name>Radar 60 km/h</name><desc>Fonte: EPTC+INMETRO+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.067570" lon="-51.236320"><name>Radar 30 km/h</name><desc>Fonte: EPTC+INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-30.067365" lon="-51.026445"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-30.067331" lon="-51.101962"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-30.067030" lon="-51.235870"><name>Radar 30 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.066616" lon="-51.088603"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-30.066236" lon="-51.021156"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-30.066134" lon="-51.107274"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-30.065955" lon="-51.107201"><name>Radar 40 km/h</name><desc>Fonte: INMETRO+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.065895" lon="-51.088909"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-30.065783" lon="-51.107311"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-30.065660" lon="-51.022846"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-30.065514" lon="-51.151519"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.063662" lon="-51.185061"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
@@ -152,7 +150,6 @@
 <wpt lat="-30.046662" lon="-51.211926"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.045995" lon="-51.101268"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.045962" lon="-51.210709"><name>Avanço de sinal</name><desc>Fonte: OSM</desc><type>RED_LIGHT</type></wpt>
-<wpt lat="-30.044989" lon="-51.199313"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-30.044500" lon="-51.176910"><name>Radar 60 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.043700" lon="-51.199490"><name>Radar 60 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.043519" lon="-51.199853"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -172,8 +169,9 @@
 <wpt lat="-30.039600" lon="-51.145070"><name>Radar 40 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.038961" lon="-51.218112"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.037138" lon="-51.219528"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
+<wpt lat="-30.036961" lon="-51.208302"><name>Radar 30 km/h</name><desc>Fonte: EPTC+INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-30.036807" lon="-51.143945"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-30.036400" lon="-51.209550"><name>Radar 30 km/h</name><desc>Fonte: EPTC+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-30.036400" lon="-51.209550"><name>Radar 30 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.035980" lon="-51.210600"><name>Radar 30 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.034851" lon="-51.212668"><name>Radar 30 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.033757" lon="-51.214850"><name>Radar 30 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
@@ -192,9 +190,11 @@
 <wpt lat="-30.025263" lon="-51.215390"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.024416" lon="-52.906953"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.024344" lon="-52.906969"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-30.022595" lon="-51.220199"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.022527" lon="-51.027227"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.022120" lon="-51.187730"><name>Radar 40 km/h</name><desc>Fonte: EPTC+INMETRO+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.022100" lon="-51.119890"><name>Radar 60 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-30.021936" lon="-51.184568"><name>Radar 30 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.020330" lon="-51.142760"><name>Radar 40 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.020130" lon="-51.142880"><name>Radar 40 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
 <wpt lat="-30.019673" lon="-51.142710"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -211,7 +211,7 @@
 <wpt lat="-30.010305" lon="-51.178893"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.007800" lon="-51.210330"><name>Radar 80 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.007150" lon="-51.189610"><name>Radar 30 km/h</name><desc>Fonte: EPTC+INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-30.005600" lon="-51.138710"><name>Radar 60 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
+<wpt lat="-30.005600" lon="-51.138710"><name>Radar 60 km/h</name><desc>Fonte: EPTC+INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-30.005500" lon="-51.138590"><name>Radar 60 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.003368" lon="-51.080905"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-30.003300" lon="-51.185230"><name>Radar 60 km/h</name><desc>Fonte: EPTC</desc><type>FIXED</type></wpt>
@@ -220,15 +220,13 @@
 <wpt lat="-30.001275" lon="-51.302390"><name>Radar</name><desc>Fonte: DNIT · sentido 71° (leste)</desc><type>FIXED</type></wpt>
 <wpt lat="-29.995578" lon="-51.283385"><name>Radar</name><desc>Fonte: DNIT · sentido 70° (leste)</desc><type>FIXED</type></wpt>
 <wpt lat="-29.995050" lon="-51.188490"><name>Radar 40 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-29.983000" lon="-51.116790"><name>Radar 60 km/h</name><desc>Fonte: EPTC+INMETRO+OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-29.983000" lon="-51.116790"><name>Radar 60 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-29.982800" lon="-51.116520"><name>Radar 60 km/h</name><desc>Fonte: EPTC+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-29.975973" lon="-51.193979"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-29.972278" lon="-51.727285"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-29.971353" lon="-51.730745"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-29.971272" lon="-51.199949"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-29.971214" lon="-51.199798"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-29.971204" lon="-51.182547"><name>Radar 100 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-29.971188" lon="-51.182885"><name>Radar 100 km/h</name><desc>Fonte: ANTT · sentido 105° (leste)</desc><type>FIXED</type></wpt>
 <wpt lat="-29.968781" lon="-51.167917"><name>Radar 100 km/h</name><desc>Fonte: ANTT+OSM · sentido 257° (oeste)</desc><type>FIXED</type></wpt>
 <wpt lat="-29.968025" lon="-51.123170"><name>Radar 110 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-29.967830" lon="-51.123116"><name>Radar 110 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -530,7 +528,6 @@
 <wpt lat="-29.151700" lon="-51.168647"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-29.150260" lon="-51.224003"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-29.149202" lon="-51.179533"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-29.135997" lon="-51.180929"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-29.132401" lon="-51.177764"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-29.131674" lon="-51.544783"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-29.124049" lon="-51.173771"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -690,7 +687,6 @@
 <wpt lat="-28.278285" lon="-52.189362"><name>Radar de trecho 50 km/h</name><desc>Fonte: OSM</desc><type>SECTION</type></wpt>
 <wpt lat="-28.275405" lon="-52.381922"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-28.275352" lon="-53.494777"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-28.274468" lon="-52.383200"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-28.274417" lon="-51.684717"><name>Radar de trecho 60 km/h</name><desc>Fonte: DNIT+OSM · sentido 283° (oeste)</desc><type>SECTION</type></wpt>
 <wpt lat="-28.273173" lon="-51.688450"><name>Radar de trecho 60 km/h</name><desc>Fonte: OSM</desc><type>SECTION</type></wpt>
 <wpt lat="-28.272245" lon="-52.385956"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -764,24 +760,14 @@
 <wpt lat="-27.656047" lon="-52.293434"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.654554" lon="-52.274964"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.653828" lon="-52.264891"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.648497" lon="-52.267362"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.648411" lon="-52.296656"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.642838" lon="-52.265960"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.640365" lon="-52.304742"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.638641" lon="-52.271812"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.638440" lon="-52.289618"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.637094" lon="-52.263458"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.636606" lon="-52.286878"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.635252" lon="-52.280373"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.635139" lon="-52.279785"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-27.636514" lon="-52.262135"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.635130" lon="-52.259279"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.634073" lon="-52.281117"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.632917" lon="-52.255171"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.632229" lon="-52.274989"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-27.632189" lon="-52.275623"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.627402" lon="-52.255320"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.623295" lon="-52.236717"><name>Radar</name><desc>Fonte: DNIT · sentido 334° (noroeste)</desc><type>FIXED</type></wpt>
-<wpt lat="-27.621910" lon="-52.243508"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-27.447580" lon="-53.948800"><name>Radar</name><desc>Fonte: DNIT · sentido 347° (norte)</desc><type>FIXED</type></wpt>
 <wpt lat="-27.444010" lon="-53.949850"><name>Radar</name><desc>Fonte: DNIT · sentido 168° (sul)</desc><type>FIXED</type></wpt>
 <wpt lat="-27.409548" lon="-53.415412"><name>Radar de trecho 50 km/h</name><desc>Fonte: OSM</desc><type>SECTION</type></wpt>

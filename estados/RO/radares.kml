@@ -5,7 +5,7 @@
 <Folder><name>Radares de velocidade</name>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT · sentido 285° (oeste)</description><Point><coordinates>-60.168590,-12.731270,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: OSM</description><Point><coordinates>-60.189619,-12.726045,0</coordinates></Point></Placemark>
-<Placemark><name>Radar</name><description>Fonte: DNIT</description><Point><coordinates>-60.191282,-12.725943,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-60.191282,-12.725943,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-60.120126,-12.704480,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-61.489242,-11.440743,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT · sentido 358° (norte)</description><Point><coordinates>-61.930397,-10.897911,0</coordinates></Point></Placemark>
@@ -22,21 +22,46 @@
 <Placemark><name>Radar 50 km/h</name><description>Fonte: OSM</description><Point><coordinates>-62.397731,-10.531356,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-63.053463,-9.944950,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-63.055416,-9.935653,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.894906,-8.793896,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.894855,-8.794022,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.907143,-8.789601,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-63.860538,-8.784236,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-63.889707,-8.777642,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: OSM</description><Point><coordinates>-63.877434,-8.774633,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: OSM</description><Point><coordinates>-63.878064,-8.774409,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.880375,-8.766226,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.843661,-8.762968,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.888997,-8.761898,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.907018,-8.760079,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.861361,-8.759956,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.900076,-8.759275,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.845231,-8.756055,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.875675,-8.755938,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.898206,-8.752538,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.877746,-8.746938,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-63.878242,-8.737241,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.872505,-8.769603,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.872997,-8.769430,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.872240,-8.769140,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.872802,-8.768990,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.883600,-8.767230,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.879780,-8.766520,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.885095,-8.764944,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.843689,-8.763167,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.843991,-8.762491,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.888660,-8.762030,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.889190,-8.761693,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.888980,-8.761350,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.906830,-8.760270,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.861120,-8.760140,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.907299,-8.760083,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.861580,-8.759960,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.899660,-8.759860,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.861450,-8.759510,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.845174,-8.756634,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.845728,-8.756434,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.875231,-8.756273,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.875808,-8.756116,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.875053,-8.755745,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.875584,-8.755588,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.898170,-8.752830,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.898591,-8.752645,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.877302,-8.747269,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.877814,-8.747084,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.877120,-8.746790,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.877666,-8.746616,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.903030,-8.742500,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.878620,-8.737800,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.879009,-8.737597,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: SEMTRAN-PVH+INMETRO</description><Point><coordinates>-63.878240,-8.737240,0</coordinates></Point></Placemark>
+<Placemark><name>Radar</name><description>Fonte: SEMTRAN-PVH</description><Point><coordinates>-63.878713,-8.737034,0</coordinates></Point></Placemark>
 </Folder>
 </Document></kml>

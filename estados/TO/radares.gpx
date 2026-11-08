@@ -1,54 +1,101 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="Pardal" xmlns="http://www.topografix.com/GPX/1/1">
 <metadata><name>Pardal — radares — TO</name><desc>Pardal — © colaboradores do OpenStreetMap (ODbL 1.0) e fontes abertas listadas no README</desc></metadata>
+<wpt lat="-13.039221" lon="-48.491326"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-13.011240" lon="-46.834071"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-12.959938" lon="-49.850585"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-12.744980" lon="-49.082581"><name>Radar 100 km/h</name><desc>Fonte: ANTT+OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-12.641756" lon="-47.119498"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-12.521229" lon="-49.106343"><name>Radar 80 km/h</name><desc>Fonte: ANTT</desc><type>FIXED</type></wpt>
 <wpt lat="-12.520441" lon="-49.106631"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-12.103320" lon="-49.186310"><name>Radar 100 km/h</name><desc>Fonte: ANTT+OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-11.888020" lon="-49.164734"><name>Radar 50 km/h</name><desc>Fonte: ANTT</desc><type>FIXED</type></wpt>
-<wpt lat="-11.887310" lon="-49.164448"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-12.246564" lon="-49.747333"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-11.856700" lon="-49.149791"><name>Radar 80 km/h</name><desc>Fonte: ANTT</desc><type>FIXED</type></wpt>
 <wpt lat="-11.855784" lon="-49.149367"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-11.822468" lon="-49.133432"><name>Radar 100 km/h</name><desc>Fonte: ANTT</desc><type>FIXED</type></wpt>
 <wpt lat="-11.821857" lon="-49.133145"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-11.805532" lon="-46.668620"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-11.775574" lon="-49.108210"><name>Radar 80 km/h</name><desc>Fonte: ANTT+OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-11.714444" lon="-47.579929"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-11.689545" lon="-49.070079"><name>Radar 80 km/h</name><desc>Fonte: ANTT · sentido 17° (norte)</desc><type>FIXED</type></wpt>
-<wpt lat="-11.685878" lon="-49.068921"><name>Radar 80 km/h</name><desc>Fonte: ANTT · sentido 198° (sul)</desc><type>FIXED</type></wpt>
+<wpt lat="-11.627092" lon="-46.919928"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-11.624140" lon="-49.048193"><name>Radar 80 km/h</name><desc>Fonte: ANTT</desc><type>FIXED</type></wpt>
 <wpt lat="-11.623464" lon="-49.047965"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-11.618259" lon="-46.813631"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-11.603886" lon="-49.041423"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-11.585121" lon="-46.757136"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-11.559894" lon="-49.026721"><name>Radar 80 km/h</name><desc>Fonte: ANTT</desc><type>FIXED</type></wpt>
 <wpt lat="-11.558964" lon="-49.026413"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-11.449020" lon="-48.991019"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-11.396493" lon="-48.974805"><name>Radar 80 km/h</name><desc>Fonte: ANTT</desc><type>FIXED</type></wpt>
 <wpt lat="-11.305727" lon="-48.940643"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-11.107178" lon="-48.921028"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-10.863104" lon="-48.905533"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-10.771111" lon="-48.048035"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.765768" lon="-48.120218"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.740998" lon="-48.423872"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.737091" lon="-48.409933"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-10.708780" lon="-48.905434"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.425379" lon="-48.898152"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.380715" lon="-48.304428"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-10.333281" lon="-48.298737"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.333256" lon="-48.298925"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.308390" lon="-48.167505"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.303538" lon="-48.139861"><name>Radar 30 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.300781" lon="-48.141499"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-10.296581" lon="-48.297567"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-10.287540" lon="-48.297421"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-10.235704" lon="-48.311694"><name>Radar 40 km/h</name><desc>Fonte: DNIT · sentido 2° (norte)</desc><type>FIXED</type></wpt>
+<wpt lat="-10.223637" lon="-48.311394"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.194798" lon="-48.302340"><name>Radar 70 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.193232" lon="-48.445520"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-10.193187" lon="-48.446085"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-10.192933" lon="-48.456637"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.192850" lon="-48.464575"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.192611" lon="-48.473245"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.191282" lon="-48.536415"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.189210" lon="-48.300303"><name>Radar 70 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.186432" lon="-48.436222"><name>Radar 70 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.185062" lon="-48.405995"><name>Radar 70 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.184933" lon="-48.384295"><name>Radar 70 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.184775" lon="-48.365441"><name>Radar 70 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-10.183797" lon="-48.880168"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-10.179310" lon="-48.300690"><name>Radar 70 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-10.166107" lon="-48.881016"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-10.161359" lon="-48.299589"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.156146" lon="-48.299896"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-10.153714" lon="-48.883646"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-10.148143" lon="-48.867123"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.132743" lon="-48.849219"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.055288" lon="-48.316074"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-10.029568" lon="-48.305381"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.971276" lon="-49.042189"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.955705" lon="-48.342373"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.864015" lon="-48.321018"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.814012" lon="-49.204640"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.751605" lon="-48.353164"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.673411" lon="-48.389631"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.623845" lon="-48.420444"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.592112" lon="-48.407815"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-9.565708" lon="-48.449439"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-9.533482" lon="-48.593619"><name>Radar 60 km/h</name><desc>Fonte: DNIT · sentido 6° (norte)</desc><type>FIXED</type></wpt>
 <wpt lat="-9.515612" lon="-48.589865"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-9.265766" lon="-49.956937"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-8.848327" lon="-48.509941"><name>Radar 60 km/h</name><desc>Fonte: DNIT · sentido 348° (norte)</desc><type>FIXED</type></wpt>
 <wpt lat="-8.835660" lon="-48.512075"><name>Radar 40 km/h</name><desc>Fonte: DNIT+OSM · sentido 0° (norte)</desc><type>FIXED</type></wpt>
 <wpt lat="-8.829097" lon="-48.512269"><name>Radar 60 km/h</name><desc>Fonte: DNIT · sentido 180° (sul)</desc><type>FIXED</type></wpt>
 <wpt lat="-8.828160" lon="-48.512235"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-8.828160" lon="-48.512159"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-8.595844" lon="-48.933684"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.594402" lon="-48.933528"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-8.390214" lon="-48.486833"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-8.066330" lon="-48.466830"><name>Radar 40 km/h</name><desc>Fonte: DNIT+OSM · sentido 2° (norte)</desc><type>FIXED</type></wpt>
 <wpt lat="-8.063436" lon="-48.466953"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-8.063163" lon="-48.466937"><name>Radar 60 km/h</name><desc>Fonte: DNIT · sentido 182° (sul)</desc><type>FIXED</type></wpt>
 <wpt lat="-8.059406" lon="-48.466470"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-8.058366" lon="-48.456354"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-8.055238" lon="-48.466599"><name>Radar 40 km/h</name><desc>Fonte: DNIT · sentido 182° (sul)</desc><type>FIXED</type></wpt>
 <wpt lat="-7.633908" lon="-48.427340"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-7.633507" lon="-48.427371"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-7.365437" lon="-48.011252"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.264531" lon="-48.262653"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-7.232804" lon="-48.252769"><name>Radar</name><desc>Fonte: DNIT · sentido 28° (nordeste)</desc><type>FIXED</type></wpt>
 <wpt lat="-7.221574" lon="-48.248218"><name>Radar 40 km/h</name><desc>Fonte: DNIT · sentido 31° (nordeste)</desc><type>FIXED</type></wpt>
@@ -59,13 +106,16 @@
 <wpt lat="-7.207337" lon="-48.193193"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.205260" lon="-48.240730"><name>Radar 60 km/h</name><desc>Fonte: DNIT+OSM · sentido 193° (sul)</desc><type>FIXED</type></wpt>
 <wpt lat="-7.202043" lon="-48.212176"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-7.201850" lon="-48.213151"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.201644" lon="-48.212767"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.196418" lon="-48.215673"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.196018" lon="-48.198046"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.195746" lon="-48.183176"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-7.194370" lon="-48.257718"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.194226" lon="-48.196775"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.192509" lon="-48.221038"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.191559" lon="-48.218433"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-7.191141" lon="-48.244494"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.186979" lon="-48.217150"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.186854" lon="-48.217472"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-7.179463" lon="-48.222795"><name>Radar 30 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -74,4 +124,8 @@
 <wpt lat="-7.115249" lon="-48.188104"><name>Radar 40 km/h</name><desc>Fonte: DNIT · sentido 217° (sudoeste)</desc><type>FIXED</type></wpt>
 <wpt lat="-6.710662" lon="-47.756247"><name>Radar 40 km/h</name><desc>Fonte: DNIT+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-6.412822" lon="-48.543734"><name>Radar 40 km/h</name><desc>Fonte: DNIT+OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-6.399032" lon="-47.862065"><name>Radar 60 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-6.273884" lon="-47.864957"><name>Radar 40 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-5.898361" lon="-47.820085"><name>Radar 50 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
+<wpt lat="-5.701120" lon="-48.140744"><name>Radar 80 km/h</name><desc>Fonte: AGETO-TO</desc><type>FIXED</type></wpt>
 </gpx>

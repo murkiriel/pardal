@@ -3,54 +3,101 @@
 <name>Pardal — radares — TO</name>
 <description>Pardal — © colaboradores do OpenStreetMap (ODbL 1.0) e fontes abertas listadas no README</description>
 <Folder><name>Radares de velocidade</name>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.491326,-13.039221,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-46.834071,-13.011240,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-49.850585,-12.959938,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 100 km/h</name><description>Fonte: ANTT+OSM</description><Point><coordinates>-49.082581,-12.744980,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-47.119498,-12.641756,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT</description><Point><coordinates>-49.106343,-12.521229,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.106631,-12.520441,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 100 km/h</name><description>Fonte: ANTT+OSM</description><Point><coordinates>-49.186310,-12.103320,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: ANTT</description><Point><coordinates>-49.164734,-11.888020,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.164448,-11.887310,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-49.747333,-12.246564,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT</description><Point><coordinates>-49.149791,-11.856700,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.149367,-11.855784,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 100 km/h</name><description>Fonte: ANTT</description><Point><coordinates>-49.133432,-11.822468,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.133145,-11.821857,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-46.668620,-11.805532,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT+OSM</description><Point><coordinates>-49.108210,-11.775574,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-47.579929,-11.714444,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT · sentido 17° (norte)</description><Point><coordinates>-49.070079,-11.689545,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT · sentido 198° (sul)</description><Point><coordinates>-49.068921,-11.685878,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-46.919928,-11.627092,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT</description><Point><coordinates>-49.048193,-11.624140,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.047965,-11.623464,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-46.813631,-11.618259,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.041423,-11.603886,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-46.757136,-11.585121,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT</description><Point><coordinates>-49.026721,-11.559894,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.026413,-11.558964,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.991019,-11.449020,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT</description><Point><coordinates>-48.974805,-11.396493,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.940643,-11.305727,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.921028,-11.107178,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.905533,-10.863104,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.048035,-10.771111,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.120218,-10.765768,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.423872,-10.740998,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.409933,-10.737091,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.905434,-10.708780,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.898152,-10.425379,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.304428,-10.380715,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.298737,-10.333281,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.298925,-10.333256,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.167505,-10.308390,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 30 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.139861,-10.303538,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.141499,-10.300781,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.297567,-10.296581,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.297421,-10.287540,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT · sentido 2° (norte)</description><Point><coordinates>-48.311694,-10.235704,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.311394,-10.223637,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 70 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.302340,-10.194798,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.445520,-10.193232,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.446085,-10.193187,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.456637,-10.192933,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.464575,-10.192850,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.473245,-10.192611,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.536415,-10.191282,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 70 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.300303,-10.189210,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 70 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.436222,-10.186432,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 70 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.405995,-10.185062,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 70 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.384295,-10.184933,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 70 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.365441,-10.184775,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.880168,-10.183797,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 70 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.300690,-10.179310,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.881016,-10.166107,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.299589,-10.161359,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.299896,-10.156146,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.883646,-10.153714,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.867123,-10.148143,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.849219,-10.132743,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.316074,-10.055288,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.305381,-10.029568,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-49.042189,-9.971276,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.342373,-9.955705,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.321018,-9.864015,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-49.204640,-9.814012,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.353164,-9.751605,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.389631,-9.673411,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.420444,-9.623845,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.407815,-9.592112,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.449439,-9.565708,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT · sentido 6° (norte)</description><Point><coordinates>-48.593619,-9.533482,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.589865,-9.515612,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-49.956937,-9.265766,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT · sentido 348° (norte)</description><Point><coordinates>-48.509941,-8.848327,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT+OSM · sentido 0° (norte)</description><Point><coordinates>-48.512075,-8.835660,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT · sentido 180° (sul)</description><Point><coordinates>-48.512269,-8.829097,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.512235,-8.828160,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.512159,-8.828160,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.933684,-8.595844,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.933528,-8.594402,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.486833,-8.390214,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT+OSM · sentido 2° (norte)</description><Point><coordinates>-48.466830,-8.066330,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.466953,-8.063436,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT · sentido 182° (sul)</description><Point><coordinates>-48.466937,-8.063163,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.466470,-8.059406,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.456354,-8.058366,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT · sentido 182° (sul)</description><Point><coordinates>-48.466599,-8.055238,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.427340,-7.633908,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.427371,-7.633507,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.011252,-7.365437,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT</description><Point><coordinates>-48.262653,-7.264531,0</coordinates></Point></Placemark>
 <Placemark><name>Radar</name><description>Fonte: DNIT · sentido 28° (nordeste)</description><Point><coordinates>-48.252769,-7.232804,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT · sentido 31° (nordeste)</description><Point><coordinates>-48.248218,-7.221574,0</coordinates></Point></Placemark>
@@ -61,13 +108,16 @@
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.193193,-7.207337,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT+OSM · sentido 193° (sul)</description><Point><coordinates>-48.240730,-7.205260,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.212176,-7.202043,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.213151,-7.201850,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.212767,-7.201644,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.215673,-7.196418,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.198046,-7.196018,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.183176,-7.195746,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.257718,-7.194370,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.196775,-7.194226,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.221038,-7.192509,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.218433,-7.191559,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.244494,-7.191141,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.217150,-7.186979,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-48.217472,-7.186854,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 30 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.222795,-7.179463,0</coordinates></Point></Placemark>
@@ -76,5 +126,9 @@
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT · sentido 217° (sudoeste)</description><Point><coordinates>-48.188104,-7.115249,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT+OSM</description><Point><coordinates>-47.756247,-6.710662,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: DNIT+OSM</description><Point><coordinates>-48.543734,-6.412822,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-47.862065,-6.399032,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 40 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-47.864957,-6.273884,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-47.820085,-5.898361,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 80 km/h</name><description>Fonte: AGETO-TO</description><Point><coordinates>-48.140744,-5.701120,0</coordinates></Point></Placemark>
 </Folder>
 </Document></kml>

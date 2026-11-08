@@ -3,7 +3,7 @@
 <metadata><name>Pardal — radares — RO</name><desc>Pardal — © colaboradores do OpenStreetMap (ODbL 1.0) e fontes abertas listadas no README</desc></metadata>
 <wpt lat="-12.731270" lon="-60.168590"><name>Radar 40 km/h</name><desc>Fonte: DNIT · sentido 285° (oeste)</desc><type>FIXED</type></wpt>
 <wpt lat="-12.726045" lon="-60.189619"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-12.725943" lon="-60.191282"><name>Radar</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-12.725943" lon="-60.191282"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-12.704480" lon="-60.120126"><name>Radar 40 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-11.440743" lon="-61.489242"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.897911" lon="-61.930397"><name>Radar 60 km/h</name><desc>Fonte: DNIT · sentido 358° (norte)</desc><type>FIXED</type></wpt>
@@ -20,20 +20,45 @@
 <wpt lat="-10.531356" lon="-62.397731"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-9.944950" lon="-63.053463"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-9.935653" lon="-63.055416"><name>Radar 80 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-8.793896" lon="-63.894906"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.794022" lon="-63.894855"><name>Radar 50 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.789601" lon="-63.907143"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
 <wpt lat="-8.784236" lon="-63.860538"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-8.777642" lon="-63.889707"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-8.774633" lon="-63.877434"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-8.774409" lon="-63.878064"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-8.766226" lon="-63.880375"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.762968" lon="-63.843661"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.761898" lon="-63.888997"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.760079" lon="-63.907018"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.759956" lon="-63.861361"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.759275" lon="-63.900076"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.756055" lon="-63.845231"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.755938" lon="-63.875675"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.752538" lon="-63.898206"><name>Radar 50 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.746938" lon="-63.877746"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-8.737241" lon="-63.878242"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.769603" lon="-63.872505"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.769430" lon="-63.872997"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.769140" lon="-63.872240"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.768990" lon="-63.872802"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.767230" lon="-63.883600"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.766520" lon="-63.879780"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.764944" lon="-63.885095"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.763167" lon="-63.843689"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.762491" lon="-63.843991"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.762030" lon="-63.888660"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.761693" lon="-63.889190"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.761350" lon="-63.888980"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.760270" lon="-63.906830"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.760140" lon="-63.861120"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.760083" lon="-63.907299"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.759960" lon="-63.861580"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.759860" lon="-63.899660"><name>Radar 50 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.759510" lon="-63.861450"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.756634" lon="-63.845174"><name>Radar 50 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.756434" lon="-63.845728"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.756273" lon="-63.875231"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.756116" lon="-63.875808"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.755745" lon="-63.875053"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.755588" lon="-63.875584"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.752830" lon="-63.898170"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.752645" lon="-63.898591"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.747269" lon="-63.877302"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.747084" lon="-63.877814"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.746790" lon="-63.877120"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.746616" lon="-63.877666"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.742500" lon="-63.903030"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.737800" lon="-63.878620"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.737597" lon="-63.879009"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
+<wpt lat="-8.737240" lon="-63.878240"><name>Radar 60 km/h</name><desc>Fonte: SEMTRAN-PVH+INMETRO</desc><type>FIXED</type></wpt>
+<wpt lat="-8.737034" lon="-63.878713"><name>Radar</name><desc>Fonte: SEMTRAN-PVH</desc><type>FIXED</type></wpt>
 </gpx>
