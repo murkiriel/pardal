@@ -147,7 +147,7 @@ class Context(unittest.TestCase):
         before = list(failures._FAILURES)
         try:
             with mock.patch.object(prf_fines, "load", down):
-                ctx = BuildContext("raw")
+                ctx = BuildContext(tempfile.mkdtemp())
                 got = (ctx.prf_speed_fines(), ctx.prf_speed_fines())
             new = failures.recorded()[len(before):]
         finally:

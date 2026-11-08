@@ -118,7 +118,7 @@ class Context(unittest.TestCase):
         before = list(failures._FAILURES)
         try:
             with mock.patch.object(sc, "zones", down):
-                ctx = BuildContext("raw")
+                ctx = BuildContext(tempfile.mkdtemp())
                 got = (ctx.sc_portable_radar("x.pbf"), ctx.sc_portable_radar("x.pbf"))
             new = failures.recorded()[len(before):]
         finally:

@@ -19,9 +19,9 @@ import sys
 from datetime import datetime, timezone
 from typing import Optional
 
-from datakit.build_pack import (ACCIDENTS_FILE, BUMPS_FILE, CAMERAS_FILE, LIMITS_FILE, MANIFEST_FILE, POTHOLES_FILE, RADAR_ZONES_FILE,
-                                 STRUCTS_FILE, TOLLS_FILE)
-from datakit.common import AccidentZone, PotholeZone, RadarZone
+from datakit.build_pack import (ACCIDENTS_FILE, BUMPS_FILE, CAMERAS_FILE, ENFORCEMENT_FILE, HAZARDS_FILE, LIMIT_LINES_FILE, LIMITS_FILE,
+                                 MANIFEST_FILE, POTHOLES_FILE, RADAR_ZONES_FILE, STRUCTS_FILE, TOLLS_FILE)
+from datakit.common import AccidentZone, EnforcementCamera, LimitLine, PotholeZone, RadarZone
 from datakit.common.ufs import SOURCE_HOME_UF, uf_name
 
 # Versão do formato do catálogo. 2 (2026-09-30): nome catalogo.json e etiquetas em inglês (name,
@@ -30,14 +30,17 @@ from datakit.common.ufs import SOURCE_HOME_UF, uf_name
 SCHEMA = 2
 
 _FEDERAL = {"DNIT", "ANTT"}
-_MUNICIPAL = {"PMF", "PCR", "PMJP", "CET-SP", "RIO", "BHTRANS", "CURITIBA", "EPTC"}
+_MUNICIPAL = {"PMF", "PCR", "PMJP", "CET-SP", "RIO", "BHTRANS", "CURITIBA", "EPTC", "TRANSALVADOR", "SEMTRAN-PVH"}
+# Órgãos estaduais que não se chamam DER-*.
+_STATE = {"DETRAN-DF", "AGETO-TO", "DETRAN-MA", "SEINFRA-BA"}
 
 
 def _coverage(cameras_csv: str, uf: str) -> dict:
     """Que tipo de fonte de radar entrou nesta UF — pra UI ser honesta. `sources` lista todas;
     `level` só conta órgão estadual ou municipal da própria UF: um radar do DER-SP colado na
     divisa aparece no pacote de MG, mas não faz de MG um estado com cobertura estadual. O
-    Detran-DF conta como estadual (era a maior fonte oficial e o DF saía só como "federal")."""
+    Detran-DF conta como estadual (era a maior fonte oficial e o DF saía só como "federal"), como
+    os outros órgãos estaduais que não se chamam DER-* (_STATE)."""
     srcs: set = set()
     try:
         with open(cameras_csv, newline="", encoding="utf-8") as f:
@@ -49,7 +52,7 @@ def _coverage(cameras_csv: str, uf: str) -> dict:
     parts = []
     if srcs & _FEDERAL:
         parts.append("federal")
-    if any(s.startswith("DER-") or s == "DETRAN-DF" for s in local):
+    if any(s.startswith("DER-") or s in _STATE for s in local):
         parts.append("state")
     if local & _MUNICIPAL:
         parts.append("municipal")
@@ -117,6 +120,12 @@ def build(packs_dir: str, dist_dir: str, base_url: str = "") -> dict:
             bump_dst = os.path.join(out, BUMPS_FILE)
             shutil.copyfile(bump_src, bump_dst)
             entry["bumps"] = _file_ref(bump_dst, counts.get("bumps"), dist_dir)
+        # pontos de atenção (pacote schema 9): só a UF que tem algum
+        hazard_src = os.path.join(pdir, HAZARDS_FILE)
+        if os.path.exists(hazard_src) and os.path.getsize(hazard_src) > len("lat,lng,kind\n"):
+            hazard_dst = os.path.join(out, HAZARDS_FILE)
+            shutil.copyfile(hazard_src, hazard_dst)
+            entry["hazards"] = _file_ref(hazard_dst, counts.get("hazards"), dist_dir)
         # pedágios (pacote schema 4): só a UF que tem algum
         toll_src = os.path.join(pdir, TOLLS_FILE)
         if os.path.exists(toll_src) and os.path.getsize(toll_src) > len("lat,lng,kind,name,source\n"):
@@ -141,6 +150,18 @@ def build(packs_dir: str, dist_dir: str, base_url: str = "") -> dict:
             acc_dst = os.path.join(out, ACCIDENTS_FILE)
             shutil.copyfile(acc_src, acc_dst)
             entry["moto_accidents"] = _file_ref(acc_dst, counts.get("moto_accidents"), dist_dir)
+        # limites como trechos de via (pacote schema 10): só a UF que tem algum
+        lt_src = os.path.join(pdir, LIMIT_LINES_FILE)
+        if os.path.exists(lt_src) and os.path.getsize(lt_src) > len(",".join(LimitLine.HEADER)) + 1:
+            lt_dst = os.path.join(out, LIMIT_LINES_FILE)
+            shutil.copyfile(lt_src, lt_dst)
+            entry["limit_lines"] = _file_ref(lt_dst, counts.get("limit_lines"), dist_dir)
+        # câmeras de fiscalização que não medem velocidade (pacote schema 11): só a UF que tem alguma
+        enf_src = os.path.join(pdir, ENFORCEMENT_FILE)
+        if os.path.exists(enf_src) and os.path.getsize(enf_src) > len(",".join(EnforcementCamera.HEADER)) + 1:
+            enf_dst = os.path.join(out, ENFORCEMENT_FILE)
+            shutil.copyfile(enf_src, enf_dst)
+            entry["enforcement_cameras"] = _file_ref(enf_dst, counts.get("enforcement_cameras"), dist_dir)
         ufs[uf] = entry
 
     catalog = {

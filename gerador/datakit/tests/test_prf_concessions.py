@@ -7,6 +7,7 @@ gov.br, sem licença escrita, endereço que muda): com ela fora do ar, o Pardal 
 registrada. Uso (decisão do dono, opção C): o radar do pacote que a planilha dá como inoperante ou vencido, sem
 equipamento ativo dela por perto, sai inativo; o ativo dela sem radar nenhum por perto entra, com a fonte "PRF".
 """
+import tempfile
 import unittest
 from unittest import mock
 
@@ -133,7 +134,7 @@ class Context(unittest.TestCase):
         before = list(failures._FAILURES)
         try:
             with mock.patch.object(prf_concessions, "load", down):
-                ctx = BuildContext("raw")
+                ctx = BuildContext(tempfile.mkdtemp())
                 got = (ctx.prf_concessions(), ctx.prf_concessions())
             new = failures.recorded()[len(before):]
         finally:

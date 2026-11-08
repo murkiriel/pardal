@@ -5,8 +5,8 @@ vai para o campo `failures` do data/dist/catalogo.json e o scripts/publish.py se
 os arquivos enquanto a lista não estiver vazia (ou com --accept-failures).
 
 Avisos são o caso mais brando: a fonte falhou, mas havia uma cópia anterior guardada em data/raw/
-e ela foi usada (dado de um mês atrás, não dado faltando), ou o dado veio por outro caminho (o
-extrato datado da Geofabrik, quando o -latest falha). Vão para o campo `warnings`, aparecem no
+e ela foi usada (dado da última leitura boa ou da edição publicada, não dado faltando; ver
+datakit/source_cache.py e datakit/edition.py), ou o dado veio por outro caminho (o extrato datado da Geofabrik, quando o -latest falha). Vão para o campo `warnings`, aparecem no
 fim do build e no publish.py, e não bloqueiam a publicação.
 """
 from __future__ import annotations
@@ -25,6 +25,23 @@ def record(source: str, error: BaseException) -> None:
 
 def recorded() -> List[str]:
     return list(_FAILURES)
+
+
+def mark() -> int:
+    """Posição atual da lista de falhas, para since()."""
+    return len(_FAILURES)
+
+
+def since(position: int) -> List[str]:
+    """Falhas registradas depois de mark()."""
+    return list(_FAILURES[position:])
+
+
+def discard(messages: List[str]) -> None:
+    """Tira da lista falhas que deixaram de valer (a fonte usou a cópia guardada; vira aviso)."""
+    for m in messages:
+        if m in _FAILURES:
+            _FAILURES.remove(m)
 
 
 _WARNINGS: List[str] = []

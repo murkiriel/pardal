@@ -2,10 +2,15 @@ name: Gerar dados
 
 # Gera brasil/, estados/ e catalogo.json do zero (fontes oficiais + OpenStreetMap) e publica.
 #
-# A cada 29 dias: todo dia, às 03:17 e às 09:17 em Brasília, o job "interval" lê a data de
-# geração dos dados publicados (built_at do catalogo.json) e só segue para o build se tiverem
-# 29 dias ou mais. Se o build falhar, o disparo seguinte tenta de novo (os dados publicados
-# continuam velhos).
+# Todo dia: às 03:17 e às 09:17 em Brasília, o job "interval" lê a data de geração dos dados
+# publicados (built_at do catalogo.json) e só segue para o build se ela não for de hoje (1 dia,
+# arredondado). Se o build falhar, o disparo seguinte tenta de novo (os dados publicados
+# continuam os de antes).
+#
+# Cada fonte atualiza quando dá: a que falha usa a última leitura boa guardada em data/raw/fontes/
+# (datakit/source_cache.py) ou, sem ela, o que a fonte tinha na edição publicada (o checkout do
+# repositório; datakit/edition.py). Vira aviso e não barra a publicação; as outras seguem
+# normalmente. As cópias ficam no cache do Actions, salvo mesmo quando o job falha.
 # Os horários ficam fora da hora cheia de propósito: é quando o GitHub mais atrasa ou pula os
 # disparos agendados (o das 06:00 UTC de 01/10/2026 não aconteceu). São dois por dia porque um
 # disparo pulado não avisa ninguém: o segundo cobre o primeiro e, se o primeiro já publicou, só
@@ -17,23 +22,34 @@ name: Gerar dados
 # O DNIT e o Inmetro não aceitam conexão de fora do Brasil, e o portal de dados da ANTT às vezes
 # devolve uma página de bloqueio em vez dos dados; as máquinas do Actions ficam nos EUA. O
 # tráfego para esses servidores (e só para eles) sai por um túnel WireGuard com saída no Brasil,
-# configurado no segredo MULLVAD_WG_CONF (arquivo .conf da VPN, nunca impresso).
+# configurado no segredo MULLVAD_WG_CONF (arquivo .conf da VPN, nunca impresso). Se o túnel não
+# subir, o job avisa e segue sem ele: essas fontes caem nas cópias guardadas (ou na edição).
 #
 # Cada publicação vira também uma release (dados-AAAA-MM-DD) com um zip por estado, o Brasil
 # inteiro, só os radares do Brasil, o catálogo e os sha256 (scripts/release.py).
 #
-# O publish.py não monta nada se alguma fonte falhou, se algum estado perdeu mais de 5% dos
-# dados em relação ao publicado ou se algum arquivo passa de 95 MB: nesses casos o job falha e o
-# GitHub avisa por e-mail; nada é publicado.
+# O publish.py não monta nada se alguma fonte falhou sem cópia nem edição publicada, se algum estado
+# perdeu mais de 5% dos dados em relação ao publicado ou se algum arquivo passa de 95 MB: nesses
+# casos o job falha e o GitHub avisa por e-mail; nada é publicado. À mão, "accept_failures" e
+# "accept_drop" publicam assim mesmo (ex.: uma fonte que nunca foi lida e está fora do ar).
+# Dia sem dado novo (só a data do catálogo mudou) não vira commit nem release.
 
 on:
   schedule:
-    - cron: "17 6 * * *"    # todo dia, 03:17 em Brasília (o job "interval" decide se gera)
+    - cron: "17 6 * * *"    # todo dia, 03:17 em Brasília
     - cron: "17 12 * * *"   # e 09:17 em Brasília, caso o primeiro seja pulado ou falhe
   workflow_dispatch:
     inputs:
       publish:
         description: "Publicar os dados (commit no repositório). Sem marcar: só gera e confere."
+        type: boolean
+        default: false
+      accept_failures:
+        description: "Publicar mesmo se alguma fonte falhou sem cópia guardada (fica sem ela)."
+        type: boolean
+        default: false
+      accept_drop:
+        description: "Publicar mesmo se algum estado perdeu mais de 5% dos dados."
         type: boolean
         default: false
 
@@ -57,11 +73,7 @@ jobs:
       - name: Idade dos dados publicados
         id: age
         env:
-          INTERVAL_DAYS: "29"
-          # Geração extra, fora do intervalo: a partir desta data (UTC), gera se os dados publicados
-          # forem mais antigos que ela (e tenta de novo nos dias seguintes se falhar). Depois de
-          # publicar, não tem mais efeito. Vazio = só o intervalo.
-          GENERATE_FROM: "2026-10-06"
+          INTERVAL_DAYS: "1"
           EVENT: ${{ github.event_name }}
         run: |
           if [ "$EVENT" != "schedule" ]; then
@@ -74,11 +86,6 @@ jobs:
           done
           if [ -z "$built" ]; then
             echo "sem a data dos dados publicados: gera"; echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
-          fi
-          today=$(date -u +%F)
-          if [ -n "$GENERATE_FROM" ] && [ ! "$today" \< "$GENERATE_FROM" ] && [ "${built:0:10}" \< "$GENERATE_FROM" ]; then
-            echo "geração extra marcada para $GENERATE_FROM (dados publicados de ${built:0:10}): gera"
-            echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           # dias arredondados: o horário do build não empurra a geração para o dia seguinte
           days=$(( ( $(date -u +%s) - $(date -u -d "$built" +%s) + 43200 ) / 86400 ))
@@ -97,6 +104,8 @@ jobs:
     timeout-minutes: 240
     env:
       PUBLISH: ${{ github.event_name == 'schedule' || inputs.publish == true }}
+      ACCEPT_FAILURES: ${{ inputs.accept_failures == true }}
+      ACCEPT_DROP: ${{ inputs.accept_drop == true }}
       TUNNEL_HOSTS: servicos.dnit.gov.br servicos.rbmlq.gov.br dados.antt.gov.br am.i.mullvad.net
       PYTHONUNBUFFERED: "1"
     steps:
@@ -117,14 +126,16 @@ jobs:
         working-directory: pardal/gerador
         run: python -m unittest discover -s datakit/tests -t .
 
+      # restore e save separados: o actions/cache sozinho só salva se o job inteiro passar, e as
+      # cópias boas de hoje valem mesmo num dia em que a publicação foi barrada
       - name: Cópias anteriores das fontes (data/raw, sem os extratos do OSM)
-        uses: actions/cache@v6
+        uses: actions/cache/restore@v6
         with:
           path: |
             pardal/gerador/data/raw
             !pardal/gerador/data/raw/*.osm.pbf
             !pardal/gerador/data/raw/*.part
-          key: pardal-raw-${{ github.run_id }}
+          key: pardal-raw-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: pardal-raw-
 
       - name: Memória extra (swap)
@@ -137,7 +148,11 @@ jobs:
         env:
           WG_CONF: ${{ secrets.MULLVAD_WG_CONF }}
         run: |
-          if [ -z "$WG_CONF" ]; then echo "::error::segredo MULLVAD_WG_CONF não configurado"; exit 1; fi
+          # Sem túnel o build segue: DNIT, Inmetro e ANTT falham daqui e caem nas cópias guardadas ou na
+          # edição publicada (aviso).
+          down() { echo "::warning::$1; seguindo sem o túnel (DNIT, Inmetro e ANTT usam as cópias guardadas)"
+                   sudo wg-quick down wg0 >/dev/null 2>&1 || true; exit 0; }
+          if [ -z "$WG_CONF" ]; then down "segredo MULLVAD_WG_CONF não configurado"; fi
           sudo apt-get install -y -qq wireguard-tools >/dev/null
           IPS=$(for h in $TUNNEL_HOSTS; do getent ahostsv4 "$h" | awk '{print $1}'; done | sort -u | sed 's#$#/32#' | paste -sd, -)
           echo "pelo túnel: $IPS"
@@ -145,11 +160,12 @@ jobs:
             | sed -E '/^[[:space:]]*DNS[[:space:]]*=/d; s#^[[:space:]]*AllowedIPs[[:space:]]*=.*#AllowedIPs = '"$IPS"'#' \
             | sudo tee /etc/wireguard/wg0.conf >/dev/null
           sudo chmod 600 /etc/wireguard/wg0.conf
-          sudo wg-quick up wg0 >/dev/null 2>&1
-          exit_info=$(curl -s --max-time 20 https://am.i.mullvad.net/json)
-          echo "$exit_info" | python -c 'import json,sys; j=json.load(sys.stdin); print("saída:", j.get("country"), "/", j.get("city"), "| mullvad:", j.get("mullvad_exit_ip"))'
+          sudo wg-quick up wg0 >/dev/null 2>&1 || down "o túnel não subiu (wg-quick)"
+          exit_info=$(curl -s --max-time 20 https://am.i.mullvad.net/json) \
+            || down "o túnel não respondeu (sem handshake com o servidor da Mullvad: chave revogada ou servidor desativado? gere outra configuração)"
+          echo "$exit_info" | python -c 'import json,sys; j=json.load(sys.stdin); print("saída:", j.get("country"), "/", j.get("city"), "| mullvad:", j.get("mullvad_exit_ip"))' || true
           echo "$exit_info" | python -c 'import json,sys; j=json.load(sys.stdin); sys.exit(0 if j.get("mullvad_exit_ip") and j.get("country") == "Brazil" else 1)' \
-            || { echo "::error::o túnel não saiu pelo Brasil"; exit 1; }
+            || down "o túnel não saiu pelo Brasil"
 
       - name: Build (27 estados + Brasil)
         working-directory: pardal/gerador
@@ -157,6 +173,16 @@ jobs:
           set -o pipefail
           mkdir -p data
           python run.py datakit.build --all 2>&1 | tee data/build.log
+
+      - name: Guarda as cópias das fontes (mesmo se o build ou a publicação falharem)
+        if: always() && hashFiles('pardal/gerador/data/raw/**') != ''
+        uses: actions/cache/save@v6
+        with:
+          path: |
+            pardal/gerador/data/raw
+            !pardal/gerador/data/raw/*.osm.pbf
+            !pardal/gerador/data/raw/*.part
+          key: pardal-raw-${{ github.run_id }}-${{ github.run_attempt }}
 
       - name: Confere e monta (publica e cria a release se for o caso)
         working-directory: pardal/gerador
@@ -169,7 +195,10 @@ jobs:
             git -C .. config user.name "Murkiriel"
             git -C .. config user.email "14956419+Murkiriel@users.noreply.github.com"
             head_before=$(git -C .. rev-parse HEAD)
-            python scripts/publish.py --commit --push
+            flags=""
+            [ "$ACCEPT_FAILURES" = "true" ] && flags="$flags --accept-failures"
+            [ "$ACCEPT_DROP" = "true" ] && flags="$flags --accept-drop"
+            python scripts/publish.py --commit --push $flags
             if [ "$(git -C .. rev-parse HEAD)" != "$head_before" ]; then
               python scripts/release.py --previous "$RUNNER_TEMP/catalogo_anterior.json" \
                 --warnings data/dist/catalogo.json --create
@@ -177,7 +206,10 @@ jobs:
               echo "Nada mudou nos dados: sem commit e sem release."
             fi
           else
-            python scripts/publish.py
+            flags=""
+            [ "$ACCEPT_FAILURES" = "true" ] && flags="$flags --accept-failures"
+            [ "$ACCEPT_DROP" = "true" ] && flags="$flags --accept-drop"
+            python scripts/publish.py $flags
             python scripts/release.py --previous "$RUNNER_TEMP/catalogo_anterior.json" --warnings data/dist/catalogo.json
             echo "Conferido e montado; sem publicar (publish=$PUBLISH, repositório=$GITHUB_REPOSITORY)."
           fi

@@ -62,6 +62,13 @@ class _Antt:
                            Camera(BRIDGE[0], BRIDGE[1], CameraKind.FIXED, 80, "ANTT", True, direction_deg=270)])
 
 
+def _rio_street():
+    """O trecho oficial do Rio sobre a via continental do OSM (nós 10-11, lat -22.95), um pouco ao lado."""
+    from datakit import limit_lines
+    return limit_lines.from_points([(-22.9502, -43.29), (-22.9502, -43.20)],
+                                   limit_lines.make_key(40, "RIO", False, None, False, "", None))
+
+
 @unittest.skipIf(osmium is None, "pyosmium/shapely não instalados")
 class EndToEnd(unittest.TestCase):
     def test_build_one_state(self):
@@ -98,6 +105,8 @@ class EndToEnd(unittest.TestCase):
                     mock.patch.object(inmetro, "load", lambda raw_dir: []), \
                     mock.patch.object(rio, "load_limits", lambda: []), \
                     mock.patch.object(cet_sp, "load_limits", lambda: []), \
+                    mock.patch.object(rio, "load_limit_lines", lambda: [_rio_street()]), \
+                    mock.patch.object(cet_sp, "load_limit_lines", lambda: []), \
                     mock.patch("datakit.sources._http.session", no_network):
                 try:
                     code = build.main(["--uf", "RJ", "--raw", raw, "--packs", os.path.join(tmp, "packs"),
@@ -119,6 +128,8 @@ class EndToEnd(unittest.TestCase):
                 tolls = list(csv.DictReader(f))
             with open(os.path.join(pack, "lombadas.csv"), encoding="utf-8") as f:
                 bumps = list(csv.DictReader(f))
+            with open(os.path.join(pack, "limites_trechos.csv"), encoding="utf-8") as f:
+                limit_lines = list(csv.DictReader(f))
             with open(os.path.join(pack, "manifesto.json"), encoding="utf-8") as f:
                 manifest = json.load(f)
             with open(os.path.join(tmp, "dist", "catalogo.json"), encoding="utf-8") as f:
@@ -138,10 +149,16 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual(structs[0]["kind"], "BRIDGE")
         self.assertTrue(lims and all(x["limit_kmh"] == "80" and x["source"] == "OSM" for x in lims))
         self.assertTrue(any(float(x["lng"]) > -43.18 for x in lims))   # limite da ponte, fora do polígono
+        # o trecho do Rio (40) cobre a via continental do OSM, que sai; a da ponte (80) fica
+        self.assertEqual(sorted((x["limit_kmh"], x["source"], x["highway"], x["oneway"], x["direction_deg"])
+                                for x in limit_lines), [("40", "RIO", "", "", ""), ("80", "OSM", "trunk", "0", "")])
+        self.assertTrue(all(x["wkt"].startswith("LINESTRING(") for x in limit_lines))
+        self.assertEqual(catalog["ufs"]["RJ"]["limit_lines"]["count"], 2)
         self.assertEqual(manifest["counts"], {"cameras": 2, "cameras_with_limit": 2, "cameras_inactive": 0,
                                               "sections": 0, "red_lights": 0, "limits": len(lims), "structs": 1,
-                                              "bumps": 1, "tolls": 1, "portable_radar": 0, "potholes": 0,
-                                              "moto_accidents": 0})  # sem o SNV, os trechos ficam de fora
+                                              "bumps": 1, "hazards": 0, "tolls": 1, "portable_radar": 0, "potholes": 0,
+                                              "moto_accidents": 0, "limit_lines": 2,
+                                              "enforcement_cameras": 0})  # sem o SNV, os trechos ficam de fora
         prf = [s for s in manifest["sources"] if s["name"] == "PRF (trechos aptos ao radar portátil)"]
         self.assertEqual([{"name": "PRF (trechos aptos ao radar portátil)", "valid_from": "2026-10-03", "count": 0,
                            "unplaced": 1}], prf)

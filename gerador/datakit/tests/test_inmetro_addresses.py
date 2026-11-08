@@ -175,7 +175,7 @@ class Geocode(unittest.TestCase):
 
     def test_brasilia_comes_in_the_goias_file_and_its_addresses_in_the_df_folder(self):
         _, listing = self._run([_meter("BRASÍLIA", "AV. CABO BRANCO, Nº 200", uf="GO")], uf="GO", files={})
-        listing.assert_called_once_with("DF")
+        listing.assert_called_once_with("DF", self.tmp)
 
     def test_city_with_nothing_addressable_downloads_nothing(self):
         _, listing = self._run([_meter("JOÃO PESSOA", "PRÓXIMO AO SHOPPING")])

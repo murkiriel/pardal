@@ -7,20 +7,25 @@ Radares: "Locais fiscalizados" da página Fiscalização Eletrônica do Trânsit
 relatório Power BI público atualizado todo dia (lido por datakit/sources/_powerbi.py). Só os
 ativos (sem data de desativação) e só os que fiscalizam velocidade (código V -> FIXED, com o
 limite de veículo leve) ou avanço de sinal (A -> RED_LIGHT); rodízio, faixa exclusiva,
-conversão proibida etc. ficam de fora. Sentido: "(CENTRO/BAIRRO)" ou "(BAIRRO/CENTRO)" na
+conversão proibida etc. ficam de fora. Reserva: a mesma base que a CET publica em CSV no GitHub
+(cetsp-dados/dados-fiscalizacao-eletronica), usada quando o Power BI falha ou quando a última
+ativação/desativação do CSV é mais nova que a do Power BI (ver _rows_with_fallback). Sentido: "(CENTRO/BAIRRO)" ou "(BAIRRO/CENTRO)" na
 descrição vira o rumo que se afasta (ou se aproxima) do marco zero; sem isso (pares de lugares
 como "RAPOSO/MARGINAL"), hint "*". Nos dois casos o build só publica o sentido quando o radar
 está claramente sobre uma pista de mão única do OSM (osm_pbf.resolve_probes).
 """
 from __future__ import annotations
 
+import functools
 import re
+from datetime import date, datetime, timezone
 from typing import Dict, List, Optional, Tuple
 
+from datakit import limit_lines
 from datakit.context import SourceData, BuildContext
 from datakit.common import Camera, CameraKind, in_bbox
 from datakit.common.geo import bearing_deg, haversine_m, sample_polyline
-from datakit.common.model import Limit
+from datakit.common.model import EnforcementCamera, Limit
 from datakit.sources import _powerbi
 from datakit.sources._http import get_json, in_br, to_float
 
@@ -54,7 +59,13 @@ PBI_VIEW = ("https://app.powerbi.com/view?r=eyJrIjoiZDhiOTU2NmMtMjVlMS00ZjY2LWE1
 PBI_API = "https://wabi-brazil-south-b-primary-api.analysis.windows.net"
 PBI_TABLE = "tblFiscalizacaoEletronica"
 PBI_COLS = ["CÓDIGO LOCAL", "LATITUDE", "LONGITUDE", "DESCRIÇÃO DO LOCAL", "ENQUADRAMENTOS",
-            "VELOCIDADE", "DESATIVAÇÃO"]
+            "VELOCIDADE", "ATIVAÇÃO", "DESATIVAÇÃO"]
+# A mesma base, publicada pela CET em CSV no GitHub (conta cetsp-dados, desde 2026-10-27): campos
+# com os mesmos nomes do Power BI, menos ENQUADRAMENTO (singular, códigos separados por ";") e as
+# datas em AAAA-MM-DD (no Power BI, milissegundos desde 1970). Atualizada à mão: em 2026-11-08,
+# 2.074 locais com a última mudança em 2026-10-20, contra 2.127 e 2026-11-04 no Power BI.
+GITHUB_CSV = ("https://raw.githubusercontent.com/cetsp-dados/dados-fiscalizacao-eletronica/main/"
+              "Base_Locais_Fiscalizados.csv")
 CITY_CENTER = (-23.550333, -46.633944)   # Praça da Sé
 RADIAL_MIN_M = 1500.0                     # perto do centro, "sair do centro" não define rumo
 _CB = re.compile(r"\(\s*(CENTRO|C)\s*/\s*(BAIRRO|B)\s*\)", re.I)
@@ -79,6 +90,48 @@ def _enforces(row: Dict) -> Optional[CameraKind]:
     if "A" in codes:
         return CameraKind.RED_LIGHT
     return None
+
+
+# Os códigos de ENQUADRAMENTO da CET (tabela "Enquadramentos" do mesmo relatório Power BI, lida em 2026-11-08) que NÃO
+# são velocidade (V) nem avanço de sinal (A), os dois do radares.csv, e o tipo do cameras_fiscalizacao.csv de cada um.
+# Todos os códigos da base tinham legenda; um código novo, sem legenda aqui, vira OTHER.
+ENFORCEMENT_KINDS = {
+    "EXD": "BUS_LANE", "EXE": "BUS_LANE",                       # faixa exclusiva direita / esquerda
+    "CPD": "NO_TURN", "CPE": "NO_TURN",                         # conversão proibida à direita / esquerda
+    "P": "STOP_ON_CROSSWALK",                                   # parada sobre a faixa de pedestres
+    "R": "ROAD_ROTATION",                                       # rodízio
+    "Z": "TRUCK_RESTRICTION", "VR": "TRUCK_RESTRICTION",        # ZMRC e VER (caminhão)
+    "PR": "TRUCK_RESTRICTION",                                  # faixa proibida (caminhão à esquerda)
+    "F": "CHARTER_RESTRICTION",                                 # ZMRF (fretado)
+    "MT": "MOTORCYCLE_RESTRICTION",                             # motocicletas
+    "S": "OTHER",                                               # trânsito seletivo
+}
+SOURCE_CAMERAS = "CET-SP:CAM"   # código próprio: a reserva pela edição busca radares pelas partes de `source` do radares.csv
+
+
+def rows_to_enforcement_cameras(rows: List[Dict]) -> List[EnforcementCamera]:
+    """Locais ativos que fiscalizam outra infração além de velocidade e avanço de sinal: uma linha por tipo de
+    infração (conversão à direita e à esquerda são uma só). Puro, testado."""
+    out: List[EnforcementCamera] = []
+    for r in rows:
+        if r.get("DESATIVAÇÃO"):
+            continue
+        lat, lng = to_float(r.get("LATITUDE")), to_float(r.get("LONGITUDE"))
+        if lat is None or lng is None or not in_br(lat, lng):
+            continue
+        kinds = {ENFORCEMENT_KINDS.get(c, "OTHER") for c in
+                 (c.strip().upper() for c in str(r.get("ENQUADRAMENTOS") or "").split(",")) if c and c not in ("V", "A")}
+        out.extend(EnforcementCamera(round(lat, 6), round(lng, 6), k, SOURCE_CAMERAS) for k in sorted(kinds))
+    return out
+
+
+def load_other_cameras(raw_dir: str) -> List[EnforcementCamera]:
+    """As câmeras sem velocidade, da tabela que a leitura dos radares acabou de guardar em data/raw (CACHE_FILE):
+    sem segunda consulta ao Power BI. Roda depois de fetch()."""
+    import json
+    import os
+    with open(os.path.join(raw_dir, CACHE_FILE), encoding="utf-8") as f:
+        return rows_to_enforcement_cameras(json.load(f))
 
 
 def rows_to_deactivated(rows: List[Dict]) -> List[Tuple[float, float]]:
@@ -114,26 +167,81 @@ def rows_to_cameras(rows: List[Dict], bbox: Optional[Tuple[float, float, float, 
 CACHE_FILE = "cet_sp_locais.json"
 
 
+def csv_rows(text: str) -> List[Dict]:
+    """CSV da CET no GitHub -> linhas com os campos do Power BI. Puro, testado."""
+    import csv
+    import io
+    out = []
+    for r in csv.DictReader(io.StringIO(text.lstrip("\ufeff"))):
+        row = {k: (r.get(k) or None) for k in PBI_COLS if k != "ENQUADRAMENTOS"}
+        row["ENQUADRAMENTOS"] = ",".join(c.strip() for c in (r.get("ENQUADRAMENTO") or "").split(";") if c.strip())
+        out.append(row)
+    return out
+
+
+def _as_date(v) -> Optional[date]:
+    if isinstance(v, (int, float)) and not isinstance(v, bool):
+        return datetime.fromtimestamp(v / 1000, tz=timezone.utc).date()
+    try:
+        return date.fromisoformat(str(v).strip()[:10]) if v else None
+    except ValueError:
+        return None
+
+
+def last_change(rows: List[Dict]) -> Optional[date]:
+    """A data mais recente de ativação ou desativação na base (o quanto ela está em dia)."""
+    days = [d for r in rows for d in (_as_date(r.get("ATIVAÇÃO")), _as_date(r.get("DESATIVAÇÃO"))) if d]
+    return max(days) if days else None
+
+
+def choose(pbi: Optional[List[Dict]], github: Optional[List[Dict]]) -> Tuple[Optional[List[Dict]], str]:
+    """Qual base usar: o Power BI, salvo quando ele falhou (None ou vazio) ou quando o CSV do GitHub
+    tem uma ativação/desativação mais nova. Devolve (linhas, motivo de ter usado o GitHub ou "")."""
+    if not github:
+        return (pbi or None), ""
+    if not pbi:
+        return github, "Power BI falhou"
+    p, g = last_change(pbi), last_change(github)
+    if g is not None and (p is None or g > p):
+        return github, f"Power BI desatualizado (última mudança {p}, a do CSV do GitHub é {g})"
+    return pbi, ""
+
+
 def _rows_with_fallback(raw_dir: str) -> List[Dict]:
-    """A tabela da CET pelo Power BI; guarda a leitura boa em data/raw/ e, se o Power BI falhar
-    (API não documentada), usa essa cópia e avisa (failures.warn). Sem cópia, a falha sobe."""
+    """A tabela da CET pelo Power BI ou, se ele falhar ou estiver mais velho, pelo CSV que a CET
+    publica no GitHub (choose). Guarda a leitura boa em data/raw/; se as duas falharem, usa essa
+    cópia e avisa (failures.warn). Sem cópia, a falha sobe."""
     import json
     import os
-    from datetime import date
+    from datakit import failures
+    from datakit.sources._http import get_bytes
     path = os.path.join(raw_dir, CACHE_FILE)
+    pbi: Optional[List[Dict]] = None
+    pbi_error: Optional[Exception] = None
     try:
         key = _powerbi.resource_key(PBI_VIEW)
-        rows = _powerbi.query_table(PBI_API, key, _powerbi.model_id(PBI_API, key), PBI_TABLE, PBI_COLS)
-        if not rows:
+        pbi = _powerbi.query_table(PBI_API, key, _powerbi.model_id(PBI_API, key), PBI_TABLE, PBI_COLS)
+        if not pbi:
             raise RuntimeError("tabela da CET veio vazia")
     except Exception as e:  # noqa: BLE001
+        pbi, pbi_error = None, e
+    github: Optional[List[Dict]] = None
+    try:
+        github = csv_rows(get_bytes(GITHUB_CSV).decode("utf-8-sig", "replace"))
+    except Exception as e:  # noqa: BLE001 — o CSV é só reserva: sem ele, vale o Power BI
+        if pbi_error is None:
+            failures.warn("CET-SP (radares)", f"CSV do GitHub (reserva) falhou ({type(e).__name__})")
+    rows, why = choose(pbi, github)
+    if rows is None:
         if not os.path.exists(path):
-            raise
-        from datakit import failures
+            raise pbi_error or RuntimeError("CET-SP: Power BI e CSV do GitHub sem dados")
         when = date.fromtimestamp(os.path.getmtime(path)).isoformat()
-        failures.warn("CET-SP (radares)", f"Power BI falhou ({type(e).__name__}); usada a cópia de {when}")
+        failures.warn("CET-SP (radares)", f"Power BI e CSV do GitHub falharam ({type(pbi_error).__name__}); "
+                      f"usada a cópia de {when}")
         with open(path, encoding="utf-8") as f:
             return json.load(f)
+    if why:
+        failures.warn("CET-SP (radares)", f"{why}; usado o CSV do GitHub")
     os.makedirs(raw_dir, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         json.dump(rows, f, ensure_ascii=False)
@@ -152,8 +260,30 @@ def fetch(ctx: BuildContext) -> SourceData:
     return SourceData(rows_to_cameras(rows), [], rows_to_deactivated(rows))
 
 
-def load_limits() -> List[Limit]:
-    out: List[Limit] = []
+def features_to_lines(features: list) -> List[limit_lines.Piece]:
+    """GeoJSON (LineString/MultiLineString em lng,lat) -> trechos de limite (limites_trechos.csv). Puro, testado."""
+    out: List[limit_lines.Piece] = []
+    for f in features:
+        kmh = CLASS_LIMIT.get(str((f.get("properties") or {}).get("dc_tipo_classificacao_viaria") or ""))
+        geom = f.get("geometry") or {}
+        if kmh is None:
+            continue
+        parts = geom.get("coordinates") or []
+        if geom.get("type") == "LineString":
+            parts = [parts]
+        key = limit_lines.Key(kmh, "CET-SP", False, None, False, "", None)
+        for line in parts:
+            piece = limit_lines.from_points([(lat, lng) for lng, lat in line], key)
+            if piece is not None:
+                out.append(piece)
+    return out
+
+
+@functools.lru_cache(maxsize=1)
+def _classified_features() -> tuple:
+    """As feições VTR e Arterial da classificação viária, lidas uma vez por execução (pontos e linhas saem da mesma
+    leitura). Falha não fica guardada."""
+    out: list = []
     start = 0
     while True:
         gj = get_json(WFS, params={
@@ -163,8 +293,17 @@ def load_limits() -> List[Limit]:
             "CQL_FILTER": "dc_tipo_classificacao_viaria IN ('VTR','Arterial')",
         })
         feats = gj.get("features", [])
-        out.extend(features_to_limits(feats))
+        out.extend(feats)
         if len(feats) < PAGE:
             break
         start += PAGE
-    return out
+    return tuple(out)
+
+
+def load_limits() -> List[Limit]:
+    return features_to_limits(list(_classified_features()))
+
+
+def load_limit_lines() -> List[limit_lines.Piece]:
+    """As vias de trânsito rápido e arteriais como linhas, juntadas quando seguidas e de mesmo limite."""
+    return limit_lines.join(features_to_lines(list(_classified_features())))

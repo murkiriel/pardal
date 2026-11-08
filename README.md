@@ -15,7 +15,7 @@ o que a comunidade do OpenStreetMap mapeia.
 **Brasil inteiro:** [`radares.csv`](brasil/radares.csv) · [`radares.gpx`](brasil/radares.gpx) ·
 [`radares.kml`](brasil/radares.kml) · [`radares.geojson`](brasil/radares.geojson) ·
 [`limites.csv`](brasil/limites.csv) · [`limites_estimados.csv`](brasil/limites_estimados.csv) ·
-[`estruturas.csv`](brasil/estruturas.csv)
+[`estruturas.csv`](brasil/estruturas.csv) · [`ufs.geojson`](brasil/ufs.geojson) (contorno dos estados)
 **Por estado:** pasta [`estados/`](estados), por exemplo [`estados/SP/`](estados/SP).
 
 ## Organização
@@ -29,14 +29,20 @@ brasil/                 o país inteiro
   limites.csv           pontos de limite de velocidade sinalizados
   limites_estimados.csv limites estimados pelo tipo de via (.csv.gz se passar de 95 MB)
   estruturas.csv        pontes, viadutos e túneis
+  ufs.geojson           contorno simplificado de cada estado, para escolher o pacote pela posição
 estados/<UF>/           um estado (AC, AL, AM … SP, TO)
   radares.csv  radares.gpx  radares.kml  radares.geojson
-  limites.csv           limites sinalizados e estimados (coluna `estimated`)
+  limites.csv           limites sinalizados e estimados (coluna `estimated`), em pontos
+  (limites_trechos.csv  os mesmos limites como trechos de via: só no zip do estado na release, ver abaixo)
   estruturas.csv
   lombadas.csv          lombadas, quebra-molas, faixas elevadas e sonorizadores
+  pontos_atencao.csv    passagens de nível, curvas e cruzamentos perigosos, travessia de animais,
+                        áreas escolares, queda de barreira e painéis de velocidade
   pedagios.csv          praças de pedágio e pórticos de free flow
   radar_portatil.csv    trechos de rodovia federal aptos à fiscalização com radar portátil (PRF)
   buracos.csv           trechos de rodovia federal com buracos (panela ruim ou péssima no ICM do DNIT)
+  cameras_fiscalizacao.csv  câmeras que fiscalizam outra infração que não velocidade (faixa exclusiva,
+                        conversão proibida, rodízio, parada sobre a faixa...)
 catalogo.json           índice dos pacotes por estado: arquivos, tamanho, sha256,
                         contagens e data de geração
 scripts/to_geojson.py converte qualquer CSV acima para GeoJSON (ver abaixo)
@@ -79,6 +85,57 @@ Paulo), ele substitui o do OpenStreetMap naquele trecho.
 Os estimados cobrem só a rede principal (autoestradas, troncos, primárias, secundárias e
 terciárias). Estradas rurais sem classificação e ruas de bairro ficam sem estimativa.
 
+**Limites como trechos (CSV, só por estado):** `limit_kmh,source,estimated,limit_low_kmh,direction_deg,highway,oneway,wkt`.
+Os mesmos limites do `limites.csv`, mas como a via: cada linha é um trecho (`wkt` = `LINESTRING(lng lat, ...)`, WGS84, cinco
+casas, ~1 m) com o limite que vale ao longo dele, para o app encaixar a posição na via mais perto em vez de adivinhar a via
+por um ponto (que erra em rua paralela, cruzamento, viaduto e marginal). O `limites.csv` continua igual.
+
+| Coluna | Significado |
+|---|---|
+| `limit_kmh` | Limite do trecho |
+| `source` | Como em `limites.csv`: `ANTT`, `RIO`, `CET-SP`, `OSM`, `OSM:zone` ou `OSM:class` |
+| `estimated` | `1` quando o valor foi estimado pelo tipo da via (não é sinalizado), como em `limites.csv`; `limit_low_kmh` é a estimativa do lado baixo |
+| `direction_deg` | Preenchido quando o limite vale só para um sentido (placa de um lado, `maxspeed:forward`/`backward` diferentes): rumo médio do trânsito, 0-359. Nesses trechos a linha vem **desenhada no sentido do trânsito**; para casar, use o rumo do segmento da linha mais perto da posição, não só este resumo. Vazio = vale para os dois sentidos |
+| `highway` | Classe da via no OpenStreetMap (`motorway`, `primary`, `residential`...); vazia nas fontes oficiais que não a informam (`ANTT`, `RIO`, `CET-SP`). Serve para casar a via do app (ou do roteador) com o trecho e para escolher entre vias paralelas |
+| `oneway` | `1` via de mão única (a linha segue o trânsito), `0` mão dupla (o sentido do desenho não quer dizer nada); vazio na fonte oficial que não informa |
+
+Exemplo (uma avenida de mão dupla com 60 km/h sinalizado no OSM, e um sentido de uma via com 40 km/h estimado):
+
+```
+limit_kmh,source,estimated,limit_low_kmh,direction_deg,highway,oneway,wkt
+60,OSM,0,,,primary,0,"LINESTRING(-49.25000 -16.68000, -49.24800 -16.68100)"
+40,OSM:class,1,40,90,tertiary,0,"LINESTRING(-49.30000 -16.70000, -49.29500 -16.70000)"
+```
+
+As vias contíguas de mesmo limite, classe e sentido vêm juntas numa linha só (no máximo ~5 km); a geometria é simplificada
+a 3 m (as curvas ficam, os vértices de reta saem). Onde há trecho oficial (placas da ANTT sobre a rota do SNV, ruas do Rio de
+Janeiro, vias de trânsito rápido e arteriais de São Paulo), a linha do OpenStreetMap que ele cobre (a até 50 m, na mesma
+orientação) não entra: se há duas linhas na mesma via, a oficial vale. Uma linha que cruza a divisa de dois estados vem nos
+dois pacotes. Não há versão do Brasil inteiro (somados os estados, ~172 MB; o maior estado, Minas Gerais, tem ~31 MB).
+
+**Onde baixar:** o `limites_trechos.csv` **não fica no repositório** (seriam ~172 MB mudando todo dia). Ele vai só no zip de
+cada estado da release diária: `https://github.com/Murkiriel/pardal/releases/latest/download/pardal-<UF>.zip`, dentro dele
+`<UF>/limites_trechos.csv` (comprimido, SP cai de 29 MB para ~6 MB). No `catalogo.json`, a entrada `limit_lines` de cada estado
+traz `release_asset` (o nome do zip), `asset_path` (o caminho dentro dele) e `bytes`, `sha256` e `count` do CSV
+descompactado, para conferir depois de extrair (pacote no schema 10).
+
+**Câmeras de fiscalização sem velocidade (CSV, só por estado):** `lat,lng,kind,source,active`. Locais oficiais de câmera que
+fiscalizam **outra infração** que não excesso de velocidade nem avanço de sinal (esses são os radares do `radares.csv`):
+um local com várias infrações vira uma linha por infração. `kind`: `BUS_LANE` (faixa exclusiva de ônibus), `NO_TURN`
+(conversão proibida), `NO_U_TURN` (retorno proibido), `MANDATORY_TURN` (conversão obrigatória), `STOP_ON_CROSSWALK` (parada
+sobre a faixa de pedestres), `ROAD_ROTATION` (rodízio), `TRUCK_RESTRICTION` (restrição de caminhão: zona, faixa ou peso),
+`CHARTER_RESTRICTION` (zona de restrição de fretados), `MOTORCYCLE_RESTRICTION` (restrição a motocicletas) ou `OTHER`.
+`source`: `CET-SP:CAM` (São Paulo), `BHTRANS:CAM` (Belo Horizonte) ou `CURITIBA:CAM`, um código próprio por fonte, nunca o
+do radar do mesmo órgão. `active`: só entram locais em operação, então é sempre `1` (a coluna acompanha o `radares.csv`). O
+mesmo local pode estar nos dois arquivos, no `radares.csv` por um tipo de infração e aqui por outro. Só São Paulo, Belo
+Horizonte e Curitiba publicam esses locais com coordenada; para os demais estados o arquivo não existe. No `catalogo.json`,
+a entrada `enforcement_cameras` (pacote no schema 11).
+
+**Contornos dos estados (`brasil/ufs.geojson`):** `FeatureCollection` com uma feição por UF (`properties`: `uf`, `name`;
+geometria `Polygon` ou `MultiPolygon`), a malha oficial do IBGE simplificada a 0,02° (~2 km; o desvio medido chega a ~3 km)
+e com quatro casas decimais: ~130 KB. Serve para o app descobrir em que estado está e quais pacotes baixar, não para dizer se
+um ponto está dentro da divisa. O `catalogo.json` aponta para ele na chave `ufs_geojson` (`file`, `bytes`, `sha256`).
+
 **Estruturas (CSV):** `lat1,lng1,lat2,lng2,kind`, com `kind` = `BRIDGE` ou `TUNNEL`.
 
 **Lombadas (CSV, só por estado):** `lat,lng,kind`, do OpenStreetMap (`traffic_calming`): o que faz o veículo
@@ -86,6 +143,15 @@ pular, não o que só estreita a via. `kind` = `BUMP` (lombada curta, quebra-mol
 (faixa elevada), `CUSHION` (almofada, lombada com vãos), `RUMBLE_STRIP` (sonorizador) ou `UNSPECIFIED` (marcada sem
 tipo). A faixa elevada desenhada como linha vira o ponto do meio. No `catalogo.json`, a entrada `bumps` de cada
 estado que tem alguma (pacote no schema 3; quem lê o schema 2 ignora a chave).
+
+**Pontos de atenção (CSV, só por estado):** `lat,lng,kind`, do OpenStreetMap. `kind` = `LEVEL_CROSSING` (passagem de
+nível: a via cruza a linha férrea, `railway=level_crossing`), `CURVE` (curva perigosa), `DANGEROUS_JUNCTION`
+(cruzamento perigoso), `ANIMAL_CROSSING` (travessia de animais), `SCHOOL_ZONE` (área escolar), `FALLING_ROCKS` (queda
+de barreira), `SPEED_DISPLAY` (painel que mostra a velocidade, `highway=speed_display`) ou `HAZARD` (outro perigo
+sinalizado no mapa, `hazard=*`: pista escorregadia, neblina, alagamento...). Um trecho desenhado como linha vira o ponto
+do meio. Semáforos não entram (são dezenas de milhares e não pedem aviso). Na geração de 2026-11-08: 19.174 pontos no
+Brasil, 17.391 deles passagens de nível; os perigos marcados com `hazard=*` ainda são poucos no OSM do Brasil (cerca de
+1.800). No `catalogo.json`, a entrada `hazards` (pacote no schema 9).
 
 **Pedágios (CSV, só por estado):** `lat,lng,kind,name,source`. As praças das rodovias federais concedidas vêm da ANTT
 (com o nome da praça, só as ativas) e as demais do OpenStreetMap (`barrier=toll_booth`, `highway=toll_gantry`); o
@@ -122,6 +188,39 @@ motocicleta, motoneta ou ciclomotor nos 12 meses mais novos publicados, juntados
 
 Todos em UTF-8, coordenadas em graus decimais (WGS84/SIRGAS 2000).
 
+## Para quem faz app de alerta
+
+Sugestões para usar os arquivos num aplicativo que avisa o motorista, tiradas do que funciona nos apps de alerta
+que já existem:
+
+- **Baixe por estado e confira.** O `catalogo.json` traz, por estado, cada arquivo com `bytes`, `sha256` e a data de
+  geração (`built_at`). Baixe só quando o `sha256` mudar e confira o arquivo antes de trocar o que o aparelho já tem; assim
+  o app funciona sem internet e não fica com um arquivo pela metade. Mostre ao usuário quando a base estiver velha.
+- **Avise pela distância na rota, não por raio.** Com rota, projete os radares sobre ela antes de sair e avise o
+  próximo à frente pela distância ao longo da rota (uns 500 m): o radar de uma rua paralela ou de um viaduto não
+  dispara. Sem rota, use um raio pequeno e só os radares à frente do veículo.
+- **Sentido.** Quando `direction_deg` vem preenchido, ignore o radar se o rumo do veículo diferir dele em mais de
+  60°, mas só com o GPS preciso (precisão de 15 m ou melhor) e em movimento: parado ou com GPS ruim, o rumo não é
+  confiável. Vazio = avisar nos dois sentidos.
+- **Escolha os pacotes pela posição.** O `brasil/ufs.geojson` traz o contorno de cada estado (simplificado: erra até ~3 km
+  na divisa). Ache o estado pelo ponto dentro do polígono; a menos de ~5 km de uma divisa, ou fora de todos os polígonos (mar,
+  ponte), tenha também os pacotes vizinhos. Em vez de baixar o `brasil/` inteiro, baixe só o estado onde o usuário está e os
+  vizinhos da rota.
+- **Limite pela via, não pelo ponto.** O `limites_trechos.csv` do estado (no zip da release, entrada `limit_lines` do
+  catálogo) traz o trecho da via com o limite: encaixe a posição
+  (GPS) no trecho mais perto cuja direção combine com o rumo do veículo (diferença de até uns 30°, e, onde `direction_deg`
+  vier preenchido, só o trecho do seu sentido: a linha vem desenhada no sentido do trânsito). Com mais de um trecho a poucos
+  metros (vias paralelas, marginal, viaduto), prefira a fonte oficial (`ANTT`, `RIO`, `CET-SP`) ao `OSM`, o valor sinalizado
+  (`estimated=0`) ao estimado (`estimated=1`), e mantenha o trecho em que você já estava enquanto ele ainda combinar (evita
+  alternar de via a cada leitura do GPS). `highway` e `oneway` ajudam a desempatar quando o app sabe a classe da via. Onde
+  não há trecho (estados sem arquivo, vias sem limite nem estimativa), use os pontos do `limites.csv` como antes.
+- **Grupos de alerta que o usuário liga e desliga:** radar de velocidade (`FIXED`, `SECTION`), avanço de sinal
+  (`RED_LIGHT`), perigos na via (lombadas, buracos, passagens de nível, curvas), pontos de atenção (pedágio, área
+  escolar, travessia de animais, radar portátil) e câmeras de outras infrações (`cameras_fiscalizacao.csv`: faixa exclusiva,
+  conversão proibida, rodízio; por `kind`).
+- **Fale pouco.** Dois avisos por radar (longe e perto) bastam, e silêncio se o veículo já estiver abaixo do limite;
+  `active = 0` não deve avisar.
+
 ## Converter para GeoJSON
 
 O `scripts/to_geojson.py` converte qualquer CSV do Pardal (radares, limites, limites estimados,
@@ -156,7 +255,8 @@ Paulo e o `maxspeed` do OpenStreetMap no resto, mais os estimados na rede princi
 
 **Como abrir os limites no QGIS ou num mapa web?** Converta para GeoJSON com
 `python scripts/to_geojson.py estados/<UF>/limites.csv`, ou abra o CSV direto no QGIS como camada
-de texto delimitado, com `lng` como X e `lat` como Y.
+de texto delimitado, com `lng` como X e `lat` como Y. Os trechos (`limites_trechos.csv`, do zip do estado na release) abrem no QGIS como texto
+delimitado com "Definição de geometria" em WKT e a coluna `wkt` (o `to_geojson.py` só converte pontos e estruturas).
 
 **O que é limite estimado? Posso ignorar?** Quando a via não tem limite cadastrado, o
 Pardal estima pela regra geral do Código de Trânsito para aquele tipo de via e marca a linha
@@ -218,17 +318,20 @@ fontes e manter a mesma licença em bases derivadas.
 | ANTT — Sinalização | Placas de velocidade máxima das concessões federais, por sentido | CC-BY |
 | Inmetro — PSIE, medidores de velocidade | Situação da aferição (ativo/inativo) e, nas rodovias federais e nas estaduais de SP (DER-SP), o limite do radar que não trazia nenhum; nos medidores com endereço urbano, a confirmação do radar, o limite e os radares que nenhuma outra fonte tem | Creative Commons |
 | DER-SP / Artesp, DER-GO (Goinfra), DER-PE | Radares das rodovias estaduais, com o sentido fiscalizado (SP e GO) | Dado aberto governamental |
+| DER-SE, AGETO-TO, Detran-MA, SEINFRA-BA | Radares e lombadas eletrônicas das rodovias estaduais de Sergipe, Tocantins, Maranhão e Bahia, com limite | Dado aberto governamental |
 | DER-MG | Radares fixos das rodovias estaduais e federais delegadas de Minas Gerais (rodovia + km, postos na via pela malha estadual da IDE-Sisema e pelo SNV, conferidos pelo município) | Dado aberto governamental |
 | IDE-Sisema (SEMAD-MG) — rodovias estaduais e federais de Minas Gerais | Quilometragem das MG, para pôr os radares do DER-MG na via | Dado aberto governamental |
 | Goinfra — malha rodoviária estadual | Quilometragem das rodovias de Goiás, para converter o sentido em rumo | Dado aberto governamental |
 | IBGE — malha das unidades da federação (API de malhas) | Contorno de cada estado, para decidir em que estado fica cada ponto | Dado aberto governamental |
 | IBGE — CNEFE, cadastro de endereços do Censo 2022 | Coordenada do endereço dos medidores do Inmetro que só informam rua e número ou um cruzamento | Dado aberto governamental |
 | Prefeitura do Rio de Janeiro (IPP, SMTR/CET-Rio) | Limite por trecho de rua e radares da cidade | CC-BY 4.0 |
-| Prefeitura de São Paulo (GeoSampa, CET) | Limite pela classificação viária (vias de trânsito rápido e arteriais) e os radares ativos da cidade (locais fiscalizados da CET, com limite e sentido centro/bairro) | Dado aberto municipal |
+| Prefeitura de São Paulo (GeoSampa, CET) | Limite pela classificação viária (vias de trânsito rápido e arteriais) e os radares ativos da cidade (locais fiscalizados da CET, com limite e sentido centro/bairro; reserva: o CSV que a CET publica no GitHub) | Dado aberto municipal |
 | BHTrans (Belo Horizonte) | Radares e detectores de avanço de sinal | CC-BY |
 | Detran-DF | Radares e lombadas eletrônicas | Dado aberto governamental |
 | Prefeituras de Fortaleza, Recife, João Pessoa e Curitiba | Radares urbanos | Dado aberto governamental |
 | EPTC (Porto Alegre) | Radares fixos, lombadas eletrônicas e detectores de avanço de sinal, com limite (relatório público da EPTC) | Dado aberto municipal |
+| Transalvador (Salvador) | Radares fixos, com limite (mapa de equipamentos da Transalvador) | Dado aberto municipal |
+| SEMTRAN (Porto Velho) | Radares fixos, com a validade da aferição (planilha publicada pela SEMTRAN) | Dado aberto municipal |
 
 ## Como os arquivos são gerados
 
@@ -249,8 +352,10 @@ O **código** (pasta `gerador/` e `scripts/`) é MIT ([`gerador/LICENSE`](gerado
 
 ## Atualização
 
-O conjunto é gerado de novo periodicamente, porque as fontes oficiais mudam todo mês.
-A data de cada pacote está no campo `built_at` do `catalogo.json`.
+O conjunto é gerado de novo todo dia. Cada fonte é atualizada quando responde; uma fonte fora do
+ar fica com a última leitura boa (ou com o que tinha na edição anterior), e as outras seguem
+normalmente. A data do dado de cada fonte está no campo `source_dates` do `catalogo.json`. Dia sem dado novo não gera commit nem release. A data de cada pacote está no
+campo `built_at` do `catalogo.json`.
 
 ## English
 

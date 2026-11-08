@@ -4,11 +4,13 @@
     python scripts/release.py --previous catalogo_antes.json --create    # monta e cria a release (gh)
 
 Roda depois do publish.py --commit: os pacotes saem dos arquivos já publicados (brasil/,
-estados/, catalogo.json na raiz do repositório). Uma release por geração, com a etiqueta
+estados/, catalogo.json na raiz do repositório), mais os que vão só na release
+(publish._RELEASE_ONLY_NAME: limites_trechos.csv), tirados do build (--dist, data/dist/estados/<UF>/). Uma release por geração, com a etiqueta
 dados-AAAA-MM-DD (data de geração do catalogo.json, UTC) apontando para o commit dos dados.
 
 Anexos:
-    pardal-<UF>.zip               um estado: radares (CSV, GeoJSON, KML, GPX), limites, estruturas
+    pardal-<UF>.zip               um estado: todos os arquivos dele, inclusive os limites em trechos
+                                  (limites_trechos.csv, que só existe aqui)
     pardal-brasil.zip             o Brasil inteiro (os mesmos arquivos de brasil/)
     pardal-brasil-radares.zip     só os radares do Brasil, nos quatro formatos (para GPS e apps)
     catalogo.json                  o índice dos pacotes
@@ -27,6 +29,9 @@ from typing import Dict, List, Optional
 
 GENERATOR_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(GENERATOR_DIR)
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from publish import _RELEASE_ONLY_NAME  # noqa: E402
+
 CAMERA_FILES = ("radares.csv", "radares.geojson", "radares.kml", "radares.gpx")
 
 
@@ -65,14 +70,24 @@ def _sha(path: str) -> str:
     return h.hexdigest()
 
 
-def build_assets(repo: str, out: str) -> List[str]:
-    """Monta os zips em out/ a partir de brasil/ e estados/ do repositório. Devolve os anexos."""
+def _release_only(dist: Optional[str], uf: str) -> List[str]:
+    """Os arquivos do estado que vão só na release, do build em dist (vazio sem dist)."""
+    d = os.path.join(dist, "estados", uf) if dist else ""
+    if not d or not os.path.isdir(d):
+        return []
+    return [os.path.join(d, f) for f in os.listdir(d) if _RELEASE_ONLY_NAME.match(f)]
+
+
+def build_assets(repo: str, out: str, dist: Optional[str] = None) -> List[str]:
+    """Monta os zips em out/ a partir de brasil/ e estados/ do repositório, mais os arquivos de cada
+    estado que vão só na release (do build em `dist`). Devolve os anexos."""
     os.makedirs(out, exist_ok=True)
     assets: List[str] = []
     est = os.path.join(repo, "estados")
     for uf in sorted(os.listdir(est)):
         d = os.path.join(est, uf)
-        files = sorted(os.path.join(d, f) for f in os.listdir(d) if os.path.isfile(os.path.join(d, f)))
+        files = sorted([os.path.join(d, f) for f in os.listdir(d) if os.path.isfile(os.path.join(d, f))]
+                       + _release_only(dist, uf), key=os.path.basename)
         if files:
             assets.append(os.path.join(out, f"pardal-{uf}.zip"))
             _zip(assets[-1], files, uf)
@@ -113,7 +128,8 @@ def release_notes(cat: dict, previous: Optional[dict], warnings: List[str], repo
                    ("limits_estimated", "Pontos de limite estimado"), ("structs", "Pontes e túneis")):
         L.append(f"| {rot} | {_fmt(br.get(k))}{_delta(br.get(k), br0.get(k))} |")
     L += ["", "## Downloads", "",
-          "- `pardal-<UF>.zip` — um estado: radares (CSV, GeoJSON, KML, GPX), limites e estruturas",
+          "- `pardal-<UF>.zip` — um estado: todos os arquivos dele, inclusive os limites em trechos "
+          "(`limites_trechos.csv`, que só existe aqui, não no repositório)",
           "- `pardal-brasil.zip` — o Brasil inteiro",
           "- `pardal-brasil-radares.zip` — só os radares do Brasil, nos quatro formatos (GPS e apps)",
           "- `catalogo.json` — índice dos pacotes; `SHA256SUMS.txt` — para conferir os arquivos",
@@ -145,6 +161,8 @@ def main(argv=None) -> int:
     ap.add_argument("--previous", help="catalogo.json publicado antes desta geração (para as diferenças)")
     ap.add_argument("--warnings", help="catalogo.json do build (data/dist), com a lista de avisos")
     ap.add_argument("--out", default=os.path.join(GENERATOR_DIR, "data", "release"))
+    ap.add_argument("--dist", default=os.path.join(GENERATOR_DIR, "data", "dist"),
+                    help="saída do build, de onde vêm os arquivos que vão só na release (limites_trechos.csv)")
     ap.add_argument("--create", action="store_true", help="cria a release no GitHub (gh)")
     ap.add_argument("--repo-url", default="https://github.com/Murkiriel/pardal")
     args = ap.parse_args(argv)
@@ -160,7 +178,7 @@ def main(argv=None) -> int:
         with open(args.warnings, encoding="utf-8-sig") as f:
             warnings = json.load(f).get("warnings") or []
 
-    assets = build_assets(args.repo, args.out)
+    assets = build_assets(args.repo, args.out, args.dist)
     notes_path = os.path.join(args.out, "NOTAS.md")
     with open(notes_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(release_notes(cat, previous, warnings, args.repo_url))

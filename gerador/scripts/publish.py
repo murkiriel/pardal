@@ -32,7 +32,14 @@ GENERATOR_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(GENERATOR_DIR)
 # Os mesmos de datakit/build_brazil.py (PUBLISHED_NAME, MANAGED_DIRS): este script não importa
 # o datakit.
-_PUBLISHED_NAME = re.compile(r"^(radares|limites_estimados|limites|estruturas)\.(csv\.gz|csv|geojson|kml|gpx)$")
+# Todo arquivo de dado do pacote (datakit/build_pack.py, *_FILE) está aqui ou em _RELEASE_ONLY_NAME:
+# um nome que falte nos dois fica fora de tudo e o catálogo aponta para o nada (testado).
+_PUBLISHED_NAME = re.compile(r"^(radares|limites_estimados|limites|estruturas|lombadas|pedagios|radar_portatil|buracos|acidentes_moto"
+    r"|pontos_atencao|cameras_fiscalizacao|ufs)\.(csv\.gz|csv|geojson|kml|gpx)$")
+# Arquivos que vão só no zip do estado na release (scripts/release.py), nunca no commit: grandes e
+# mudando todo dia com o OSM, fariam o repositório crescer GBs por ano. O catálogo publicado aponta
+# para o zip (release_asset/asset_path) em vez de um caminho no repositório.
+_RELEASE_ONLY_NAME = re.compile(r"^limites_trechos\.csv$")
 _MANAGED = ("brasil", "estados")
 CATALOG = "catalogo.json"
 # Nome do catálogo até o schema 1: lido como o publicado anterior se o novo ainda não existir, e
@@ -94,10 +101,19 @@ def drops(published: dict, new: dict, max_drop: float = MAX_DROP) -> List[str]:
 
 def rewrite_catalog(cat: dict) -> dict:
     """O catálogo publicado: o do build sem as listas de falhas e avisos (só servem para barrar
-    ou avisar na publicação; não vão para o repositório)."""
+    ou avisar na publicação; não vão para o repositório). Entrada de arquivo que vai só na release
+    (_RELEASE_ONLY_NAME) troca "file" por "release_asset" (o zip do estado na release) e "asset_path"
+    (o caminho dentro dele); contagem, bytes e sha256 continuam os do CSV."""
     out = json.loads(json.dumps(cat))
     out.pop("failures", None)
     out.pop("warnings", None)
+    for uf, entry in (out.get("ufs") or {}).items():
+        for value in entry.values():
+            path = value.get("file") if isinstance(value, dict) else None
+            if isinstance(path, str) and _RELEASE_ONLY_NAME.match(path.rsplit("/", 1)[-1]):
+                value.pop("file")
+                value["release_asset"] = f"pardal-{uf}.zip"
+                value["asset_path"] = f"{uf}/{path.rsplit('/', 1)[-1]}"
     return out
 
 
@@ -180,8 +196,17 @@ def main(argv=None) -> int:
              if os.path.exists(os.path.join(args.repo, p)) or subprocess.run(
                  ["git", "-C", args.repo, "ls-files", "--", p], capture_output=True, text=True).stdout.strip()]
     git("add", "-A", "--", *paths)
-    if subprocess.run(["git", "-C", args.repo, "diff", "--cached", "--quiet"]).returncode == 0:
+    staged = subprocess.run(["git", "-C", args.repo, "diff", "--cached", "--name-only"],
+                            capture_output=True, text=True, check=True).stdout.split()
+    if not staged:
         print("nada mudou")
+        return 0
+    if staged == [CATALOG]:
+        # só o catálogo mudou (data de geração; os sha256 dos arquivos são os mesmos): com a geração
+        # diária, não vale um commit nem uma release por dia sem dado novo
+        git("reset", "-q", "--", CATALOG)
+        git("checkout", "--", CATALOG)
+        print("nada mudou nos dados (só a data do catálogo)")
         return 0
     git("commit", "-m", f"Dados gerados em {cat.get('built_at', '')}")
     if args.push:

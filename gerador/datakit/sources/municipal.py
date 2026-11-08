@@ -1,19 +1,26 @@
 """Fiscalização eletrônica municipal das capitais que publicam com coordenada:
 João Pessoa/PB (PMJP), Fortaleza/CE (PMF), Recife/PE (PCR), Curitiba/PR (CURITIBA, desde
 2026-10-05: a página de fiscalização eletrônica da Setran, que traz a coordenada de cada ponto).
-FIXED, e RED_LIGHT no ponto de Curitiba que só fiscaliza o sinal; `active` do status quando existe.
+FIXED, e RED_LIGHT no ponto de Curitiba que só fiscaliza o sinal; `active` do status quando existe. As câmeras de
+Curitiba que fiscalizam outra infração (parada na faixa, conversão, faixa exclusiva...) vão para o
+cameras_fiscalizacao.csv (`other_cameras`).
 """
 from __future__ import annotations
 
 import csv
+import functools
 import io
 import json
 import re
 from typing import List, Optional, Tuple
 
 from datakit.context import SourceData, BuildContext
-from datakit.common import Camera, CameraKind, Limit, in_bbox
+from datakit.common import Camera, CameraKind, EnforcementCamera, Limit, in_bbox
 from datakit.sources._http import get_bytes, in_br, to_float
+
+# Códigos da coluna source de cada capital (a reserva pela edição publicada procura por eles; ver
+# datakit/context.py): João Pessoa, Fortaleza, Recife, Curitiba.
+SOURCE_CODES = ("PMJP", "PMF", "PCR", "CURITIBA")
 
 PMJP_FS = ("https://services7.arcgis.com/KTW4hifejtFfNNYu/arcgis/rest/services/"
            "MEDIDORES_DE_VELOCIDADE_24/FeatureServer/0/query")
@@ -112,8 +119,50 @@ def parse_curitiba(html: str, bbox=None) -> List[Camera]:
     return out
 
 
+# O que cada ícone da página da Setran fiscaliza (título do ícone) -> tipo do cameras_fiscalizacao.csv. Velocidade e
+# avanço de sinal vão para o radares.csv; título que não está aqui nem lá vira OTHER.
+CURITIBA_KINDS = {
+    "Parada na faixa": "STOP_ON_CROSSWALK",
+    "Conversão proibida": "NO_TURN",
+    "Retorno proibido": "NO_U_TURN",
+    "Conversão obrigatória": "MANDATORY_TURN",
+    "Faixa Exclusiva": "BUS_LANE",
+    "Peso Bruto Total": "TRUCK_RESTRICTION",
+}
+CURITIBA_RADAR_TITLES = {"Velocidade controlada", "Avanço de sinal"}
+SOURCE_CAMERAS = "CURITIBA:CAM"   # código próprio: a reserva pela edição busca radares pelas partes de `source`
+
+
+def other_cameras(html: str) -> List[EnforcementCamera]:
+    """Pontos da página da Setran que fiscalizam outra infração além de velocidade e avanço de sinal, uma linha por
+    infração. A página só lista equipamento em operação. Puro, testado."""
+    out: List[EnforcementCamera] = []
+    for item in _CWB_ITEM.split(html)[1:]:
+        m = _CWB_POINT.search(item)
+        if m is None:
+            continue
+        lat, lng = to_float(m.group(1)), to_float(m.group(2))
+        if lat is None or lng is None or not in_br(lat, lng):
+            continue
+        titles = set(_CWB_TITLE.findall(item)) - CURITIBA_RADAR_TITLES
+        kinds = sorted({CURITIBA_KINDS.get(t, "OTHER") for t in titles})
+        out.extend(EnforcementCamera(round(lat, 6), round(lng, 6), k, SOURCE_CAMERAS) for k in kinds)
+    return out
+
+
+@functools.lru_cache(maxsize=1)
+def _curitiba_html() -> str:
+    """A página de fiscalização eletrônica da Setran, lida uma vez por execução (os radares e as outras câmeras saem da
+    mesma leitura). Falha não fica guardada."""
+    return get_bytes(CURITIBA_PAGE).decode("utf-8", "replace")
+
+
 def _curitiba(bbox) -> List[Camera]:
-    return parse_curitiba(get_bytes(CURITIBA_PAGE).decode("utf-8", "replace"), bbox)
+    return parse_curitiba(_curitiba_html(), bbox)
+
+
+def load_other_cameras() -> List[EnforcementCamera]:
+    return other_cameras(_curitiba_html())
 
 
 def load(raw_dir: str, bbox: Optional[Tuple[float, float, float, float]] = None

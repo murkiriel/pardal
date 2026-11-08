@@ -91,7 +91,7 @@ class PackAndCatalog(unittest.TestCase):
                 rows = list(csv.DictReader(f))
             cat = build_catalog.build(packs, dist)
         self.assertEqual(["BAD"], [r["level"] for r in rows])
-        self.assertEqual((m["schema"], m["counts"]["potholes"]), (8, 1))  # 8 desde os acidentes com moto
+        self.assertEqual((m["schema"], m["counts"]["potholes"]), (11, 1))  # 11 desde as câmeras de fiscalização
         self.assertIn("buracos.csv", m["files"])
         self.assertEqual((cat["ufs"]["GO"]["potholes"]["file"], cat["ufs"]["GO"]["potholes"]["count"]), ("estados/GO/buracos.csv", 1))
         self.assertNotIn("potholes", cat["ufs"]["AC"])
@@ -110,7 +110,7 @@ class Context(unittest.TestCase):
         before = list(failures._FAILURES)
         try:
             with mock.patch.object(dnit_icm, "load", down):
-                ctx = BuildContext("raw")
+                ctx = BuildContext(tempfile.mkdtemp())
                 got = (ctx.dnit_potholes(), ctx.dnit_potholes())
             new = failures.recorded()[len(before):]
         finally:

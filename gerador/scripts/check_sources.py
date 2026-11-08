@@ -23,8 +23,8 @@ import requests  # noqa: E402
 
 from datakit.common import ufpoly  # noqa: E402
 from datakit.sources import (  # noqa: E402
-    _powerbi, antt, antt_placas, bh, cet_sp, cnefe, der_go, der_pe, der_sp, df_detran, dnit, inmetro,
-    municipal, osm_pbf, rio, snv,
+    _powerbi, ageto_to, antt, antt_placas, bh, cet_sp, cnefe, der_go, der_pe, der_se, der_sp, detran_ma,
+    df_detran, dnit, inmetro, municipal, osm_pbf, rio, seinfra_ba, semtran_pvh, snv, transalvador,
 )
 from datakit.sources._http import UA  # noqa: E402
 
@@ -73,6 +73,10 @@ SOURCES = [
     ("Artesp", "planilha de recursos (xlsx)", lambda: _req("GET", der_sp.ARTESP_XLSX)),
     ("DER-SP", "planilha de radares (xlsx)", lambda: _req("GET", der_sp.DER_SP_OWN_XLSX)),
     ("DER-PE", "página com a tabela", lambda: _req("GET", der_pe.URL)),
+    ("DER-SE", "página com a planilha", lambda: _req("GET", der_se.PAGE)),
+    ("AGETO-TO", "página com a lista em PDF", lambda: _req("GET", ageto_to.PAGE)),
+    ("Detran-MA", "página com a lista em PDF", lambda: _req("GET", detran_ma.PAGE)),
+    ("SEINFRA-BA", "página com a lista em PDF", lambda: _req("GET", seinfra_ba.PAGE)),
     ("João Pessoa", "ArcGIS", lambda: _req("GET", municipal.PMJP_FS, params={"where": "1=1", "returnCountOnly": "true", "f": "json"})),
     ("Fortaleza", "GeoJSON", lambda: _req("GET", municipal.FORTALEZA_GEOJSON)),
     ("Recife", "CSV", lambda: _req("GET", municipal.RECIFE_CSV)),
@@ -82,6 +86,9 @@ SOURCES = [
     ("Rio (geocodificador)", "ArcGIS da prefeitura", lambda: _req("GET", rio.GEOCODE, params={"SingleLine": "AVENIDA BRASIL 1000", "f": "json"})),
     ("Rio (trechos)", "ArcGIS da prefeitura", lambda: _req("GET", rio.SEGMENTS_URL, params={"where": "1=1", "returnCountOnly": "true", "f": "json"})),
     ("CET-SP (radares)", "Power BI público", _pbi),
+    ("CET-SP (reserva)", "CSV da CET no GitHub (HEAD)", lambda: _req("HEAD", cet_sp.GITHUB_CSV)),
+    ("Salvador (Transalvador)", "página do mapa", lambda: _req("GET", transalvador.PAGE)),
+    ("Porto Velho (SEMTRAN)", "página com a planilha em PDF", lambda: _req("GET", semtran_pvh.PAGE)),
     ("CET-SP (limites)", "GeoSampa WFS", lambda: _req("GET", cet_sp.WFS, params={"service": "WFS", "request": "GetCapabilities"})),
     ("OpenStreetMap", "Geofabrik (HEAD do extrato)", lambda: _req("HEAD", f"{osm_pbf.GEOFABRIK_BASE}/norte-latest.osm.pbf")),
     ("IBGE (malha das UFs)", "API de malhas v3", lambda: _req("GET", ufpoly.MESH_URL)),

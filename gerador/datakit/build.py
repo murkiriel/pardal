@@ -4,8 +4,9 @@
     python -m datakit.build --uf GO,RJ,SC         # algumas UFs num build só
     python -m datakit.build --all                 # 27 UFs, 5 macrorregiões Geofabrik
 
-Fontes ligadas: OSM (extrato Geofabrik) + DNIT + ANTT + DERs + capitais (JP, Fortaleza,
-Recife, BH, Rio) + Detran-DF; limites oficiais das placas da ANTT e dos trechos do Rio (têm
+Fontes ligadas: OSM (extrato Geofabrik) + DNIT + ANTT + órgãos estaduais (DERs, AGETO-TO,
+Detran-MA, SEINFRA-BA) + capitais (JP, Fortaleza, Recife, Curitiba, BH, Rio, São Paulo, Porto
+Alegre, Salvador, Porto Velho) + Detran-DF; limites oficiais das placas da ANTT e dos trechos do Rio (têm
 prioridade sobre o OSM no mesmo lugar); situação ativo/inativo pelo Inmetro nas BRs (SNV).
 Fonte que falha (rede/portal) é tratada como ausente. Cada ponto vai para exatamente uma UF pelo
 polígono do IBGE (ou o mais perto a até 5 km: pontes, orla, ilhas — common/ufassign.py) quando
@@ -19,7 +20,7 @@ import sys
 
 from datakit.build_catalog import build as build_catalog
 from datakit.build_pack import build as build_pack
-from datakit import accident_spots, failures, inmetro_addresses, inmetro_status, potholes, radar_zones
+from datakit import accident_spots, failures, inmetro_addresses, inmetro_status, limit_lines, potholes, radar_zones
 from datakit.common import merge_cameras, merge_limits
 from datakit.common.model import merge_tolls
 from datakit.common.model import (absorb_osm, collapse_osm, deactivate_near, merge_cross_agency,
@@ -29,6 +30,7 @@ from datakit.common.ufassign import UfAssigner
 from datakit.common.ufs import SOURCE_HOME_UF, UF_BBOX, geofabrik_region, uf_bbox
 from datakit.context import BuildContext
 from datakit.sources import dnit, antt, der_go, der_sp, der_pe, der_mg, municipal, bh, df_detran, rio, cet_sp, eptc
+from datakit.sources import ageto_to, der_se, detran_ma, seinfra_ba, semtran_pvh, transalvador
 from datakit.sources import prf_concessions
 
 # Fontes oficiais de radares, na ordem do manifest. Cada módulo expõe fetch(ctx) -> SourceData
@@ -37,6 +39,8 @@ OFFICIAL = {
     "DNIT": dnit, "ANTT": antt,
     "DER-GO": der_go, "DER-SP": der_sp, "DER-PE": der_pe, "DER-MG": der_mg,
     "capitais": municipal, "BHTRANS": bh, "DETRAN-DF": df_detran, "RIO": rio, "CET-SP": cet_sp, "EPTC": eptc,
+    "AGETO-TO": ageto_to, "DETRAN-MA": detran_ma, "DER-SE": der_se, "SEINFRA-BA": seinfra_ba,
+    "TRANSALVADOR": transalvador, "SEMTRAN-PVH": semtran_pvh,
 }
 
 # Gravado em data/dist no início do build e apagado só no fim: enquanto existir (build rodando,
@@ -100,6 +104,16 @@ class _Split:
             return [x for x in items if in_bbox(bbox, x.lat, x.lng)]
         return [x for x, u in zip(items, self._ufs(key, items, lambda x: (x.lat, x.lng))) if u == uf]
 
+    def lines(self, uf: str, key, items: list) -> list:
+        """Trechos (limit_lines.Piece) da UF: os que têm o primeiro, o do meio ou o último vértice nela. Uma linha que
+        cruza a divisa fica nas duas UFs, como a ponte (a posição nunca fica sem a via do outro lado)."""
+        spots = (lambda p: p.first(), lambda p: p.middle(), lambda p: p.last())
+        if self.assigner is None:
+            bbox = uf_bbox(uf)
+            return [p for p in items if any(in_bbox(bbox, *at(p)) for at in spots)]
+        ufs = [self._ufs((key, i), items, at) for i, at in enumerate(spots)]
+        return [p for p, a, b, c in zip(items, *ufs) if uf in (a, b, c)]
+
     def structs(self, uf: str, key, items: list) -> list:
         """Ponte/túnel fica com a UF de qualquer uma das duas pontas (a divisa às vezes é o rio)."""
         if self.assigner is None:
@@ -123,6 +137,8 @@ def build_one(uf: str, ctx: BuildContext, packs_dir: str, split: "_Split | None"
     osm_l = split.points(uf, "osm-limites", osm_lims)
     structs = split.structs(uf, "osm-estruturas", osm_structs)
     bumps = split.points(uf, "osm-lombadas", ctx.osm_bumps(region))
+    hazards = split.points(uf, "osm-atencao", ctx.osm_hazards(region))
+    enforcement = split.points(uf, "cameras-fiscalizacao", ctx.enforcement_cameras())
     tolls = merge_tolls(split.points(uf, "antt-pedagios", ctx.antt_tolls()), split.points(uf, "osm-pedagios", ctx.osm_tolls(region)))
     off_c = _resolve_hints([c for name, loaded in official.items()
                             for c in split.points(uf, ("oficial", name), loaded.cameras)], probe_dirs)
@@ -156,11 +172,22 @@ def build_one(uf: str, ctx: BuildContext, packs_dir: str, split: "_Split | None"
     off_by_src = {n: split.points(uf, ("limites", n), pts) for n, pts in nat["official_limits"].items()}
     off_l = [x for pts in off_by_src.values() for x in pts]
     lims = merge_limits(override_limits(off_l, osm_l))
+    # os mesmos limites como trechos de via: o oficial ganha, e do OSM sai o que ele cobre (limit_lines.cut)
+    off_t = {n: split.lines(uf, ("linhas", n), pcs) for n, pcs in nat["official_lines"].items()}
+    official_lines = [p for pcs in off_t.values() for p in pcs]
+    osm_t = split.lines(uf, "osm-linhas", ctx.osm_limit_lines(region))
+    osm_kept, cut_stats = limit_lines.cut(osm_t, official_lines)
+    limit_pieces = limit_lines.to_lines(official_lines + osm_kept)
+    print(f"[build] {uf}: {len(limit_pieces)} trechos de limite antes de tirar os repetidos ({len(official_lines)} oficiais, "
+          f"{len(osm_kept)} do OSM de {len(osm_t)}; corte pelo oficial: {_fmt_cut(cut_stats)})")
 
     sources = [{"name": f"OSM/Geofabrik {region}", "file_date": ex.file_date,
                 "sha256": ex.sha256, "bytes": ex.bytes}]
     sources += [{"name": n, "count": len(official[n].cameras) if n in official else 0} for n in ctx.sources]
     sources += [{"name": f"{n} (limites)", "count": len(pts)} for n, pts in off_by_src.items()]
+    sources += [{"name": f"{n} (trechos de limite)", "count": len(pcs)} for n, pcs in off_t.items()]
+    sources.append({"name": "OSM (trechos de limite)", "count": len(osm_kept), "before_cut": len(osm_t),
+                    **{k: round(v, 1) for k, v in cut_stats.items()}})
     if status:
         sources.append({"name": "Inmetro (situação)", "snv": nat["snv_version"], **status})
     sources.append({"name": "PRF (radares das concessões)", **conc_stats})
@@ -185,10 +212,20 @@ def build_one(uf: str, ctx: BuildContext, packs_dir: str, split: "_Split | None"
     sources.append({"name": "PRF (acidentes com moto)", "months": f"{period[0]}/{period[1]}", "count": len(accidents),
                     "unplaced": accidents_out})
 
+    sources.append({"name": "Câmeras de fiscalização sem velocidade", "count": len(enforcement)})
+
     manifest = build_pack(uf, packs_dir, cams, lims, structs, sources, bumps=bumps, tolls=tolls, radar_zones=zones,
-                          potholes=holes, moto_accidents=accidents)
+                          potholes=holes, moto_accidents=accidents, hazards=hazards,
+                          limit_lines=limit_pieces, enforcement_cameras=enforcement)
     print(f"[build] pacote {uf}: {manifest['counts']}")
     return manifest
+
+
+def _fmt_cut(stats: dict) -> str:
+    if not stats:
+        return "sem trecho oficial"
+    return (f"{int(stats['lines'])} linhas tocadas, {int(stats['cut'])} cortadas, {int(stats['dropped'])} inteiras fora, "
+            f"{stats['km_before']:.0f} km -> {stats['km_after']:.0f} km")
 
 
 def _write_audit(raw_dir: str, uf: str, rows: list) -> None:
@@ -213,6 +250,12 @@ def main(argv=None) -> int:
     ap.add_argument("--no-polygon", action="store_true", help="recorte só por bbox (ignora IBGE)")
     ap.add_argument("--osm-local", action="store_true",
                     help="usa os extratos do OSM já baixados em data/raw/ sem conferir se há versão nova")
+    from datakit.edition import default_root
+    ap.add_argument("--edition", default=default_root(),
+                    help="edição publicada (raiz com brasil/ e catalogo.json), último recurso de uma "
+                         "fonte que falha sem cópia guardada; padrão: a raiz deste repositório")
+    ap.add_argument("--no-edition", action="store_true",
+                    help="sem a edição publicada: fonte que falha sem cópia guardada é falha")
     args = ap.parse_args(argv)
 
     if not args.all and not args.uf:
@@ -224,7 +267,10 @@ def main(argv=None) -> int:
         from datetime import datetime, timezone
         f.write(f"{datetime.now(timezone.utc):%Y-%m-%dT%H:%M:%SZ} {' '.join(argv or sys.argv[1:])}\n")
 
-    ctx = BuildContext(args.raw, refresh_osm=not args.osm_local, sources=OFFICIAL)
+    ctx = BuildContext(args.raw, refresh_osm=not args.osm_local, sources=OFFICIAL,
+                       edition_dir=None if args.no_edition else args.edition)
+    if ctx.edition is not None:
+        print(f"[build] edição publicada de reserva: {ctx.edition.root} (de {ctx.edition.built_at})")
     poly = {} if args.no_polygon else ctx.polygons()
     split = _Split(UfAssigner(poly) if poly else None)
     targets = sorted(UF_BBOX) if args.all else [u.strip().upper() for u in args.uf.split(",") if u.strip()]
@@ -252,6 +298,11 @@ def main(argv=None) -> int:
         from datakit.build_formats import build as build_formats
         print(f"[build] formatos extras (GeoJSON/KML/GPX): {build_formats(args.dist)}")
 
+    from datakit import build_ufs
+    ufs_entry = build_ufs.build(poly, args.dist)
+    if ufs_entry is not None:
+        print(f"[build] contornos das UFs: {ufs_entry['file']} ({ufs_entry['bytes'] / 1000:.0f} KB)")
+
     from datakit.build_brazil import MAX_FILE_BYTES, oversized
     for name, size in oversized(args.dist):
         failures.record(f"tamanho {name}", ValueError(
@@ -268,8 +319,11 @@ def _record_failures(dist_dir: str) -> None:
     path = os.path.join(dist_dir, "catalogo.json")
     with open(path, encoding="utf-8") as f:
         cat = json.load(f)
+    from datakit import source_cache
     cat["failures"] = failures.recorded()
     cat["warnings"] = failures.warnings()
+    # a data do dado de cada fonte: a próxima edição que cair nesta herda a data, não a renova
+    cat["source_dates"] = source_cache.dates()
     with open(path, "w", encoding="utf-8") as f:
         json.dump(cat, f, ensure_ascii=False, indent=2)
     for x in cat["warnings"]:

@@ -78,6 +78,47 @@ class Limit:
                      parse_dir(r.get("direction_deg")))
 
 
+@dataclass(frozen=True)
+class LimitLine:
+    """Limite como trecho de via: a linha (WKT `LINESTRING(lng lat, ...)`, como as zonas do radar portátil) com o valor
+    que vale ao longo dela. Complementa os pontos do `limites.csv`: o app encaixa a posição na via mais perto, de
+    direção compatível, em vez de adivinhar a via pelo ponto.
+
+    `points` (lat, lng): quando o limite vale para um sentido só, ou a via é de mão única, a linha vem desenhada no
+    sentido do trânsito; fora disso o sentido do desenho não quer dizer nada. `direction_deg` só vem preenchido
+    quando o limite vale para um sentido só (rumo médio do trecho, 0-359; para casar com a via use o rumo do próprio
+    segmento da linha); vazio = vale para os dois sentidos. `highway`: classe da via no OSM (`primary`,
+    `residential`...), vazia na fonte oficial que não a informa; `oneway`: True/False pelo OSM (mão única; a linha
+    segue o trânsito), None quando a fonte não diz."""
+    points: Tuple[Tuple[float, float], ...]
+    limit_kmh: int
+    source: str = "OSM"
+    estimated: bool = False
+    low_kmh: Optional[int] = None
+    direction_deg: Optional[int] = None
+    highway: str = ""
+    oneway: Optional[bool] = None
+
+    HEADER = ("limit_kmh", "source", "estimated", "limit_low_kmh", "direction_deg", "highway", "oneway", "wkt")
+
+    @property
+    def lat(self) -> float:
+        """Um ponto da linha (o vértice do meio), para quem trata linha como ponto."""
+        return self.points[len(self.points) // 2][0]
+
+    @property
+    def lng(self) -> float:
+        return self.points[len(self.points) // 2][1]
+
+    def wkt(self) -> str:
+        return "LINESTRING(" + ", ".join(f"{lng:.5f} {lat:.5f}" for lat, lng in self.points) + ")"
+
+    def row(self) -> List[str]:
+        return [str(self.limit_kmh), self.source, "1" if self.estimated else "0",
+                "" if self.low_kmh is None else str(self.low_kmh), _dir(self.direction_deg), self.highway,
+                "" if self.oneway is None else ("1" if self.oneway else "0"), self.wkt()]
+
+
 def _dir(d: Optional[int]) -> str:
     return "" if d is None else str(int(d) % 360)
 
@@ -118,6 +159,40 @@ class Bump:
 
     def row(self) -> List[str]:
         return [f"{self.lat:.6f}", f"{self.lng:.6f}", self.kind]
+
+
+@dataclass(frozen=True)
+class Hazard:
+    """Ponto de atenção na via, do OSM: passagem de nível, travessia de animais, curva perigosa, cruzamento
+    perigoso, área escolar, queda de barreira, painel de velocidade ou outro perigo sinalizado (hazard=*)."""
+    lat: float
+    lng: float
+    kind: str  # LEVEL_CROSSING | ANIMAL_CROSSING | CURVE | DANGEROUS_JUNCTION | SCHOOL_ZONE | FALLING_ROCKS
+    #            | SPEED_DISPLAY | HAZARD
+
+    HEADER = ("lat", "lng", "kind")
+
+    def row(self) -> List[str]:
+        return [f"{self.lat:.6f}", f"{self.lng:.6f}", self.kind]
+
+
+@dataclass(frozen=True)
+class EnforcementCamera:
+    """Local de câmera de fiscalização que NÃO mede velocidade nem pega avanço de sinal (esses vão para o radares.csv):
+    faixa exclusiva, conversão proibida, rodízio, parada sobre a faixa de pedestres, restrição de caminhão... Um local
+    que fiscaliza várias infrações vira uma linha por infração. `active`: só entram locais em operação, então hoje é
+    sempre True (a coluna fica para fontes que informem desativados)."""
+    lat: float
+    lng: float
+    kind: str    # BUS_LANE | NO_TURN | NO_U_TURN | MANDATORY_TURN | STOP_ON_CROSSWALK | ROAD_ROTATION
+    #              | TRUCK_RESTRICTION | CHARTER_RESTRICTION | MOTORCYCLE_RESTRICTION | OTHER
+    source: str  # CET-SP:CAM | BHTRANS:CAM | CURITIBA:CAM (código próprio, nunca o do radar da mesma fonte)
+    active: bool = True
+
+    HEADER = ("lat", "lng", "kind", "source", "active")
+
+    def row(self) -> List[str]:
+        return [f"{self.lat:.6f}", f"{self.lng:.6f}", self.kind, self.source, "1" if self.active else "0"]
 
 
 @dataclass(frozen=True)

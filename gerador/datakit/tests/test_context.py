@@ -1,4 +1,5 @@
 """Contexto do build (o estado de uma execução num objeto só) e o contrato das fontes."""
+import tempfile
 import unittest
 from unittest import mock
 
@@ -23,7 +24,7 @@ class SourceContract(unittest.TestCase):
         rows = [{"LATITUDE": "-23.55", "LONGITUDE": "-46.63", "ENQUADRAMENTOS": "V", "VELOCIDADE": "50"},
                 {"LATITUDE": "-23.56", "LONGITUDE": "-46.64", "ENQUADRAMENTOS": "V", "DESATIVAÇÃO": "2024-01-01"}]
         with mock.patch.object(cet_sp, "_rows_with_fallback", lambda raw_dir: rows):
-            loaded = cet_sp.fetch(BuildContext("raw"))
+            loaded = cet_sp.fetch(BuildContext(tempfile.mkdtemp()))
         self.assertEqual(len(loaded.cameras), 1)
         self.assertEqual(loaded.deactivated, [(-23.56, -46.64)])
 
@@ -46,7 +47,7 @@ class BuildContextTests(unittest.TestCase):
 
         before = list(failures._FAILURES)
         try:
-            ctx = BuildContext("raw", sources={"RUIM": Bad, "BOA": Good})
+            ctx = BuildContext(tempfile.mkdtemp(), sources={"RUIM": Bad, "BOA": Good})
             got = ctx.official()
             self.assertIs(ctx.official(), got)                      # carregado uma vez
             new_failures = failures.recorded()[len(before):]
@@ -71,11 +72,11 @@ class BuildContextTests(unittest.TestCase):
             return {"GO": object()}
 
         with mock.patch.object(snv, "load_routes", rotas), mock.patch.object(ufpoly, "polygons", polys):
-            ctx = BuildContext("raw")
+            ctx = BuildContext(tempfile.mkdtemp())
             self.assertEqual([ctx.snv_routes(), ctx.snv_routes()], ["rotas", "rotas"])
             ctx.polygons()
             ctx.polygons()
-            BuildContext("raw").snv_routes()                               # outro contexto: carrega de novo
+            BuildContext(tempfile.mkdtemp()).snv_routes()                               # outro contexto: carrega de novo
         self.assertEqual(calls, {"snv": 2, "poly": 1})
 
 

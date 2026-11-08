@@ -19,6 +19,7 @@ import zipfile
 from dataclasses import dataclass
 from typing import Dict, List, Optional, Tuple
 
+from datakit import limit_lines
 from datakit.common.lrs import SnvRoutes
 from datakit.common.model import Limit
 from datakit.common.direction import direction_on
@@ -127,5 +128,55 @@ def limits_from_signs(signs: List[Sign], snv: SnvRoutes) -> List[Limit]:
     return out
 
 
+def lines_from_signs(signs: List[Sign], snv: SnvRoutes) -> List[limit_lines.Piece]:
+    """As mesmas placas como trechos (limites_trechos.csv): cada placa vale da posição dela até a próxima do mesmo
+    sentido (no máximo CAP_KM), pela geometria da rota do SNV. A rota é cortada onde algum trecho de qualquer sentido
+    começa ou termina; em cada pedaço, valor igual nos dois sentidos dá uma linha sem sentido, valor diferente (ou só um
+    sentido com placa) dá uma linha por sentido, desenhada no sentido do trânsito. Pedaços seguidos de mesmo valor
+    são juntados."""
+    per_line: Dict[int, dict] = {}
+    for s in signs:
+        hit = snv.nearest(s.br, s.uf, (s.lat, s.lng), SNAP_M)
+        if hit is None:
+            continue
+        line, km, _ = hit
+        slot = per_line.setdefault(id(line), {"line": line, True: [], False: []})
+        slot[s.increasing].append((km, s.kmh))
+
+    out: List[limit_lines.Piece] = []
+    for slot in per_line.values():
+        line = slot["line"]
+        up, down = sorted(_intervals(slot[True], True)), sorted(_intervals(slot[False], False))
+        up_s, down_s = [a for a, _, _ in up], [a for a, _, _ in down]
+        cuts = sorted({max(line.m_min, min(line.m_max, k)) for a, b, _ in up + down for k in (a, b)})
+        for k0, k1 in zip(cuts, cuts[1:]):
+            if k1 - k0 < 1e-6:
+                continue
+            mid = (k0 + k1) / 2
+            vu, vd = _value_at(up, up_s, mid), _value_at(down, down_s, mid)
+            if vu is None and vd is None:
+                continue
+            pts = line.slice(k0, k1)
+            if len(pts) < 2:
+                continue
+            pieces: List[Tuple[int, list, bool]] = []
+            if vu is not None and vu == vd:
+                pieces.append((vu, pts, False))
+            else:
+                if vu is not None:
+                    pieces.append((vu, pts, True))
+                if vd is not None:
+                    pieces.append((vd, pts[::-1], True))
+            for kmh, geometry, directional in pieces:
+                piece = limit_lines.from_points(geometry, limit_lines.Key(kmh, "ANTT", False, None, directional, "", None))
+                if piece is not None:
+                    out.append(piece)
+    return limit_lines.join(out)
+
+
 def load(raw_dir: str, snv: SnvRoutes) -> List[Limit]:
     return limits_from_signs(load_signs(raw_dir), snv)
+
+
+def load_lines(raw_dir: str, snv: SnvRoutes) -> List[limit_lines.Piece]:
+    return lines_from_signs(load_signs(raw_dir), snv)

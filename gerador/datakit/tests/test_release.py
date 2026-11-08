@@ -68,5 +68,24 @@ class Assets(unittest.TestCase):
                 self.assertEqual(len(fh.read().splitlines()), 5)
 
 
+    def test_release_only_lines_go_into_the_state_zip_from_the_build(self):
+        with tempfile.TemporaryDirectory() as repo, tempfile.TemporaryDirectory() as dist:
+            os.makedirs(os.path.join(repo, "estados", "SP"))
+            os.makedirs(os.path.join(repo, "brasil"))
+            with open(os.path.join(repo, "estados", "SP", "radares.csv"), "w") as fh:
+                fh.write("x")
+            with open(os.path.join(repo, "catalogo.json"), "w") as fh:
+                json.dump(_cat("2026-11-08T06:40:00Z"), fh)
+            os.makedirs(os.path.join(dist, "estados", "SP"))
+            for f in ("limites_trechos.csv", "radares.csv", "rascunho.txt"):   # só o trecho vem do build
+                with open(os.path.join(dist, "estados", "SP", f), "w") as fh:
+                    fh.write("do build")
+            out = os.path.join(repo, "_out")
+            rel.build_assets(repo, out, dist)
+            with zipfile.ZipFile(os.path.join(out, "pardal-SP.zip")) as z:
+                self.assertEqual(sorted(z.namelist()), ["SP/limites_trechos.csv", "SP/radares.csv"])
+                self.assertEqual(z.read("SP/radares.csv"), b"x")   # o publicado, não o do build
+
+
 if __name__ == "__main__":
     unittest.main()

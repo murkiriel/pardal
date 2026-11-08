@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import os
 import re
-from typing import Tuple
+from typing import Optional, Tuple
 
 import requests
 
@@ -62,11 +62,20 @@ def load_routes(raw_dir: str):
 
 
 def ensure(raw_dir: str) -> Tuple[str, str, str]:
-    """(caminho do zip das rotas, caminho do zip da base, versão ex. '202607A')."""
+    """(caminho do zip das rotas, caminho do zip da base, versão ex. '202607A'). Se a pasta do DNIT não
+    responder, usa as versões mais novas já baixadas em raw_dir (aviso); sem elas, a falha sobe."""
     os.makedirs(raw_dir, exist_ok=True)
-    route_zip = _latest(ROUTES, r"^rota_\d{6}[A-Z]\.zip$")
+    try:
+        route_zip = _latest(ROUTES, r"^rota_\d{6}[A-Z]\.zip$")
+        base = _latest(BASES, r"^\d{6}[A-Z]\.zip$")
+    except Exception as e:  # noqa: BLE001 — decide abaixo se há cópia guardada
+        stored = _stored(raw_dir)
+        if stored is None:
+            raise
+        from datakit import failures
+        failures.warn("SNV", f"pasta do DNIT falhou ({type(e).__name__}); usada a versão guardada {stored[2]}")
+        return stored
     version = route_zip[len("rota_"):-len(".zip")]
-    base = _latest(BASES, r"^\d{6}[A-Z]\.zip$")
     paths = []
     for folder, name, local in ((ROUTES, route_zip, f"snv_rota_{version}.zip"),
                                 (BASES, base, f"snv_base_{base[:-4]}.zip")):
@@ -76,3 +85,14 @@ def ensure(raw_dir: str) -> Tuple[str, str, str]:
             _fetch(folder, name, path)
         paths.append(path)
     return paths[0], paths[1], version
+
+
+def _stored(raw_dir: str) -> Optional[Tuple[str, str, str]]:
+    """As versões mais novas das rotas e da base do SNV já baixadas em raw_dir, ou None."""
+    names = os.listdir(raw_dir)
+    routes = sorted(n for n in names if re.fullmatch(r"snv_rota_\d{6}[A-Z]\.zip", n))
+    bases = sorted(n for n in names if re.fullmatch(r"snv_base_\d{6}[A-Z]\.zip", n))
+    if not routes or not bases:
+        return None
+    return (os.path.join(raw_dir, routes[-1]), os.path.join(raw_dir, bases[-1]),
+            routes[-1][len("snv_rota_"):-len(".zip")])

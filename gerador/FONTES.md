@@ -39,10 +39,23 @@ endereços (geocodificador).
 | Mogi das Cruzes (ArcGIS `radares`) | 14 radares | ArcGIS REST |
 | **Curitiba — fiscalização eletrônica da Setran** (`transito.curitiba.pr.gov.br/fiscalizacaoeletronica`, desde 2026-10-05) | 308 pontos em operação: coordenada, identificação, o que fiscaliza (velocidade, avanço de sinal, parada na faixa, conversão), limite | Página HTML (a lista inteira numa página só) |
 | **Porto Alegre — EPTC, medidores eletrônicos de velocidade** (relatório Power BI público ligado à página da EPTC, desde 2026-10-05) | 155 medidores: coordenada, sentido, limite, tipo (pardal, lombada, DAS, portátil), situação | Power BI "publicar na web", como o da CET-SP |
+| **DER-SE** (`der.se.gov.br/localizacao-de-radares-fixos`, desde 2026-11-08) | 129 radares e lombadas das rodovias estaduais: coordenada, limite | Planilha Google publicada na web (CSV) |
+| **AGETO-TO** (`to.gov.br/ageto/lista-de-radares`, desde 2026-11-08) | 58 radares, barreiras eletrônicas e mistos das rodovias estaduais: coordenada, limite, nº Inmetro | PDF |
+| **Detran-MA** (página de fiscalização eletrônica, desde 2026-11-08) | 33 radares das rodovias estaduais: coordenada, limite, sentido nominal | PDF |
+| **SEINFRA-BA** (`ba.gov.br/infraestrutura/12046/mapas`, desde 2026-11-08) | 78 radares das rodovias estaduais: coordenada, limite, rodovia + km | PDF (o KML vem num RAR) |
+| **Transalvador** (mapa de pórticos do transonline, desde 2026-11-08) | 102 radares de Salvador: coordenada, limite, série | Página HTML (marcadores do Google Maps) |
+| **SEMTRAN Porto Velho** (página "radares fixos", desde 2026-11-08) | 39 radares: coordenada, validade da aferição | PDF |
 
 ## B — Rodovia + km (precisam de referência linear)
 
 - **DER-MG**: 708 radares fixos com limite (tabela HTML, atualizada 2026-09-29).
+- **DAER-RS, fixos e lombadas** (conferido em 2026-11-08): ao contrário do que a linha abaixo dizia, a
+  página `daer.rs.gov.br/pardais` liga um PDF com cada pardal por rodovia RS + km (60 equipamentos, com
+  série e nº Inmetro), e `localizacao-das-lombadas` outro com 131 redutores. Sem coordenada.
+- **DER-ES** (`servicos.der.es.gov.br/Radares.aspx`, conferido em 2026-11-08): 392 registros com código,
+  endereço com rodovia + km, faixas, tipo, velocidade e série; sem coordenada.
+- **DER-RJ, radar portátil** (`sgitp.der.rj.gov.br/radares-portateis`): 41 locais por rodovia + km; o
+  certificado do site estava vencido em 2026-11-08.
 - **DER-PR, DAER-RS, DER-ES**: listas em PDF (a obrigação vem da Res. Contran 798/2020).
   DAER-RS não publica o ponto exato dos pardais, só os trechos.
   DER-PR (conferido em 2026-10-09): a página "Fiscalização por equipamento fixo" traz um só PDF, o da EPR Litoral
@@ -73,15 +86,18 @@ Referência linear disponível:
   (atualizado 2026-09-11). A própria prefeitura tem geocodificador com número de porta
   (`pgeo3.../Geocode/Geocode_NP`, `Geocode_Logradouros_WGS84`).
 - **Inmetro**: ~8.900 válidos com endereço urbano (Brasília 1.013, Goiânia 291, …).
-- CET-SP (mapa), Salvador
-  (Transalvador, fora do ar no teste), Goiânia (consulta na tela) — sem arquivo aberto.
+- CET-SP (mapa), Goiânia (consulta na tela) — sem arquivo aberto. Salvador saiu desta lista em
+  2026-11-08 (seção A): o mapa de pórticos da Transalvador traz a coordenada de cada radar.
+- Manaus (IMMU, página "Consulta Aferição dos Radares", `immu.manaus.am.gov.br/index.php?r=site%2Finforadar`),
+  Aracaju (SMTT, `smtt.aracaju.se.gov.br/wp-json/smtt/v1/radares`, 44 medidores com situação e limite),
+  Araguaína-TO (PDF da ASTT): endereço e sentido, sem coordenada (achados em 2026-11-08, ver abaixo).
   Curitiba e Porto Alegre saíram desta lista em 2026-10-05 (seção A): a página da Setran passou a trazer
   a coordenada, e o relatório Power BI da EPTC tem a tabela dos medidores com ela.
 
 ## D — Indisponíveis agora
 
-- **Seinfra-BA**: publicava KML dos radares estaduais; página suspensa pelo período
-  eleitoral. Outros sites estaduais podem estar no mesmo caso até o fim de outubro.
+- ~~**Seinfra-BA**~~: voltou depois da eleição; entrou como fonte em 2026-11-08 (seção A, pela lista
+  em PDF de 15/09/2026).
 - **SC**: sem radar em rodovia estadual há 14 anos; contrato de retomada suspenso em maio/2026.
 - DNIT: o portal só tem `controle-de-velocidade` como dado útil (já usado); sem inventário
   de placas das federais não concedidas.
@@ -188,6 +204,212 @@ operação do radar móvel e fica de fora. Limite com dois valores ("40km/h_60km
 RS gerado localmente, área de Porto Alegre: radares ativos de 147 para 192. Dos 96, 47 se juntam a
 radares que já estavam (33 do OSM, 8 do Inmetro, 6 dos dois) e 49 entram novos; 6 dos novos têm um
 radar só do OSM entre 30 e 50 m (como em Curitiba, fora do raio de junção).
+
+### Órgãos estaduais e capitais achados em 2026-11-08
+
+Origem: a lista de coletores do projeto Bunda-de-Urso (`github.com/Challado/Bunda-de-Urso`, cadastro
+de radares de várias fontes oficiais; código "fonte disponível", não livre, e compilação CC BY 4.0).
+O projeto serviu só de mapa: cada fonte abaixo foi baixada e lida direto do órgão. Outros projetos
+olhados no mesmo dia e descartados por só repetirem fontes que já entram aqui (OSM, DNIT, ANTT, CET,
+Inmetro ou os próprios pacotes do Pardal): radar-na-rota, ohm-maps-dados, radarsp (zzzzghst7, que também
+usa o radarnobrasil, sem licença), pardal (olegantonov), pardal-teste, Efisc; open-radars-manaus (7
+pontos levantados em campo, ODbL) e fiscalizacao-eletronica (8 pontos de São José dos Pinhais de 2023,
+sem origem) por serem pequenos demais.
+
+Leitura de 2026-11-08 e distância de cada ponto ao radar mais perto de `brasil/radares.csv` (pacote
+publicado antes delas):
+
+| Fonte (`source`) | Módulo | Pontos | Já no pacote a ≤ 50 m | Novos (> 200 m) | Observações |
+|---|---|---|---|---|---|
+| `AGETO-TO` | `sources/ageto_to.py` | 58 | 0 | 57 | 40 radares fixos, 16 barreiras eletrônicas, 2 mistos; todos com limite |
+| `DER-SE` | `sources/der_se.py` | 129 | 5 | 124 | coordenada no link do Maps (`query=` ou `!3d!4d`), em graus/minutos/segundos ou num link curto (9), aberto pelo redirecionamento; limite 50 ou 40 |
+| `SEINFRA-BA` | `sources/seinfra_ba.py` | 78 | 5 | 67 | lista de 15/09/2026; um ponto com a longitude sem o "-" (corrigido: a BA inteira é sul/oeste) |
+| `DETRAN-MA` | `sources/detran_ma.py` | 33 | 1 | 31 | 68 linhas (uma por sentido e faixa); todos 60 km/h |
+| `TRANSALVADOR` | `sources/transalvador.py` | 102 | 27 | 69 | data de aferição velha na página (52 de 2022): não desativa nada |
+| `SEMTRAN-PVH` | `sources/semtran_pvh.py` | 39 | 15 | 9 | sem limite; coordenada estragada pela planilha ("-876.651.999.999.999.000" = -8,76652), refeita pelo número de dígitos inteiros; ativo enquanto a validade da aferição não venceu (38) |
+
+Todas entram como FIXED (lombada e barreira eletrônica medem velocidade), sem sentido (o Detran-MA e a
+Transalvador dão só o nominal, "LESTE/OESTE", "SENTIDO AEROPORTO"). Cada uma tem a sua entrada no
+`OFFICIAL` do `build.py` e, por isso, a sua cópia da última leitura boa (`source_cache`). A UF do órgão
+está em `common/ufs.py` (`_drop_far_from_home`); no catálogo, AGETO-TO, Detran-MA e SEINFRA-BA contam
+como cobertura estadual e Transalvador e SEMTRAN-PVH como municipal.
+
+Build real de TO, MA, SE, BA e RO em 2026-11-08 (servidores reais, extratos do OSM de 29/09), radares
+no pacote antes → depois: TO 77 → 136, MA 145 → 176, SE 131 → 255, BA 463 → 618, RO 35 → 61; nenhuma
+falha nem aviso das seis fontes. No pacote: AGETO-TO 58, Detran-MA 33, DER-SE 129 e SEINFRA-BA 77, todos
+com limite; Transalvador 102 (98 com limite); SEMTRAN-PVH 38 (12 com limite, vindo da junção, 37 ativos).
+Radar novo a 30–100 m de um de outra fonte, fora do raio de junção (30 m): SEINFRA-BA 7, Transalvador 5,
+AGETO-TO 1, DER-SE 1. Em Salvador e na BA-526 há também pares da mesma fonte a 30–100 m com o mesmo
+limite, nos dois lados da via: são os dois sentidos, publicados como equipamentos separados. Como em
+Curitiba e Porto Alegre, fica anotado, sem mudar a regra de junção.
+
+Achadas e **não** integradas (sem coordenada; criar radar a partir de rodovia + km foi descartado depois
+de medir, seção "Resultado da implementação", e endereço sem número cai no meio da rua): DAER-RS (fixos e
+lombadas, rodovia + km), DER-ES (392, rodovia + km), DER-RJ (radar portátil, rodovia + km), SMTT Aracaju
+(44, endereço; API JSON), IMMU Manaus (endereço e sentido), Araguaína-TO (endereço), Cariacica-ES (13
+pontos num mapa do Google My Maps ligado pela prefeitura; candidata, não medida), Joinville-SC (PDF bienal,
+parte dos itens com GPS; candidata, não medida). Campo Grande, Macapá, Boa Vista, Cuiabá, Teresina e
+Belém só têm notícia ou portaria, sem lista.
+
+### Pontos de atenção do OSM (2026-11-08)
+
+Ideia tirada dos apps de alerta Super Tripper (Pod e Dash), que além dos radares avisam de perigos na via e de pontos de
+atenção. A base deles não serve: mistura a SCDB.info (comercial; os termos proíbem repassar os dados), o OSM e o DNIT
+sem dizer a origem de cada ponto (análise em `~/APKs/RADARES-OFFLINE.md`). O que entrou aqui vem só do OSM:
+`osm_pbf.load_hazards`, arquivo `pontos_atencao.csv` por estado (pacote schema 9). Etiquetas: `railway=level_crossing`
+(passagem de nível), `highway=speed_display` (painel de velocidade) e `hazard=*` (os valores da wiki agrupados em curva,
+cruzamento perigoso, travessia de animais, área escolar e queda de barreira; o resto vira `HAZARD`).
+
+Leitura dos extratos de 2026-11-08 (38 s nas cinco regiões): 19.174 pontos, 17.391 passagens de nível, 793 `HAZARD`,
+467 curvas, 332 painéis de velocidade, 116 áreas escolares, 31 travessias de animais, 31 quedas de barreira e 13
+cruzamentos perigosos. Ficaram de fora: semáforos (`highway=traffic_signals`, mais de 12 mil só no Norte, Nordeste e
+Centro-Oeste, que não pedem aviso), travessias de pedestre e placas de pare e de dê a preferência.
+
+Também da análise dos mesmos apps, as recomendações de uso para quem faz app (aviso pela distância na rota, filtro de
+sentido só com GPS preciso, grupos de alerta, dois avisos por radar) estão no README, seção "Para quem faz app de alerta".
+
+### Limites como trechos (2026-11-08)
+
+`<UF>/limites_trechos.csv` no zip `pardal-<UF>.zip` da release diária (pacote no schema 10; decidido em 2026-11-08: só na
+release, não no repositório, porque somam ~172 MB e mudam quase todo dia com o OSM; no zip, SP cai de 29,0 para 6,1 MB, MG de
+30,6 para 7,3 MB, PR de 11,7 para 2,7 MB). No `catalogo.json` publicado, a entrada `limit_lines` traz `release_asset`,
+`asset_path`, `bytes`, `sha256` e `count` (o `publish.rewrite_catalog` troca o `file` do build por esses dois campos). O
+limite como a via, não como pontos. Colunas
+`limit_kmh,source,estimated,limit_low_kmh,direction_deg,highway,oneway,wkt`; o `limites.csv` não mudou. Código em
+`datakit/limit_lines.py` (juntar, cortar, escrever), `osm_pbf.load(..., lines_out=)` (vias do OSM) e `rio.py`, `cet_sp.py`,
+`antt_placas.py` (trechos oficiais).
+
+**Do OSM.** Cada via com limite, sinalizado ou estimado, na mesma passada que gera os pontos e com as mesmas regras de
+estimativa (`maxspeed`, `maxspeed:forward/backward`, zona sem número, classe da via; tronco/primária/secundária sem `lit`
+esperam o fim da leitura para saber se é cidade). Diferenças dos pontos, de propósito:
+- *Mão única* (`oneway=yes/-1`, e também autoestrada e rotatória, que o OSM sobreentende): a linha vem desenhada no sentido do
+  trânsito (`oneway=-1` é virada) e só vale o limite do sentido que existe; `maxspeed:backward` numa via `oneway=yes` é
+  ignorado (os pontos o emitem). `direction_deg` fica vazio: a mão única já diz o sentido, e a coluna `oneway=1` avisa.
+- *Mão dupla com `maxspeed:forward` ≠ `backward`*: uma linha por sentido, cada uma desenhada no sentido do trânsito, com
+  `direction_deg` = rumo médio. O sentido sem valor ganha a estimativa de sempre, também como linha de um sentido só (os pontos
+  a emitem sem sentido).
+- `highway` (classe da via) e `oneway` (`1`/`0`) vão para o CSV porque o app (ou o roteador) costuma saber a classe e a mão da
+  via em que está: ajudam a escolher entre duas vias paralelas e a não casar uma rua com uma marginal. Nas fontes oficiais
+  que não os informam, as duas colunas ficam vazias.
+- *Geometria*: Douglas-Peucker a 3 m por via, coordenadas com 5 casas (~1,1 m). Medido em SP (280.926 vias, 110.080 km, antes de
+  juntar): sem simplificar 70,4 MB; a 1 m 48,6; a 2 m 40,7; a 3 m 36,8; a 5 m 32,9; a 8 m 30,2 MB. Em 30.000 vias sorteadas, o
+  maior desvio de um vértice original para a linha simplificada a 3 m foi de 3,0 m (mediana 1,7 m). Ficou 3 m: abaixo disso o
+  arquivo cresce 10-30% sem ganho para casar a via (a largura de uma pista é maior).
+- *Juntar* (`limit_lines.join`): vias que se encontram numa ponta (id do nó no OSM, a coordenada nas fontes oficiais) com o mesmo
+  limite, fonte, estimativa, classe e sentido viram uma linha só, até 5 km. Só se junta onde exatamente duas pontas se
+  encontram (num nó com três vias iguais não dá para saber qual segue); linha de mão única ou de um sentido só junta no
+  sentido do trânsito. SP: 280.926 linhas → 155.372 (-45%), 36,8 → 29,2 MB. O teto de 5 km evita uma linha de centenas de km
+  que o app teria de ler inteira para casar uma posição.
+
+**Das fontes oficiais.** Rio: o trecho de logradouro da prefeitura (a geometria já vinha na camada que gera os pontos); CET de
+São Paulo: a geometria das vias de trânsito rápido (70) e arteriais (50) da classificação viária do GeoSampa; ANTT: a placa vale
+da posição dela até a próxima do mesmo sentido (máx. 10 km), como nos pontos, e a rota do SNV é cortada onde qualquer
+trecho começa ou termina: valor igual nos dois sentidos dá uma linha sem sentido, diferente (ou um sentido só) dá uma linha por
+sentido, desenhada no sentido do trânsito (crescente do km = como o SNV está desenhado, decrescente = ao contrário), com
+`direction_deg` = rumo médio. Pontos e linhas de cada fonte saem da mesma leitura (`rio._segments`, `cet_sp._classified_features`
+guardam as respostas na execução; a ANTT baixa o KMZ duas vezes). As linhas oficiais têm cópia guardada própria
+(`Rio trechos (linhas)`, `CET-SP limites (linhas)`, `ANTT placas (trechos)` em `data/raw/fontes/`); sem cópia e sem a fonte, a falha
+vira aviso (não barra o `publish.py`) e o estado sai só com as linhas do OSM, sem corte. Não há reserva pela edição publicada
+(ela só tem os pontos oficiais).
+
+**Corte do OSM pelo oficial** (`limit_lines.cut`), no espírito do `override_limits`: cada linha do OSM é medida a cada 20 m, e o
+ponto fica de fora se há uma amostra de um trecho oficial a até 50 m (o mesmo raio dos pontos) **e** de orientação compatível
+(rumos até 30° de diferença, módulo 180°: uma rua que cruza a via oficial não é cortada). Oficial sem sentido (Rio, CET) cobre
+qualquer sentido; oficial de um sentido só (ANTT) cobre a via de mão única do mesmo sentido, e a de mão dupla só quando
+os dois sentidos têm trecho oficial ali (como nos pontos: com placa de um sentido só, o OSM fica). As sequências de pontos
+sem cobertura viram linhas novas (simplificadas a 1 m); sobra com menos de 40 m sai. Medido em SP (155.372 linhas do OSM, 110.000
+km) com as linhas oficiais de SP (11.830: ANTT 1.157 + CET 10.673):
+
+| Oficial | raio / ângulo | OSM tocado | cortadas | inteiras fora | km antes → depois |
+|---|---|---|---|---|---|
+| ANTT | 50 m / 30° | 9.845 | 2.388 | 1.603 | 5.809 → 3.837 |
+| ANTT | 25 m / 30° | 9.845 | 1.769 | 937 | 5.809 → 4.226 |
+| ANTT | 50 m / 90° (sem orientação) | 9.845 | 3.193 | 2.118 | 5.809 → 3.767 |
+| CET | 50 m / 30° | 16.202 | 7.538 | 6.054 | 6.025 → 3.407 |
+| CET | 25 m / 30° | 16.202 | 6.782 | 5.559 | 6.025 → 3.526 |
+| CET | 50 m / 90° | 16.202 | 9.776 | 7.069 | 6.025 → 3.219 |
+| ANTT + CET | 50 m / 30° (o do build) | 23.961 | 9.786 | 7.593 | 10.929 → 6.399 |
+
+Escolhido 50 m / 30°: o raio dos pontos, e a orientação evita cortar a rua transversal e a paralela que cruza (a 90° o corte
+passa a levar também as transversais). Dos 10.929 km de OSM tocados em SP, o corte tira 4.530 km, e a CET leva a maior parte porque a classificação viária cobre as avenidas e o OSM as desenha em duas pistas (duas linhas de mão única por
+linha oficial). No Brasil (lido com as linhas oficiais da ANTT e da CET; as do Rio ficaram de fora, ver abaixo): 46.965 km
+de OSM tocados → 28.553 km. O Rio não foi medido: o servidor da prefeitura (`pgeo3`) respondeu com erro e timeout durante a
+medição de 2026-11-08, e RJ saiu sem corte pelo Rio. A medição do corte do Rio fica para o build.
+
+**Tamanho** (CSV; medido sem build, chamando `osm_pbf.load` nos cinco extratos de 2026-11-08 e as funções do pacote; os pontos
+são só os do OSM, sem os oficiais, então o `limites.csv` real é um pouco maior):
+
+| UF | linhas | `limites_trechos.csv` | linhas estimadas | pontos do OSM (`limites.csv`) |
+|---|---|---|---|---|
+| SP | 159.701 | 29,0 MB | 80.871 | 16,4 MB |
+| MG | 93.197 | 30,6 MB | 46.480 | 15,1 MB |
+| RS | 54.562 | 13,5 MB | 27.472 | 8,2 MB |
+| PR | 48.808 | 11,7 MB | 22.199 | 6,9 MB |
+| BA | 34.403 | 13,3 MB | 25.309 | 7,8 MB |
+| RJ | 25.846 | 6,7 MB | 14.813 | 3,4 MB |
+| GO | 29.804 | 6,3 MB | 19.383 | 4,5 MB |
+| Brasil (27 UFs) | 663.631 | 171,9 MB | 359.672 | 101,0 MB |
+
+O maior arquivo é o de MG, com 30,6 MB (teto de 95 MB). Os trechos pesam cerca de 1,7 vez os pontos (a geometria são ~1,1 milhão
+de vértices só em SP). Não há versão em `brasil/`: a soma, 172 MB, passaria do teto, e o app baixa o estado. Metade das linhas
+é estimada (`estimated=1`): se o arquivo pesar demais para o app, a coluna deixa filtrar. Tempo (nesta máquina): a passada
+do OSM com as linhas levou 145 s para o recorte de SP, 188 s para o sudeste inteiro, 4,3 GB de memória no pico; juntar e
+cortar leva segundos por estado.
+
+**Fora do escopo.** Os limites oficiais de outros órgãos (DER-SP, Goinfra) vêm como pontos, sem geometria de trecho; vias sem
+`maxspeed` e fora da rede principal (residencial, serviço, estrada sem classe) continuam sem linha nem estimativa, como nos
+pontos. Uma via do OSM de mão dupla com oficial de um sentido só fica inteira (nos dois sentidos).
+
+### Câmeras de fiscalização sem velocidade (2026-11-08)
+
+`estados/<UF>/cameras_fiscalizacao.csv` (pacote no schema 11): `lat,lng,kind,source,active`. O CET de São Paulo, a BHTrans e a
+Setran de Curitiba listam locais de câmeras que fiscalizam outras infrações; o gerador as descartava (`cet_sp._enforces`: só V e
+A; `bh._kind`; `municipal.parse_curitiba`). Agora vão para um arquivo à parte, para não misturar com radar de velocidade. O
+`radares.csv` não mudou. O mesmo local pode estar nos dois: dos 615 locais do CET com outra infração, 610 também são radar de
+velocidade ou de avanço de sinal.
+
+**Códigos do CET** (tabela `Enquadramentos` do mesmo relatório Power BI, com a legenda de cada código, lida em 2026-11-08; o
+dicionário do CSV do GitHub manda consultar essa tabela): V velocidade e A avanço de sinal (radares.csv); `EXD`/`EXE` faixa
+exclusiva (direita/esquerda) → `BUS_LANE`; `CPD`/`CPE` conversão proibida (direita/esquerda) → `NO_TURN`; `P` parada sobre a
+faixa de pedestres → `STOP_ON_CROSSWALK`; `R` rodízio → `ROAD_ROTATION`; `Z` (ZMRC), `VR` (VER) e `PR` (faixa proibida,
+caminhão à esquerda) → `TRUCK_RESTRICTION`; `F` (ZMRF, fretados) → `CHARTER_RESTRICTION`; `MT` motocicletas →
+`MOTORCYCLE_RESTRICTION`; `S` trânsito seletivo → `OTHER` (2 locais). Todo código da base tinha legenda; um código novo cai em
+`OTHER`.
+
+**BHTrans** (tipo do controlador): conversão-retorno em local proibido → `NO_TURN`, invasão de faixa exclusiva (MOVE) →
+`BUS_LANE`. **Curitiba** (títulos dos ícones da página da Setran): Parada na faixa → `STOP_ON_CROSSWALK`, Conversão proibida →
+`NO_TURN`, Retorno proibido → `NO_U_TURN`, Conversão obrigatória → `MANDATORY_TURN`, Faixa Exclusiva → `BUS_LANE`, Peso Bruto Total
+→ `TRUCK_RESTRICTION`.
+
+**Escolhas.** Uma linha por local e infração, não uma lista com `;` (o app filtra por `kind` e liga/desliga o grupo; um local
+com cinco infrações vira cinco linhas de ~45 bytes, e conversão à direita e à esquerda são uma linha só). Só locais em operação
+(`active` é sempre `1`; a coluna fica por simetria com o `radares.csv`): os 1.195 locais desativados do CET não ajudam um app de
+alerta. `source` com código próprio (`CET-SP:CAM`, `BHTRANS:CAM`, `CURITIBA:CAM`): a reserva pela edição publicada procura radares
+no `brasil/radares.csv` pelas partes da coluna `source`, e com o código do radar essas câmeras voltariam como radar.
+
+**Onde passam.** Ficam fora do `SourceData.cameras` das três fontes (ali viram radar na mescla, entram na trava de queda do
+`publish.py` e na cópia guardada da fonte). `BuildContext.enforcement_cameras` as lê à parte, depois de `official()`: o CET
+reaproveita a tabela que a leitura dos radares guardou em `data/raw/cet_sp_locais.json` (sem segunda consulta ao Power BI),
+a BHTrans e a Setran leem o CSV e a página uma vez só por execução (`bh._csv_text`, `municipal._curitiba_html`) para os
+radares e para as câmeras. Cada fonte tem cópia guardada própria (`CET-SP (outras câmeras)`, `BHTRANS (outras câmeras)`,
+`Curitiba (outras câmeras)`); sem cópia, a falha vira aviso, não falha (o arquivo não tem reserva pela edição). Só as fontes
+ligadas no build são lidas.
+
+**Contagens** (2026-11-08): CET de São Paulo 615 locais ativos, 1.306 linhas (`ROAD_ROTATION` 388, `TRUCK_RESTRICTION` 384,
+`CHARTER_RESTRICTION` 174, `STOP_ON_CROSSWALK` 170, `BUS_LANE` 158, `MOTORCYCLE_RESTRICTION` 19, `NO_TURN` 11, `OTHER` 2); BHTrans
+(MG) 51 locais (`NO_TURN` 28, `BUS_LANE` 23); Curitiba (PR) 234 locais, 320 linhas (`STOP_ON_CROSSWALK` 223, `NO_TURN` 44,
+`NO_U_TURN` 20, `MANDATORY_TURN` 17, `BUS_LANE` 12, `TRUCK_RESTRICTION` 4). Total: 1.677 linhas, 900 locais. O Rio publica
+em PDF seções de faixa exclusiva, carga e conversão sem coordenada (`rio.parse_list` as descarta); não entram.
+
+### Contornos das UFs (2026-11-08)
+
+`brasil/ufs.geojson` e a chave `ufs_geojson` do `catalogo.json` (`datakit/build_ufs.py`): uma feição por UF (`uf`, `name`) com a
+malha oficial do IBGE já usada no recorte, simplificada (shapely, `simplify(tol, preserve_topology=True)`) e com quatro casas. Medido
+nas 27 UFs: contorno cheio 1.001 KB; tolerância 0,002° → 836 KB; 0,005° → 457 KB; 0,01° → 250 KB; 0,02° → 132 KB. Casas decimais
+(4 ou 5) não mudaram o tamanho. Escolhida a 0,02° (132,9 KB; alvo ≤ ~150 KB). Erro: o maior desvio de um vértice do contorno
+original para o simplificado é de 3,0 km (no Pará; a tolerância é de 0,02°, ~2,2 km, e a preservação da topologia passa um pouco
+dela); no sentido inverso, 0,1 m. É para o app escolher os pacotes pela posição, não para decidir a divisa: perto dela (uns 5 km) o
+app deve olhar também os estados vizinhos. Sem `shapely` ou sem a malha, o arquivo não sai.
 
 ## Sentido dos radares e das placas (2026-09-29)
 
@@ -297,6 +519,17 @@ estavam no pacote pelo OSM (a < 30 m), 278 são novos. Os locais só de rodízio
 exclusiva, conversão proibida etc. ficam de fora. Alternativa descartada: o pacote `radarsp` (ciclocidade),
 que tem um dicionário de locais de 2024 montado a partir de pedido por LAI; a fonte da CET é
 a original e está atualizada.
+
+**Reserva (desde 2026-11-08):** a CET também publica a mesma base em CSV no GitHub
+(`github.com/cetsp-dados/dados-fiscalizacao-eletronica`, `Base_Locais_Fiscalizados.csv`, desde
+2026-10-27, com dicionário de dados): mesmos campos e nomes, mais número de série, faixas, captura e
+redutor; enquadramentos separados por ";" e datas em AAAA-MM-DD. É atualizada à mão (em 2026-11-08:
+2.074 locais e a última ativação/desativação em 2026-10-20, contra 2.127 e 2026-11-05 no Power BI).
+`cet_sp._rows_with_fallback` lê as duas e usa o CSV só quando o Power BI falha ou quando a data mais
+recente de ativação/desativação do CSV é mais nova que a do Power BI (aviso no build nos dois casos);
+se as duas falharem, a cópia da última leitura boa em `data/raw/`. O portal de dados abertos da
+prefeitura (`dados.prefeitura.sp.gov.br`, conjunto "Fiscalização Eletrônica - Locais Fiscalizados",
+CC-BY) tem a mesma base em XLSX/CSV mensal, mas atrasada (a mais nova é de 06/2026): não é usado.
 
 ### Auditoria das junções (2026-09-30)
 

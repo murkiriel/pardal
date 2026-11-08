@@ -166,12 +166,13 @@ class Resilience(unittest.TestCase):
         raw = tempfile.mkdtemp()
         rows = [{"CÓDIGO LOCAL": "1", "LATITUDE": -23.60, "LONGITUDE": -46.66, "DESCRIÇÃO DO LOCAL": "R X",
                  "ENQUADRAMENTOS": "V", "VELOCIDADE": "50 km/h", "DESATIVAÇÃO": None}]
+        no_github = mock.patch("datakit.sources._http.get_bytes", side_effect=ConnectionError("sem rede"))
         with mock.patch.object(cet_sp._powerbi, "model_id", return_value=1), \
-                mock.patch.object(cet_sp._powerbi, "query_table", return_value=rows):
+                mock.patch.object(cet_sp._powerbi, "query_table", return_value=rows), no_github:
             self.assertEqual(len(cet_sp.load(raw)[0]), 1)             # leitura boa: guarda a cópia
         before = len(failures.warnings())
-        with mock.patch.object(cet_sp._powerbi, "model_id", side_effect=RuntimeError("mudou")):
-            self.assertEqual(len(cet_sp.load(raw)[0]), 1)             # falhou: usa a cópia
+        with mock.patch.object(cet_sp._powerbi, "model_id", side_effect=RuntimeError("mudou")), no_github:
+            self.assertEqual(len(cet_sp.load(raw)[0]), 1)             # falhou (e a reserva do GitHub também): usa a cópia
         self.assertEqual(len(failures.warnings()), before + 1)
         self.assertIn("CET-SP", failures.warnings()[-1])
         with open(os.path.join(raw, cet_sp.CACHE_FILE), encoding="utf-8") as f:
@@ -308,16 +309,30 @@ class OsmDatedFallback(unittest.TestCase):
         self.assertEqual(raised.exception.code, 404)
         self.assertFalse(os.path.exists(os.path.join(self.raw, "sudeste-latest.osm.pbf")))
 
-    def test_version_check_with_latest_and_dated_down_keeps_the_stored_file_as_a_failure(self):
+    def test_version_check_with_latest_and_dated_down_keeps_the_stored_file_as_a_warning(self):
         from datakit import failures
         self._stored(self.STAMP)
-        f0 = len(failures.recorded())
+        f0, w0 = len(failures.recorded()), len(failures.warnings())
         with self.mock.patch.object(self.osm, "_remote_last_modified",
                                     side_effect=requests.TooManyRedirects("Exceeded 30 redirects.")), \
                 self.mock.patch.object(self.osm, "get_text", return_value=self.LISTING):
             ex = self.osm.ensure_extract("sudeste", self.raw)
         self.assertEqual(ex.bytes, 7)
-        self.assertEqual(len(failures.recorded()), f0 + 1)
+        self.assertEqual(len(failures.recorded()), f0)
+        self.assertEqual(len(failures.warnings()), w0 + 1)
+
+    def test_new_version_that_fails_to_download_keeps_the_stored_file_as_a_warning(self):
+        from datakit import failures
+        self._stored("Mon, 01 Jan 2001 00:00:00 GMT")   # guardado mais velho que o publicado: tenta baixar
+        f0, w0 = len(failures.recorded()), len(failures.warnings())
+        with self.mock.patch.object(self.osm, "_remote_last_modified", return_value=self.STAMP), \
+                self.mock.patch.object(self.osm, "_download", side_effect=OSError("conexão caiu")), \
+                self.mock.patch.object(self.osm, "get_text", side_effect=OSError("listagem fora")):
+            ex = self.osm.ensure_extract("sudeste", self.raw)
+        self.assertEqual(ex.bytes, 7)
+        self.assertEqual(ex.file_date, "Mon, 01 Jan 2001 00:00:00 GMT")
+        self.assertEqual(len(failures.recorded()), f0)
+        self.assertEqual(len(failures.warnings()), w0 + 1)
 
     def test_listing_that_fails_for_a_while_is_waited_for(self):
         # 01/10/2026: a listagem respondeu com erro por até 45 s; as esperas comuns (5 s, 10 s) não bastaram
@@ -344,6 +359,39 @@ class OsmDatedFallback(unittest.TestCase):
             self.assertEqual(self.osm._dated_url("sul"), self.BASE + "/sul-261001.osm.pbf")
             with self.assertRaises(RuntimeError):
                 self.osm._dated_url("norte")
+
+
+class PublishedNames(unittest.TestCase):
+    """Todo arquivo de dado do pacote vai para o repositório ou para o zip da release (só um dos
+    dois): o catálogo aponta para ele."""
+
+    def test_every_pack_data_file_is_published_or_release_only(self):
+        from datakit import build_brazil, build_pack
+        names = [v for k, v in vars(build_pack).items()
+                 if k.endswith("_FILE") and isinstance(v, str) and v.endswith(".csv")]
+        self.assertGreaterEqual(len(names), 8)
+        for name in names:
+            with self.subTest(name=name):
+                committed = bool(pub._PUBLISHED_NAME.match(name))
+                self.assertNotEqual(committed, bool(pub._RELEASE_ONLY_NAME.match(name)), name)
+                self.assertEqual(committed, bool(build_brazil.PUBLISHED_NAME.match(name)), name)
+        self.assertEqual(pub._PUBLISHED_NAME.pattern, build_brazil.PUBLISHED_NAME.pattern)
+
+    def test_lines_stay_out_of_the_commit(self):
+        self.assertIsNone(pub._PUBLISHED_NAME.match("limites_trechos.csv"))
+        self.assertTrue(pub._PUBLISHED_NAME.match("ufs.geojson"))
+
+    def test_published_catalog_points_release_only_files_to_the_zip(self):
+        entry = {"file": "estados/SP/limites_trechos.csv", "bytes": 10, "sha256": "ab", "count": 3}
+        cat = {"failures": [], "warnings": ["x"],
+               "ufs": {"SP": {"limit_lines": dict(entry), "limits": {"file": "estados/SP/limites.csv"}}}}
+        out = pub.rewrite_catalog(cat)
+        self.assertEqual(out["ufs"]["SP"]["limit_lines"],
+                         {"bytes": 10, "sha256": "ab", "count": 3,
+                          "release_asset": "pardal-SP.zip", "asset_path": "SP/limites_trechos.csv"})
+        self.assertEqual(out["ufs"]["SP"]["limits"], {"file": "estados/SP/limites.csv"})
+        self.assertNotIn("failures", out)
+        self.assertEqual(cat["ufs"]["SP"]["limit_lines"], entry)   # o do build fica como estava
 
 
 class CommitDataOnly(unittest.TestCase):
@@ -391,6 +439,33 @@ class CommitDataOnly(unittest.TestCase):
             self.assertIn("solto.txt", pending)
             self.assertIn("gerador/", pending)
             self.assertIn("LEIAME.md", pending)
+        finally:
+            shutil.rmtree(repo, ignore_errors=True)
+            shutil.rmtree(dist, ignore_errors=True)
+
+    def test_new_build_date_alone_makes_no_commit(self):
+        # geração diária: dia sem dado novo não vira commit (nem release) só pela data do catálogo
+        import json
+        import shutil
+        import tempfile
+        repo, dist = tempfile.mkdtemp(), tempfile.mkdtemp()
+        try:
+            self._git(repo, "init", "-q")
+            self._git(repo, "config", "user.email", "teste@example.invalid")
+            self._git(repo, "config", "user.name", "teste")
+            os.makedirs(os.path.join(dist, "estados", "GO"))
+            with open(os.path.join(dist, "estados", "GO", "radares.csv"), "w", encoding="utf-8") as f:
+                f.write("lat,lng\n-16,-49\n")
+            cat = {"built_at": "2026-11-07T06:30:00Z", "ufs": {"GO": {"counts": {"cameras": 1}}}}
+            with open(os.path.join(dist, "catalogo.json"), "w", encoding="utf-8") as f:
+                json.dump(cat, f)
+            self.assertEqual(pub.main(["--repo", repo, "--dist", dist, "--commit"]), 0)
+            head = self._git(repo, "rev-parse", "HEAD")
+            with open(os.path.join(dist, "catalogo.json"), "w", encoding="utf-8") as f:
+                json.dump({**cat, "built_at": "2026-11-08T06:30:00Z"}, f)
+            self.assertEqual(pub.main(["--repo", repo, "--dist", dist, "--commit"]), 0)
+            self.assertEqual(self._git(repo, "rev-parse", "HEAD"), head)
+            self.assertEqual(self._git(repo, "status", "--porcelain"), "")
         finally:
             shutil.rmtree(repo, ignore_errors=True)
             shutil.rmtree(dist, ignore_errors=True)

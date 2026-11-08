@@ -31,11 +31,13 @@ from datakit.common.geo import angle_diff, bearing_deg
 from datakit.common.infer import class_limit, is_yes, zone_limit
 from datakit.common.lrs import _proj_seg
 from datakit.common.model import to_dir
+from datakit import limit_lines
+from datakit.limit_lines import Piece, from_points, make_key
 from datakit.common.direction import orient_to_hint
 from datakit.common.spatial import lat_span_deg, lng_span_deg
 from datakit.sources._http import HTTP_TIMEOUT, UA, get_text, with_retries
 from datakit.common import (
-    Bump, Camera, CameraKind, Limit, Struct, Toll,
+    Bump, Camera, CameraKind, Hazard, Limit, Struct, Toll,
     parse_maxspeed, in_bbox, haversine_m, rdp, sample_polyline,
 )
 
@@ -106,9 +108,10 @@ class Extract:
 def ensure_extract(region: str, raw_dir: str, refresh: bool = True) -> Extract:
     """<region>-latest.osm.pbf em raw_dir, na versão atual da Geofabrik: com refresh, pergunta
     a data da versão publicada (HEAD) e baixa de novo se for mais nova que a guardada. Sem
-    refresh (build --osm-local), usa o arquivo guardado se existir. Se a consulta falhar, usa
-    o guardado e registra a falha (o publish.py barra: os dados podem estar velhos). Consulta e
-    download caem para o arquivo datado quando o -latest falha (ver _with_dated_fallback)."""
+    refresh (build --osm-local), usa o arquivo guardado se existir. Se a consulta ou o download
+    da versão nova falharem, usa o guardado e avisa (failures.warn, com a data dele): fica como
+    estava. Consulta e download caem para o arquivo datado quando o -latest falha (ver
+    _with_dated_fallback). Sem arquivo guardado, a falha do download sobe."""
     os.makedirs(raw_dir, exist_ok=True)
     path = os.path.join(raw_dir, f"{region}-latest.osm.pbf")
     stamp = os.path.join(raw_dir, f"{region}.last-modified")
@@ -122,12 +125,21 @@ def ensure_extract(region: str, raw_dir: str, refresh: bool = True) -> Extract:
                 print(f"[osm_pbf] {region}: versão guardada é a atual ({remote})")
         except Exception as e:  # noqa: BLE001
             from datakit import failures
-            failures.record(f"OSM {region} (conferir versão; usado o arquivo guardado)", e)
+            failures.warn(f"OSM {region}", f"conferir a versão falhou ({type(e).__name__}); "
+                                           f"usado o arquivo guardado ({_read_or(stamp, 'sem data')})")
     if download:
         print(f"[osm_pbf] baixando {url}")
-        last_mod, _ = _with_dated_fallback(region, url, lambda u: _download(u, path))
-        with open(stamp, "w") as m:
-            m.write(last_mod)
+        try:
+            last_mod, _ = _with_dated_fallback(region, url, lambda u: _download(u, path))
+        except Exception as e:  # noqa: BLE001
+            if not os.path.exists(path):
+                raise
+            from datakit import failures
+            failures.warn(f"OSM {region}", f"baixar a versão nova falhou ({type(e).__name__}); "
+                                           f"usado o arquivo guardado ({_read_or(stamp, 'sem data')})")
+        else:
+            with open(stamp, "w") as m:
+                m.write(last_mod)
     last_mod = _read_or(stamp, "")
     return Extract(
         path=path, region=region, file_date=last_mod,
@@ -227,11 +239,69 @@ def load_bumps(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] 
     return bumps
 
 
+# hazard=* do OSM -> tipo no pontos_atencao.csv (os valores da wiki e as variantes usadas no Brasil). O que não está
+# aqui e não é "no" vira HAZARD (perigo sinalizado sem tipo próprio: pista escorregadia, neblina, alagamento...).
+HAZARD_KINDS = {
+    "animal_crossing": "ANIMAL_CROSSING", "cattle": "ANIMAL_CROSSING", "deer": "ANIMAL_CROSSING",
+    "horses": "ANIMAL_CROSSING", "horse": "ANIMAL_CROSSING", "frog_crossing": "ANIMAL_CROSSING",
+    "curve": "CURVE", "curves": "CURVE", "dangerous_curve": "CURVE", "turn": "CURVE", "turns": "CURVE",
+    "dangerous_junction": "DANGEROUS_JUNCTION", "junction": "DANGEROUS_JUNCTION", "intersection": "DANGEROUS_JUNCTION",
+    "school_zone": "SCHOOL_ZONE", "school": "SCHOOL_ZONE", "children": "SCHOOL_ZONE",
+    "falling_rocks": "FALLING_ROCKS", "landslide": "FALLING_ROCKS", "landslides": "FALLING_ROCKS",
+    "rockfall": "FALLING_ROCKS",
+}
+_NOT_A_HAZARD = {"no", "none", "0"}
+
+
+def hazard_kind(tags) -> Optional[str]:
+    """Tipo do ponto de atenção pelas etiquetas do OSM, ou None. Passagem de nível (railway=level_crossing: rua
+    cruzando trilho), painel de velocidade (highway=speed_display) e hazard=* (HAZARD_KINDS)."""
+    if tags.get("railway") == "level_crossing":
+        return "LEVEL_CROSSING"
+    if tags.get("highway") == "speed_display":
+        return "SPEED_DISPLAY"
+    value = (tags.get("hazard") or "").strip().lower()
+    if not value or value in _NOT_A_HAZARD:
+        return None
+    first = value.split(";")[0].strip()
+    return HAZARD_KINDS.get(first, "HAZARD")
+
+
+def load_hazards(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] = None) -> List[Hazard]:
+    """Pontos de atenção do extrato (hazard_kind). Nó vira o ponto; via com hazard=* (um trecho de curvas, uma
+    área escolar desenhada como linha) vira o seu nó do meio, como nas lombadas. `bbox` = (lat mín., lng mín.,
+    lat máx., lng máx.)."""
+    out: List[Hazard] = []
+
+    def keep(kind: Optional[str], loc) -> None:
+        if kind is not None and loc.valid() and (bbox is None or in_bbox(bbox, loc.lat, loc.lon)):
+            out.append(Hazard(loc.lat, loc.lon, kind))
+
+    # nós: uma passada sem índice de posições (o nó já traz a dele)
+    nodes = (osmium.FileProcessor(pbf_path)
+             .with_filter(osmium.filter.EntityFilter(osmium.osm.NODE))
+             .with_filter(osmium.filter.KeyFilter("hazard", "railway", "highway")))
+    for o in nodes:
+        keep(hazard_kind(o.tags), o.location)
+    # vias com hazard=*: o nó do meio, com o índice de posições
+    ways = (osmium.FileProcessor(pbf_path)
+            .with_locations()
+            .with_filter(osmium.filter.EntityFilter(osmium.osm.WAY))
+            .with_filter(osmium.filter.KeyFilter("hazard")))
+    for o in ways:
+        if len(o.nodes) > 0:
+            keep(hazard_kind(o.tags), o.nodes[len(o.nodes) // 2].location)
+    return out
+
+
 def load(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] = None,
          probes: Optional[List[Camera]] = None, probe_out: Optional[Dict] = None,
+         lines_out: Optional[List[Piece]] = None,
          ) -> Tuple[List[Camera], List[Limit], List[Struct]]:
     """probes: radares de outras fontes com heading_hint; para cada um que casar com uma via,
-    probe_out[(lat, lng, hint)] = rumo do trânsito (graus)."""
+    probe_out[(lat, lng, hint)] = rumo do trânsito (graus). lines_out: recebe uma `Piece` por via com limite
+    (sinalizado ou estimado), na mesma passada dos pontos (line_specs); quem chama junta e corta os trechos
+    (datakit/limit_lines.py)."""
     probe_grid = _probe_grid(probes or [])
     probe_found: Dict[Tuple[float, float, str], List[Tuple[float, float, bool]]] = {}
     fb: Dict[int, Tuple[int, bool]] = {}   # nid do radar 'forward'/'backward' -> (índice, forward?)
@@ -244,6 +314,7 @@ def load(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] = None
     wanted: set = set()           # nids de from/to/device p/ resolver coords na 2ª passada
     urban: dict = {}              # célula da grade -> peso das ruas em volta (ver _is_urban)
     pending_main: list = []       # (highway, verts, pts) de tronco/primária/secundária sem lit
+    pending_lines: list = []      # (highway, pts, via) das linhas que esperam a estimativa urbana/rural
 
     fp = (osmium.FileProcessor(pbf_path)
           .with_locations()
@@ -298,6 +369,13 @@ def load(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] = None
             if w:
                 for cell in {_cell(lat, lng) for lat, lng in pts}:
                     urban[cell] = urban.get(cell, 0) + w
+
+            if lines_out is not None:
+                way_line = _way_line(o, tags, hw, bbox)
+                if way_line is not None:
+                    est = _line_estimate(tags, hw, way_line, lines_out)
+                    if est is _PENDING:
+                        pending_lines.append((hw, pts, way_line))
 
             lim = parse_maxspeed(tags.get("maxspeed")) if "maxspeed" in tags else None
             fw, bw = _side_limit(tags, "forward", lim), _side_limit(tags, "backward", lim)
@@ -357,6 +435,10 @@ def load(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] = None
         est = class_limit(hw, _is_urban(pts, urban))
         if est is not None:
             _emit(lims, verts, bbox, Limit(0, 0, est[0], "OSM:class", True, est[1]))
+
+    if lines_out is not None:
+        for hw, pts, way_line in pending_lines:
+            _add_lines(lines_out, way_line, class_limit(hw, _is_urban(pts, urban)), "OSM:class")
 
     missing = wanted - node_pt.keys()
     if missing:
@@ -475,6 +557,107 @@ def _emit_directed(lims, verts, bbox, kmh: int, reverse: bool) -> None:
         for lat, lng in (pts if i == 0 else pts[1:]):   # o vértice a já saiu no trecho anterior
             if in_bbox(bbox, lat, lng):
                 lims.append(Limit(lat, lng, kmh, "OSM", direction_deg=d))
+
+
+# ── limites como trechos (limites_trechos.csv) ───────────────────────────────
+
+_PENDING = object()   # a estimativa da via depende de a região em volta ser urbana (decide no fim da leitura)
+
+
+def oneway_of(tags) -> int:
+    """Mão única em relação ao desenho da via: 1 (o trânsito segue o desenho), -1 (contra o desenho), 0 (mão dupla).
+    Além de oneway=*, o OSM sobreentende mão única na autoestrada e na rotatória."""
+    v = (tags.get("oneway") or "").strip().lower()
+    if v in ("yes", "true", "1"):
+        return 1
+    if v in ("-1", "reverse"):
+        return -1
+    if v in ("no", "false", "0"):
+        return 0
+    if tags.get("highway") == "motorway" or (tags.get("junction") or "") in ("roundabout", "circular"):
+        return 1
+    return 0
+
+
+@dataclass
+class _WayLine:
+    """Uma via do OSM a caminho do limites_trechos.csv: pontas, geometria simplificada e o que falta decidir."""
+    first: int
+    last: int
+    points: List[Tuple[float, float]]
+    highway: str
+    oneway: int
+    signed: List[Tuple[int, bool, bool]]     # (km/h, contra o desenho?, vale a um sentido só?)
+    missing: List[Tuple[bool, bool]]         # sentidos sem limite sinalizado, a estimar: (contra o desenho?, um sentido?)
+
+
+def line_specs(tags, ow: int) -> Tuple[List[Tuple[int, bool, bool]], List[Tuple[bool, bool]]]:
+    """(limites sinalizados, sentidos sem limite) de uma via, cada um como (km/h, contra o desenho?, um sentido só?).
+
+    Mão única: só o sentido do trânsito conta (maxspeed:forward numa via oneway=-1 não vale a ninguém). Mão dupla:
+    maxspeed:forward/backward iguais ou ausentes viram um limite para os dois sentidos; diferentes, um limite por
+    sentido, e o sentido sem valor fica a estimar (também com um sentido só). Os pontos do limites.csv fazem o mesmo
+    por sentido, mas sem o corte da mão única."""
+    lim = parse_maxspeed(tags.get("maxspeed")) if "maxspeed" in tags else None
+    fw, bw = _side_limit(tags, "forward", lim), _side_limit(tags, "backward", lim)
+    if ow != 0:
+        v = fw if ow == 1 else bw
+        reverse = ow == -1
+        return ([(v, reverse, False)], []) if v is not None else ([], [(reverse, False)])
+    if fw == bw:
+        return ([(fw, False, False)], []) if fw is not None else ([], [(False, False)])
+    signed = [(v, reverse, True) for v, reverse in ((fw, False), (bw, True)) if v is not None]
+    missing = [(reverse, True) for v, reverse in ((fw, False), (bw, True)) if v is None]
+    return signed, missing
+
+
+def _way_line(o, tags, hw: str, bbox) -> Optional[_WayLine]:
+    nodes = [n for n in o.nodes if n.location.valid()]
+    if len(nodes) < 2:
+        return None
+    pts = [(n.location.lat, n.location.lon) for n in nodes]
+    if bbox is not None and not any(in_bbox(bbox, lat, lng) for lat, lng in pts):
+        return None
+    ow = oneway_of(tags)
+    signed, missing = line_specs(tags, ow)
+    if not signed and not missing:
+        return None
+    return _WayLine(nodes[0].ref, nodes[-1].ref, limit_lines.simplified(pts), hw, ow, signed, missing)
+
+
+def _line_estimate(tags, hw: str, way: _WayLine, out: List[Piece]):
+    """Põe a via em `out`: os limites sinalizados e, nos sentidos sem valor, a estimativa (zona marcada sem número,
+    senão a classe da via, a mesma regra dos pontos). Via de tronco/primária/secundária sem `lit` espera o fim da
+    leitura (_PENDING)."""
+    _add_lines(out, way, None, "")
+    if not way.missing:
+        return None
+    zone = _zone_limit(tags)
+    if zone is not None:
+        _add_lines(out, way, zone, "OSM:zone")
+        return None
+    if hw not in _INFER_CLASSES:
+        return None
+    if hw in _MAIN_ROADS and not tags.get("lit"):
+        return _PENDING
+    _add_lines(out, way, class_limit(hw, is_yes(tags.get("lit"))), "OSM:class")
+    return None
+
+
+def _add_lines(out: List[Piece], way: _WayLine, estimate: Optional[Tuple[int, int]], source: str) -> None:
+    """Sem `estimate`: os limites sinalizados da via. Com ele: os sentidos sem limite, com (típico, lado baixo)."""
+    if estimate is None and source:
+        return   # estimativa que não existe para a classe
+    oneway = way.oneway != 0
+    todo = ([(kmh, rev, one, False, None, "OSM") for kmh, rev, one in way.signed] if estimate is None else
+            [(estimate[0], rev, one, True, estimate[1], source) for rev, one in way.missing])
+    for kmh, reverse, directional, estimated, low, src in todo:
+        pts = way.points[::-1] if reverse else way.points
+        start, end = (way.last, way.first) if reverse else (way.first, way.last)
+        piece = from_points(pts, make_key(kmh, src, estimated, low, directional, way.highway, oneway), start, end,
+                            epsilon_m=0)
+        if piece is not None:
+            out.append(piece)
 
 
 def _cell(lat: float, lng: float) -> int:

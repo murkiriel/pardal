@@ -92,7 +92,7 @@ def geocode(meters: Iterable[Meter], uf: str, raw_dir: str) -> List[Camera]:
         cnefe_uf = _CNEFE_UF.get((uf, cnefe._name_key(city)), uf)
         try:
             if cnefe_uf not in listings:
-                listings[cnefe_uf] = cnefe.municipality_files(cnefe_uf)
+                listings[cnefe_uf] = cnefe.municipality_files(cnefe_uf, raw_dir)
             href = cnefe.file_for(city, listings[cnefe_uf])
             if href is None:
                 failures.warn(f"CNEFE {uf}", f"sem arquivo de endereços para o município {city}")

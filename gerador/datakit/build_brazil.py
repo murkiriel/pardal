@@ -32,7 +32,10 @@ from typing import Dict, Iterator, List, Sequence, Tuple
 # Teto por arquivo publicado: o GitHub recusa arquivos acima de 100 MB.
 MAX_FILE_BYTES = 95_000_000
 # Arquivos publicados, dentro de data/dist/brasil/ e data/dist/estados/<UF>/.
-PUBLISHED_NAME = re.compile(r"^(radares|limites_estimados|limites|estruturas)\.(csv\.gz|csv|geojson|kml|gpx)$")
+# O mesmo de scripts/publish.py (_PUBLISHED_NAME): só o que vai para o commit. limites_trechos.csv vai
+# só na release (publish._RELEASE_ONLY_NAME) e fica fora do teto de 95 MB do repositório (testado).
+PUBLISHED_NAME = re.compile(r"^(radares|limites_estimados|limites|estruturas|lombadas|pedagios|radar_portatil|buracos|acidentes_moto"
+    r"|pontos_atencao|cameras_fiscalizacao|ufs)\.(csv\.gz|csv|geojson|kml|gpx)$")
 MANAGED_DIRS = ("brasil", "estados")
 
 

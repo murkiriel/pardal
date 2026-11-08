@@ -49,14 +49,35 @@ def _name_key(name: str) -> str:
     return re.sub(r"[^A-Z0-9]", "", unicodedata.normalize("NFKD", name.upper()).encode("ascii", "ignore").decode())
 
 
-def municipality_files(uf: str) -> Dict[str, str]:
-    """{nome do município sem acento nem espaço: nome do arquivo .zip} da pasta da UF no IBGE."""
-    html = get_text(f"{BASE}/{UF_CODE[uf]}_{uf}/")
+def municipality_files(uf: str, raw_dir: Optional[str] = None) -> Dict[str, str]:
+    """{nome do município sem acento nem espaço: nome do arquivo .zip} da pasta da UF no IBGE. Se a
+    pasta não responder e `raw_dir` tiver arquivos já baixados da UF, usa esses (aviso): o cadastro é
+    do Censo 2022 e não muda, então os guardados valem tanto quanto os do servidor."""
+    try:
+        html = get_text(f"{BASE}/{UF_CODE[uf]}_{uf}/")
+    except Exception as e:  # noqa: BLE001 — decide abaixo se há arquivos guardados
+        stored = _stored_files(uf, raw_dir) if raw_dir else {}
+        if not stored:
+            raise
+        from datakit import failures
+        failures.warn(f"CNEFE {uf}", f"pasta do IBGE falhou ({type(e).__name__}); usados os "
+                                     f"{len(stored)} municípios já baixados")
+        return stored
     out: Dict[str, str] = {}
     for href in re.findall(r'href="(\d{7}_[^"]+\.zip)"', html):
         name = urllib.parse.unquote(href)[8:-4].replace("_", " ")
         out[_name_key(name)] = href
     return out
+
+
+def _stored_files(uf: str, raw_dir: str) -> Dict[str, str]:
+    """Os .zip da UF já baixados em data/raw/cnefe/ (o código do município começa pelo da UF)."""
+    folder = os.path.join(raw_dir, FOLDER)
+    if not os.path.isdir(folder):
+        return {}
+    code = str(UF_CODE[uf])
+    return {_name_key(n[8:-4].replace("_", " ")): urllib.parse.quote(n)
+            for n in os.listdir(folder) if re.fullmatch(code + r"\d{5}_.+\.zip", n)}
 
 
 # Municípios que mudaram de nome ou de grafia depois do nome usado nos arquivos do cadastro.

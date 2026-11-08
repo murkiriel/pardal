@@ -6,13 +6,21 @@
 * Radares: lista da SMTR/CET-Rio em PDF (endereço, código, limite), geocodificada pelo
   geocodificador de número de porta da própria prefeitura. Endereço sem número ("ACESSO AO
   MERGULHÃO…") não é geocodificado: sem número, o ponto cairia no meio da rua inteira.
+  Se o geocodificador da prefeitura não responder (o servidor pgeo3 ficou fora do ar em
+  novembro de 2026) e não houver cópia guardada da última leitura boa (datakit/source_cache.py),
+  os mesmos endereços são localizados pelo cadastro de endereços do IBGE (sources/cnefe.py, como
+  os medidores do Inmetro), com aviso. Medido em 2026-11-08 contra os 344 radares publicados em
+  outubro pelo geocodificador da prefeitura: mediana de 19 m, 89% a até 100 m. Havendo cópia, ela
+  vale mais que o CNEFE: a falha sobe e o build usa a cópia.
 """
 from __future__ import annotations
 
+import functools
 import io
 import re
-from typing import Iterable, List, Optional, Tuple
+from typing import Callable, Iterable, List, Optional, Tuple
 
+from datakit import limit_lines
 from datakit.context import SourceData, BuildContext
 from datakit.common.geo import rdp, sample_polyline
 from datakit.common.model import Camera, CameraKind, Limit
@@ -23,6 +31,7 @@ SEGMENTS_URL = ("https://pgeo3.rio.rj.gov.br/arcgis/rest/services/CadLog/"
 GEOCODE = ("https://pgeo3.rio.rj.gov.br/arcgis/rest/services/Geocode/Geocode_NP/"
            "GeocodeServer/findAddressCandidates")
 LIST_PAGE = "https://cetrio.prefeitura.rio/fiscalizacao-eletronica/"
+CITY = "RIO DE JANEIRO"
 PAGE = 2000
 MAX_GAP_M = 150.0
 MIN_SCORE = 95.0
@@ -42,17 +51,46 @@ def segment_points(paths: List[List[List[float]]], kmh: int) -> List[Limit]:
     return out
 
 
-def load_limits() -> List[Limit]:
+def segment_lines(paths: List[List[List[float]]], kmh: int) -> List[limit_lines.Piece]:
+    """Geometria ArcGIS (paths de [lng, lat]) -> trechos de limite (limites_trechos.csv). Puro, testado."""
+    key = limit_lines.Key(kmh, "RIO", False, None, False, "", None)
+    out = []
+    for path in paths:
+        piece = limit_lines.from_points([(y, x) for x, y in path], key)
+        if piece is not None:
+            out.append(piece)
+    return out
+
+
+@functools.lru_cache(maxsize=1)
+def _segments() -> Tuple[Tuple[int, tuple], ...]:
+    """(limite, paths) de cada trecho de logradouro com velocidade regulamentada. Lido uma vez por execução: os pontos
+    (load_limits) e as linhas (load_limit_lines) saem da mesma leitura. Falha não fica guardada."""
     from datakit.sources._arcgis import query_all
-    out: List[Limit] = []
+    out = []
     for ft in query_all(SEGMENTS_URL, {"where": "velocidade_regulamentada > 0",
                                        "outFields": "velocidade_regulamentada", "outSR": 4326},
                         page=PAGE, order_by="objectid"):
         kmh = (ft.get("attributes") or {}).get("velocidade_regulamentada")
         paths = (ft.get("geometry") or {}).get("paths") or []
         if isinstance(kmh, int) and 10 <= kmh <= 130:
-            out.extend(segment_points(paths, kmh))
+            out.append((kmh, tuple(map(tuple, paths))))
+    return tuple(out)
+
+
+def load_limits() -> List[Limit]:
+    out: List[Limit] = []
+    for kmh, paths in _segments():
+        out.extend(segment_points([list(p) for p in paths], kmh))
     return out
+
+
+def load_limit_lines() -> List[limit_lines.Piece]:
+    """Os trechos de logradouro com limite como linhas, juntados quando seguidos e de mesmo limite."""
+    out: List[limit_lines.Piece] = []
+    for kmh, paths in _segments():
+        out.extend(segment_lines([list(p) for p in paths], kmh))
+    return limit_lines.join(out)
 
 
 # ── radares ──────────────────────────────────────────────────────────────────
@@ -120,6 +158,54 @@ def _geocode(q: str) -> Optional[Tuple[float, float]]:
     return loc["y"], loc["x"]
 
 
+def _cnefe_geocoder(addrs: List[str], raw_dir: str) -> Callable[[str], Optional[Tuple[float, float]]]:
+    """Geocodificador de reserva: "rua + número" pelo CNEFE do município do Rio (sources/cnefe.py)."""
+    from datakit.common.address import parse_number
+    from datakit.sources import cnefe
+    href = cnefe.file_for(CITY, cnefe.municipality_files("RJ", raw_dir))
+    if href is None:
+        raise RuntimeError(f"CNEFE sem arquivo para {CITY}")
+    wanted = [n[0] for n in (parse_number(a) for a in addrs) if n]
+    streets = cnefe.read_streets(cnefe.ensure("RJ", href, raw_dir), wanted)
+
+    def geocode(addr: str) -> Optional[Tuple[float, float]]:
+        numbered = parse_number(addr)
+        street = cnefe.match_street(numbered[0], streets) if numbered else None
+        return cnefe.locate_number(streets[street], numbered[1]) if numbered and street else None
+    return geocode
+
+
+def locate(items: List[Tuple[str, CameraKind, Optional[int]]],
+           primary: Callable[[str], Optional[Tuple[float, float]]],
+           fallback: Callable[[List[str]], Callable[[str], Optional[Tuple[float, float]]]],
+           ) -> Tuple[List[Camera], Optional[BaseException]]:
+    """(radares, erro do geocodificador da prefeitura ou None). `primary(consulta)` é o da prefeitura;
+    no primeiro erro dele (servidor fora, não "endereço não achado"), todos os endereços passam para
+    `fallback(endereços)(endereço)`. Puro dado os geocodificadores, testado."""
+    usable = [(addr, kind, kmh, q) for addr, kind, kmh in items if (q := geocode_query(addr)) is not None]
+    seen: dict = {}
+    error: Optional[BaseException] = None
+    for _addr, _kind, _kmh, q in usable:
+        if q in seen:
+            continue
+        try:
+            seen[q] = primary(q)
+        except Exception as e:  # noqa: BLE001 — servidor fora: decide abaixo
+            error = e
+            break
+    if error is not None:
+        backup = fallback([addr for addr, _k, _l, _q in usable])
+        points = {addr: backup(addr) for addr, _k, _l, _q in usable}
+    else:
+        points = {addr: seen[q] for addr, _k, _l, q in usable}
+    out: List[Camera] = []
+    for addr, kind, kmh, _q in usable:
+        p = points[addr]
+        if p is not None:
+            out.append(Camera(round(p[0], 6), round(p[1], 6), kind, kmh, "RIO", True))
+    return out, error
+
+
 def _latest_pdf_url() -> str:
     html = get_text(LIST_PAGE, timeout=60)
     urls = re.findall(r"https?://[^\"'<> ]+ListagemSMTR\.pdf", html)
@@ -128,30 +214,34 @@ def _latest_pdf_url() -> str:
     return max(urls)
 
 
-def load_cameras() -> List[Camera]:
+def load_cameras(raw_dir: str = "data/raw", cnefe_backup: bool = True) -> List[Camera]:
+    """Radares da lista da CET-Rio. `cnefe_backup`: com o geocodificador da prefeitura fora, localiza
+    pelo CNEFE (True) ou deixa a falha subir (False, quando há cópia guardada melhor que o CNEFE)."""
     import pypdf
 
     pdf = pypdf.PdfReader(io.BytesIO(get_bytes(_latest_pdf_url())))
     lines = [ln for page in pdf.pages for ln in (page.extract_text() or "").splitlines()]
-    out: List[Camera] = []
-    seen = {}
-    for addr, kind, kmh in parse_list(lines):
-        q = geocode_query(addr)
-        if q is None:
-            continue
-        if q not in seen:
-            seen[q] = _geocode(q)
-        p = seen[q]
-        if p is not None:
-            out.append(Camera(round(p[0], 6), round(p[1], 6), kind, kmh, "RIO", True))
-    return out
+
+    def backup(addrs: List[str]) -> Callable[[str], Optional[Tuple[float, float]]]:
+        if not cnefe_backup:
+            raise RuntimeError("geocodificador da prefeitura fora do ar")
+        return _cnefe_geocoder(addrs, raw_dir)
+    cams, error = locate(parse_list(lines), _geocode, backup)
+    if error is not None:
+        from datakit import failures
+        failures.warn("RIO", f"geocodificador da prefeitura falhou ({type(error).__name__}); "
+                             f"{len(cams)} endereços localizados pelo CNEFE do IBGE")
+    return cams
 
 
-def load(raw_dir: str, bbox=None):
+def load(raw_dir: str, bbox=None, cnefe_backup: bool = True):
     """Interface das fontes oficiais de radar (build.OFFICIAL)."""
-    return load_cameras(), []
+    return load_cameras(raw_dir, cnefe_backup), []
 
 
 def fetch(ctx: BuildContext) -> SourceData:
-    """Contrato das fontes (datakit/context.py)."""
-    return SourceData(*load(ctx.raw_dir))
+    """Contrato das fontes (datakit/context.py). O CNEFE só entra sem cópia guardada da fonte."""
+    import os
+    from datakit import source_cache
+    has_copy = os.path.exists(source_cache.path_for(ctx.raw_dir, "RIO"))
+    return SourceData(*load(ctx.raw_dir, cnefe_backup=not has_copy))
