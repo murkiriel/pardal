@@ -363,6 +363,11 @@ ar fica com a última leitura boa (ou com o que tinha na edição anterior), e a
 normalmente. A data do dado de cada fonte está no campo `source_dates` do `catalogo.json`. Dia sem dado novo não gera release. A data de cada pacote está no
 campo `built_at` do `catalogo.json`.
 
+**Só a geração corrente é reproduzível.** O código, as dependências (com hash) e as actions do
+GitHub (por SHA) ficam travados, mas as fontes são lidas ao vivo e não são arquivadas, e as cópias
+guardadas delas ficam só no cache do GitHub Actions, que some depois de 7 dias sem uso. Uma geração
+antiga não se refaz: para ter o dado de uma data, guarde a release dela.
+
 ## English
 
 **Pardal** is an open dataset of **speed cameras in Brazil** (fixed cameras, average-speed

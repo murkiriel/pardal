@@ -5,9 +5,10 @@ partir das fontes abertas listadas no README principal.
 
 ## Requisitos
 
-- Python 3.10+ (testado com 3.12) e o binário `curl` no PATH (a PBH barra o TLS do Python, o curl passa)
-- `pip install -r requirements.txt` (pyosmium, requests, openpyxl, shapely, pyshp, pypdf, nas
-  versões testadas)
+- Python 3.12 (é com ele que as versões são travadas e testadas, aqui e no Actions; o numpy fixado
+  não instala abaixo do 3.11) e o binário `curl` no PATH (a PBH barra o TLS do Python, o curl passa)
+- `pip install --require-hashes -r requirements.txt` (pyosmium, requests, openpyxl, shapely, numpy,
+  pyshp, pypdf e as dependências deles)
 - ~2 GB de disco para os extratos do OpenStreetMap e cerca de 1 h de processamento
 
 ## Como rodar
@@ -25,13 +26,35 @@ Verificação de estilo e de tipos (ferramentas em `requirements-dev.txt`, confi
 `ruff.toml` e `mypy.ini`):
 
 ```
-pip install -r requirements-dev.txt
+pip install --require-hashes -r requirements-dev.txt
 python -m ruff check datakit scripts run.py
 python -m mypy datakit scripts
 ```
 
 Os testes e essas duas verificações rodam também no GitHub a cada push que mexe no código
 (`.github/workflows/testes.yml`).
+
+**Dependências travadas.** As dependências diretas ficam em `requirements.in` (gerador) e
+`requirements-dev.in` (mais ruff e mypy), nas versões testadas. Os `requirements.txt` e
+`requirements-dev.txt` são gerados deles pelo `uv`, com todas as dependências (inclusive as
+transitivas) em versão exata e com o sha256 de cada arquivo do PyPI; os workflows instalam com
+`--require-hashes`, então um pacote trocado no PyPI ou uma dependência nova faz a instalação falhar em
+vez de entrar calada. Não edite os `.txt` à mão: mude o `.in` e gere de novo, da pasta `gerador/` (o
+comando também está no topo de cada `.txt`):
+
+```
+uv pip compile requirements.in --generate-hashes --python-version 3.12 \
+  --python-platform x86_64-unknown-linux-gnu -o requirements.txt
+uv pip compile requirements-dev.in --generate-hashes --python-version 3.12 \
+  --python-platform x86_64-unknown-linux-gnu -o requirements-dev.txt
+```
+
+As actions dos workflows ficam fixadas pelo SHA do commit, com a tag no comentário
+(`actions/checkout@<40 caracteres>  # v7.0.1`): uma tag pode ser movida, o SHA não. Para atualizar
+uma action, resolva a tag nova (`gh api repos/<dono>/<action>/git/ref/tags/<tag>`; se for tag
+anotada, siga até o commit) e troque o SHA e o comentário. O teste `PinnedBuild`
+(`datakit/tests/test_publish.py`) barra action sem SHA, `pip install` sem `--require-hashes` e
+pacote sem versão exata ou sem hash.
 
 `build --all` já gera os radares em GeoJSON, KML e GPX; para gerá-los de novo sobre um
 `data/dist/` existente: `python run.py datakit.build_formats`. Limites e estruturas saem só em
@@ -127,6 +150,15 @@ das junções e o catálogo ficam nos artefatos da execução por 30 dias.
 As cópias das fontes (`data/raw/` sem os extratos do OSM) ficam no cache do Actions e são salvas
 logo depois do build, mesmo quando o build ou a publicação falham. Com o build diário o cache é
 usado todo dia; o GitHub só apaga um cache que fica 7 dias sem uso.
+
+**Só a geração corrente é reproduzível** (decisão D-12). O código, as actions (por SHA) e as
+dependências (com hash) ficam travados, então dá para repetir a geração de hoje com o mesmo
+ambiente; mas as entradas são lidas ao vivo (portais dos órgãos, extratos `-latest` da Geofabrik) e
+não são arquivadas, e as cópias guardadas das fontes vivem só no cache do Actions, que o GitHub
+apaga depois de 7 dias sem uso (cada build grava uma cópia nova e as antigas param de ser usadas).
+Uma geração antiga não se refaz:
+quem precisa do dado de uma data guarda a release dela (as diárias ficam 90 dias; as semanais, no
+histórico do repositório e na release, para sempre).
 
 Arquivo publicado acima de 95 MB (o GitHub recusa a partir de 100 MB) sai compactado: o build
 grava `<arquivo>.gz` no lugar dele e o catálogo aponta para o `.gz`, com `bytes` e `sha256` do

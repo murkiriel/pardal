@@ -46,6 +46,12 @@ name: Gerar dados
 # casos o job falha e o GitHub avisa por e-mail; nada é publicado. À mão, "accept_failures" e
 # "accept_drop" publicam assim mesmo (ex.: uma fonte que nunca foi lida e está fora do ar).
 # Dia sem dado novo (só a data do catálogo mudou) não vira commit nem release.
+#
+# Reprodutível é só a geração corrente (D-12): as actions ficam fixadas pelo SHA do commit (a tag vai
+# no comentário) e as dependências do Python, inclusive as transitivas, em versão exata e com hash
+# (gerador/requirements.in → requirements.txt, instalado com --require-hashes). As fontes são lidas
+# ao vivo e não ficam arquivadas, e as cópias do cache do Actions somem em 7 dias sem uso: uma
+# geração antiga não se refaz.
 
 on:
   schedule:
@@ -124,17 +130,18 @@ jobs:
       PYTHONUNBUFFERED: "1"
     steps:
       - name: Código e dados publicados
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           repository: murkiriel/pardal
           path: pardal
 
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0  # v7.1.0
         with:
           python-version: "3.12"
 
+      # todas as dependências (inclusive as transitivas) fixadas e com hash: gerador/requirements.in
       - name: Dependências
-        run: pip install -q -r pardal/gerador/requirements.txt
+        run: pip install -q --require-hashes -r pardal/gerador/requirements.txt
 
       - name: Testes do gerador
         working-directory: pardal/gerador
@@ -143,7 +150,7 @@ jobs:
       # restore e save separados: o actions/cache sozinho só salva se o job inteiro passar, e as
       # cópias boas de hoje valem mesmo num dia em que a publicação foi barrada
       - name: Cópias anteriores das fontes (data/raw, sem os extratos do OSM)
-        uses: actions/cache/restore@v6
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
           path: |
             pardal/gerador/data/raw
@@ -196,7 +203,7 @@ jobs:
 
       - name: Guarda as cópias das fontes (mesmo se o build ou a publicação falharem)
         if: always() && hashFiles('pardal/gerador/data/raw/**') != ''
-        uses: actions/cache/save@v6
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
         with:
           path: |
             pardal/gerador/data/raw
@@ -257,7 +264,7 @@ jobs:
 
       - name: Log, auditoria e catálogo (artefatos)
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9  # v7.0.2
         with:
           name: build-${{ github.run_number }}
           path: |
@@ -280,7 +287,7 @@ jobs:
       issues: write
     steps:
       - name: Código (só o script da rotina)
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           sparse-checkout: gerador/scripts/routine.py
           sparse-checkout-cone-mode: false

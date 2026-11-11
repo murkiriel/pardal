@@ -1,0 +1,7 @@
+# Ferramentas de verificação (não precisam para gerar os dados), nas versões testadas, mais as
+# dependências do gerador. O requirements-dev.txt é gerado a partir deste arquivo (comando no
+# topo do requirements.in); o -c mantém nele as mesmas versões do requirements.txt.
+-c requirements.txt
+-r requirements.in
+ruff==0.16.9
+mypy==2.1.0
