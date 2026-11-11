@@ -77,6 +77,7 @@ estados/<UF>/           um estado (AC, AL, AM … SP, TO)
                         entra no catálogo: cameras_fiscalizacao.csv só existe em SP, MG e PR)
 catalogo.json           índice dos pacotes por estado: arquivos, tamanho, sha256,
                         contagens e data de geração
+docs/CATALOGO.md        contrato de catálogo comum aos quatro geradores (chave contract); o Pardal na seção #pardal
 scripts/to_geojson.py converte qualquer CSV acima para GeoJSON (ver abaixo)
 gerador/                código que baixa as fontes e gera todos os arquivos acima
 ```
