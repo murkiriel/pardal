@@ -12,6 +12,12 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, Iterable, List, Optional, Tuple
 
+# `source_ref` (radar, ponte/túnel, lombada, ponto de atenção, pedágio, câmera sem velocidade): (fonte, id) do registro
+# na fonte que o publicou, quando o leitor da fonte o tem: o elemento do OSM ("node/123", "way/45") ou o código do órgão
+# ("SE001R" no DER-SE, "MA301R" no Detran-MA, o "CÓDIGO LOCAL" da CET). Não entra na comparação (as mesclas seguem
+# iguais) nem no CSV: vai só para o SQLite (colunas source_id e source_id_from) e é a base do id estável
+# (datakit/build_sqlite.py). Numa mescla fica o do registro que sobra.
+
 
 class CameraKind(str, Enum):
     FIXED = "FIXED"
@@ -37,6 +43,7 @@ class Camera:
     # medidor sem passar pela geometria do SNV, que erra o km em até ~2 km (inmetro_status.py), e vale
     # também em rodovia estadual, que o SNV não tem. Não vai para o CSV.
     road_km: Optional[Tuple[Tuple[str, int], float]] = field(default=None, compare=False)
+    source_ref: Optional[Tuple[str, str]] = field(default=None, compare=False)   # (fonte, id): ver o topo do módulo
 
     HEADER = ("lat", "lng", "kind", "limit_kmh", "source", "active", "end_lat", "end_lng", "direction_deg")
 
@@ -141,6 +148,7 @@ class Struct:
     lat2: float
     lng2: float
     kind: str  # BRIDGE | TUNNEL
+    source_ref: Optional[Tuple[str, str]] = field(default=None, compare=False)
 
     HEADER = ("lat1", "lng1", "lat2", "lng2", "kind")
 
@@ -154,6 +162,7 @@ class Bump:
     lat: float
     lng: float
     kind: str  # BUMP | HUMP | TABLE | CUSHION | RUMBLE_STRIP | UNSPECIFIED
+    source_ref: Optional[Tuple[str, str]] = field(default=None, compare=False)
 
     HEADER = ("lat", "lng", "kind")
 
@@ -169,6 +178,7 @@ class Hazard:
     lng: float
     kind: str  # LEVEL_CROSSING | ANIMAL_CROSSING | CURVE | DANGEROUS_JUNCTION | SCHOOL_ZONE | FALLING_ROCKS
     #            | SPEED_DISPLAY | HAZARD
+    source_ref: Optional[Tuple[str, str]] = field(default=None, compare=False)
 
     HEADER = ("lat", "lng", "kind")
 
@@ -188,6 +198,7 @@ class EnforcementCamera:
     #              | TRUCK_RESTRICTION | CHARTER_RESTRICTION | MOTORCYCLE_RESTRICTION | OTHER
     source: str  # CET-SP:CAM | BHTRANS:CAM | CURITIBA:CAM (código próprio, nunca o do radar da mesma fonte)
     active: bool = True
+    source_ref: Optional[Tuple[str, str]] = field(default=None, compare=False)
 
     HEADER = ("lat", "lng", "kind", "source", "active")
 
@@ -284,6 +295,7 @@ class Toll:
     kind: str  # PLAZA | FREE_FLOW
     name: str
     source: str  # ANTT | OSM
+    source_ref: Optional[Tuple[str, str]] = field(default=None, compare=False)
 
     HEADER = ("lat", "lng", "kind", "name", "source")
 

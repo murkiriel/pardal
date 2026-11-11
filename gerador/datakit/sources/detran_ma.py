@@ -40,7 +40,7 @@ def parse(text: str, bbox=None) -> List[Camera]:
     """Linhas do PDF -> um radar por ponto (a lista repete o equipamento por sentido e faixa)."""
     out: List[Camera] = []
     seen = set()
-    for _code, kmh, lat_s, lng_s in _ROW.findall(text):
+    for code, kmh, lat_s, lng_s in _ROW.findall(text):
         lat, lng = to_float(lat_s), to_float(lng_s)
         if lat is None or lng is None or not in_br(lat, lng) or not in_bbox(bbox, lat, lng):
             continue
@@ -49,7 +49,7 @@ def parse(text: str, bbox=None) -> List[Camera]:
             continue
         seen.add(key)
         limit = int(kmh) if 20 <= int(kmh) <= 130 else None
-        out.append(Camera(key[0], key[1], CameraKind.FIXED, limit, "DETRAN-MA", True))
+        out.append(Camera(key[0], key[1], CameraKind.FIXED, limit, "DETRAN-MA", True, source_ref=("DETRAN-MA", code)))
     return out
 
 
