@@ -176,11 +176,15 @@ jobs:
           if [ -z "$WG_CONF" ]; then down "segredo MULLVAD_WG_CONF não configurado"; fi
           # o índice do apt da imagem pode estar velho (o .deb some do espelho: "Failed to fetch ... 404"); sem
           # o || down, o bash -e derrubava o job inteiro aqui (2026-11-11) em vez de seguir sem o túnel
+          # Em 2026-11-11 o apt falhou de novo, mesmo com update e 3 tentativas (no dia 10 a mesma imagem
+          # instalou): o erro do apt vai para o log, e o próprio apt repete cada download antes de desistir.
+          apt_err=""
           for i in 1 2 3; do
-            sudo apt-get update -qq >/dev/null 2>&1 && sudo apt-get install -y -qq wireguard-tools >/dev/null && break
+            apt_err=$( { sudo apt-get update -qq -o Acquire::Retries=3 && sudo apt-get install -y -qq -o Acquire::Retries=3 wireguard-tools; } 2>&1 >/dev/null ) && break
+            echo "tentativa $i do apt falhou:"; echo "$apt_err" | tail -n 5
             sleep $((i * 10))
           done
-          command -v wg-quick >/dev/null || down "não deu para instalar o wireguard-tools (apt)"
+          command -v wg-quick >/dev/null || down "não deu para instalar o wireguard-tools (apt: $(echo "$apt_err" | tail -n 1))"
           IPS=$(for h in $TUNNEL_HOSTS; do getent ahostsv4 "$h" | awk '{print $1}'; done | sort -u | sed 's#$#/32#' | paste -sd, -)
           echo "pelo túnel: $IPS"
           printf '%s\n' "$WG_CONF" \
