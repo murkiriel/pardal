@@ -1,9 +1,9 @@
-"""O pacote de cada estado num banco SQLite (decisão D-04): `pardal-<UF>.sqlite.zst`, só na release.
+"""O pacote de cada estado num banco SQLite: `pardal-<UF>.sqlite.zst`, só na release.
 
 Os CSVs continuam iguais, byte a byte. O banco traz os mesmos registros de todos os arquivos do estado numa tabela só
 (`event`), com:
 - um id estável entre gerações (a chave de cada registro em Event.key, o número em stable_id);
-- os campos do contrato SafetyEvent da ETD (§7.4) que dá para tirar dos dados sem inventar: `direction_scope`,
+- os campos de segurança que dá para tirar dos dados sem inventar: `direction_scope`,
   `position_accuracy_m`, `confidence`, `observed_at`, `valid_from`, `valid_until`;
 - o id do registro na fonte que o publicou (`source_id`), onde o leitor da fonte o tem (common/model.py, source_ref);
 - um índice espacial por célula do zoom 13 (`event_cell`), no piso técnico do Sabiá: SQLite 3.22 (Android 10), sem

@@ -47,7 +47,7 @@ name: Gerar dados
 # "accept_drop" publicam assim mesmo (ex.: uma fonte que nunca foi lida e está fora do ar).
 # Dia sem dado novo (só a data do catálogo mudou) não vira commit nem release.
 #
-# Reprodutível é só a geração corrente (D-12): as actions ficam fixadas pelo SHA do commit (a tag vai
+# Reprodutível é só a geração corrente: as actions ficam fixadas pelo SHA do commit (a tag vai
 # no comentário) e as dependências do Python, inclusive as transitivas, em versão exata e com hash
 # (gerador/requirements.in → requirements.txt, instalado com --require-hashes). As fontes são lidas
 # ao vivo e não ficam arquivadas, e as cópias do cache do Actions somem em 7 dias sem uso: uma

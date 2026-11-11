@@ -1,4 +1,4 @@
-"""O banco SQLite por estado (datakit/build_sqlite.py, decisão D-04): esquema, id estável entre gerações, regras de
+"""O banco SQLite por estado (datakit/build_sqlite.py): esquema, id estável entre gerações, regras de
 precisão, confiança, sentido e data, índice por célula, conferência contra os CSVs, catálogo, publicação e release.
 
     python -m unittest discover -s datakit/tests -t .     # de dentro de gerador/

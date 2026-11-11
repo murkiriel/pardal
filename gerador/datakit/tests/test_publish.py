@@ -652,7 +652,7 @@ class TunnelStepNeverFailsTheJob(unittest.TestCase):
 
 
 class PinnedBuild(unittest.TestCase):
-    """D-12: só a geração corrente precisa ser reproduzível, mas ela tem de ser. Duas regras: toda action
+    """Só a geração corrente precisa ser reproduzível, mas ela tem de ser. Duas regras: toda action
     dos workflows fixada por SHA de commit (a tag fica no comentário: uma tag pode ser movida, o SHA não), e
     toda instalação do pip com --require-hashes, de um requirements*.txt gerado do .in, com cada pacote
     (inclusive os transitivos) em versão exata e com hash."""
