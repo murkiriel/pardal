@@ -133,19 +133,26 @@ O `publish.py` não monta os arquivos se:
 ## Publicação automática
 
 O workflow `.github/workflows/gerar-dados.yml` gera os dados todo dia numa máquina do GitHub
-Actions. Cada dia com dado novo vira uma release (`release.py --skip-if-same` compara os sha256
-com os da última release). Uma vez por semana os dados vão também para o repositório: na primeira
-geração que passar a partir do domingo (00:00 em Brasília), se o `catalogo.json` do repositório for
-de antes dele; se o domingo falhar, segunda tenta de novo, e assim por diante (`scripts/routine.py
-mode`). Dispara às 03:17 e às 09:17 em Brasília e só gera se ainda não
-houve uma execução bem-sucedida hoje — se o build falhar ou o GitHub pular um disparo, o seguinte
-tenta de novo. Também pode ser disparado à mão (Actions → Gerar
-dados → Run workflow; só publica com "publish" marcado; "accept_failures" e "accept_drop" passam
-as opções de mesmo nome ao `publish.py`). Roda os testes, o build completo e o
-`publish.py --commit --push`, com as mesmas travas: fonte que falhou sem cópia guardada, estado
-que perdeu mais de 5% ou arquivo acima de 95 MB mesmo compactado fazem o job falhar sem publicar
-nada. Dia sem dado novo (os mesmos sha256) não vira commit nem release. O log do build, a auditoria
-das junções e o catálogo ficam nos artefatos da execução por 30 dias.
+Actions. Dispara às 03:17 e às 09:17 em Brasília e só gera se ainda não houve uma execução
+bem-sucedida no dia (UTC): se o build falhar ou o GitHub pular um disparo, o seguinte tenta de novo
+(o GitHub também atrasa disparos agendados, às vezes em horas). Cada geração roda os testes e o build
+completo; o que ela publica depende do modo (`scripts/routine.py mode`):
+
+- **release**, todo dia: o `publish.py` monta na cópia de trabalho, sem commit, e o
+  `release.py --release-only --skip-if-same --create` cria a release só se algum sha256 mudou em
+  relação à última release;
+- **commit**, uma vez por semana: na primeira geração agendada que passar a partir do domingo (00:00
+  em Brasília), se o `catalogo.json` do repositório for de antes dele (se o domingo falhar, segunda
+  tenta de novo, e assim por diante), o `publish.py --commit --push` e, se o commit saiu, a release;
+- **none**: disparo à mão sem "publish" marcado, ou fora do repositório `murkiriel/pardal`: monta e
+  confere, sem publicar.
+
+À mão (Actions → Gerar dados → Run workflow), com "publish" marcado o modo é sempre commit, em
+qualquer dia; "accept_failures" e "accept_drop" passam as opções de mesmo nome ao `publish.py`. As
+travas valem em todos os modos: fonte que falhou sem cópia guardada, estado que perdeu mais de 5% ou
+arquivo acima de 95 MB mesmo compactado fazem o job falhar sem publicar nada. Dia sem dado novo (os
+mesmos sha256) não vira commit nem release. O log do build, a auditoria das junções e o catálogo ficam
+nos artefatos da execução por 30 dias.
 
 As cópias das fontes (`data/raw/` sem os extratos do OSM) ficam no cache do Actions e são salvas
 logo depois do build, mesmo quando o build ou a publicação falham. Com o build diário o cache é

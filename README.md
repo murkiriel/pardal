@@ -41,8 +41,11 @@ estados/<UF>/           um estado (AC, AL, AM … SP, TO)
   pedagios.csv          praças de pedágio e pórticos de free flow
   radar_portatil.csv    trechos de rodovia federal aptos à fiscalização com radar portátil (PRF)
   buracos.csv           trechos de rodovia federal com buracos (panela ruim ou péssima no ICM do DNIT)
+  acidentes_moto.csv    trechos de rodovia federal com muitos acidentes com moto (PRF)
   cameras_fiscalizacao.csv  câmeras que fiscalizam outra infração que não velocidade (faixa exclusiva,
                         conversão proibida, rodízio, parada sobre a faixa...)
+                        (fora radares e limites, o arquivo que ficaria vazio no estado não sai e não
+                        entra no catálogo: cameras_fiscalizacao.csv só existe em SP, MG e PR)
 catalogo.json           índice dos pacotes por estado: arquivos, tamanho, sha256,
                         contagens e data de geração
 scripts/to_geojson.py converte qualquer CSV acima para GeoJSON (ver abaixo)
@@ -281,7 +284,9 @@ carregar tudo na memória (o Brasil inteiro, 1,4 milhão de pontos, leva cerca d
 
 **Onde baixar a lista de radares do Brasil atualizada?** Na pasta `brasil/`: `radares.csv`
 (planilha), `radares.gpx` (GPS) ou `radares.kml` (Google Earth). Para um estado só, use a
-pasta dele, por exemplo `estados/MG/radares.csv`.
+pasta dele, por exemplo `estados/MG/radares.csv`. O repositório é atualizado uma vez por semana;
+a versão do dia está na release mais nova (`pardal-brasil-radares.zip`, ou `pardal-<UF>.zip` por
+estado).
 
 **Como colocar os radares no GPS ou no celular?** Importe o `radares.gpx` (do Brasil ou do
 seu estado) como pontos favoritos ou de interesse: OsmAnd, Organic Maps, Garmin BaseCamp e
@@ -389,15 +394,20 @@ O **código** (pasta `gerador/` e `scripts/`) é MIT ([`gerador/LICENSE`](gerado
 
 ## Atualização
 
-O conjunto é gerado de novo todo dia. Cada dia com dado novo vira uma release (`dados-AAAA-MM-DD`,
-com os zips; `releases/latest/download/pardal-<UF>.zip` traz sempre a mais nova), e os arquivos do
-repositório (`brasil/`, `estados/`, `catalogo.json`) uma vez por semana, a partir do domingo. As
-releases ficam 90 dias; as semanais (as que foram para o repositório) ficam sempre. Arquivo que passaria dos 100 MB que o
-GitHub aceita sai compactado (`.csv.gz`), e o catálogo aponta para ele. Cada fonte é atualizada
-quando responde; uma fonte fora do
-ar fica com a última leitura boa (ou com o que tinha na edição anterior), e as outras seguem
-normalmente. A data do dado de cada fonte está no campo `source_dates` do `catalogo.json`. Dia sem dado novo não gera release. A data de cada pacote está no
-campo `built_at` do `catalogo.json`.
+| O quê | Quando | Onde |
+|---|---|---|
+| Geração completa e **release** `dados-AAAA-MM-DD` (zips por estado, Brasil, catálogo e sha256) | **todo dia**, se algum arquivo mudou em relação à última release (dia sem dado novo não gera release) | Releases; `releases/latest/download/pardal-<UF>.zip` traz sempre a mais nova |
+| **Commit** dos arquivos do repositório (`brasil/`, `estados/`, `catalogo.json`) | **uma vez por semana**: na primeira geração que passar a partir do **domingo** (se o domingo falhar, segunda tenta de novo, e assim por diante) | este repositório |
+| **Retenção** | releases com mais de **90 dias** são apagadas, menos as semanais (as que foram para o repositório) e a mais nova | — |
+
+A geração dispara às 03:17 de Brasília e de novo às 09:17, que só gera se a primeira não tiver
+passado; o GitHub às vezes atrasa ou pula disparos agendados. Por isso o repositório pode estar até
+uma semana atrás da release mais nova: para o dado mais novo, use a release. Arquivo acima de 95 MB
+(o GitHub recusa a partir de 100 MB) sai compactado (`.csv.gz`), e o catálogo aponta para ele.
+
+Cada fonte é atualizada quando responde; uma fonte fora do ar fica com a última leitura boa (ou com
+o que tinha na edição anterior), e as outras seguem normalmente. A data do dado de cada fonte está no
+campo `source_dates` do `catalogo.json`, e a data de cada pacote, no campo `built_at`.
 
 **Só a geração corrente é reproduzível.** O código, as dependências (com hash) e as actions do
 GitHub (por SHA) ficam travados, mas as fontes são lidas ao vivo e não são arquivadas, e as cópias
@@ -411,7 +421,9 @@ sections, red-light cameras, with the enforced direction as a compass bearing) a
 KML and GPX, for the whole country (`brasil/`) and per state (`estados/<UF>/`). It merges
 official Brazilian open data (DNIT, ANTT, Inmetro, state road agencies, city halls) with
 OpenStreetMap. Coordinates are WGS84; mind the order: CSV columns are `lat,lng`, GeoJSON is
-`[lng, lat]` and WKT is `lng lat`. Data licensed under the ODbL 1.0; the generator code (`gerador/`, Python) under
+`[lng, lat]` and WKT is `lng lat`. Regenerated daily as a GitHub release (when anything changed);
+the files in the repository are updated weekly; releases older than 90 days are pruned, except the
+weekly ones. Data licensed under the ODbL 1.0; the generator code (`gerador/`, Python) under
 MIT. Not an official source; road signs always prevail.
 
 <sub>Palavras-chave: radares Brasil, lista de radares, localização de radares, base de
