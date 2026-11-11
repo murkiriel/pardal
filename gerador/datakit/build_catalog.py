@@ -78,6 +78,42 @@ def _file_ref(path: str, count: Optional[int], dist_dir: str) -> dict:
     }
 
 
+def _sqlite_ref(uf: str, pack_dir: str, out: str, manifest: dict, dist_dir: str) -> Optional[dict]:
+    """A entrada `sqlite` do estado: o banco do pacote conferido contra os CSVs que acabaram de ir para `out` (mesma
+    geração: contagem por tipo, integrity_check, esquema; build_sqlite.validate) e compactado em
+    out/pardal-<UF>.sqlite.zst. O arquivo não vai para o repositório (scripts/publish.py, _RELEASE_ASSET_NAME): a
+    entrada publicada troca "file" por "release_asset". Problema na conferência ou banco acima do teto de 95 MB por
+    arquivo: falha registrada (o publish.py não monta) e o estado sai sem o banco. Sem banco no pacote: None."""
+    from datakit import build_sqlite, failures
+    from datakit.build_brazil import MAX_FILE_BYTES
+    src = os.path.join(pack_dir, build_sqlite.SQLITE_FILE)
+    if not manifest.get("sqlite") or not os.path.isfile(src):
+        return None
+    try:
+        problems, counts = build_sqlite.validate(src, out)
+        if problems:
+            raise ValueError("; ".join(problems))
+        dst = os.path.join(out, build_sqlite.release_name(uf))
+        build_sqlite.compress(src, dst)
+        if os.path.getsize(dst) > MAX_FILE_BYTES:
+            os.remove(dst)
+            raise ValueError(f"{os.path.getsize(src) / 1e6:.1f} MB passa do teto de {MAX_FILE_BYTES / 1e6:.0f} MB "
+                             "por arquivo mesmo compactado")
+    except Exception as e:  # noqa: BLE001
+        failures.record(f"sqlite {uf}", e)
+        return None
+    return {
+        "file": os.path.relpath(dst, dist_dir).replace(os.sep, "/"),
+        "bytes": os.path.getsize(dst),
+        "sha256": _sha256(dst),
+        "uncompressed_bytes": os.path.getsize(src),
+        "uncompressed_sha256": _sha256(src),
+        "schema_version": build_sqlite.SCHEMA_VERSION,
+        "count": sum(counts.values()),
+        "counts": counts,
+    }
+
+
 def build(packs_dir: str, dist_dir: str, base_url: str = "") -> dict:
     os.makedirs(dist_dir, exist_ok=True)
     states_dir = os.path.join(dist_dir, "estados")
@@ -162,6 +198,10 @@ def build(packs_dir: str, dist_dir: str, base_url: str = "") -> dict:
             enf_dst = os.path.join(out, ENFORCEMENT_FILE)
             shutil.copyfile(enf_src, enf_dst)
             entry["enforcement_cameras"] = _file_ref(enf_dst, counts.get("enforcement_cameras"), dist_dir)
+        # o banco SQLite do estado (build_sqlite.py): conferido contra os CSVs acima e compactado; vai só na release
+        sqlite_entry = _sqlite_ref(uf, pdir, out, man, dist_dir)
+        if sqlite_entry is not None:
+            entry["sqlite"] = sqlite_entry
         ufs[uf] = entry
 
     catalog = {

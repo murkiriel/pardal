@@ -91,10 +91,10 @@ class Pack(unittest.TestCase):
             self.assertEqual(os.listdir(d), ["GO"])
             self.assertEqual(sorted(os.listdir(os.path.join(d, "GO"))),
                              ["acidentes_moto.csv", "buracos.csv", "cameras_fiscalizacao.csv", "estruturas.csv", "limites.csv",
-                              "limites_trechos.csv", "lombadas.csv", "manifesto.json", "pedagios.csv",
+                              "limites_trechos.csv", "lombadas.csv", "manifesto.json", "pardal.sqlite", "pedagios.csv",
                               "pontos_atencao.csv", "radar_portatil.csv", "radares.csv"])
             # + lombadas (3), pedágios (4), radar portátil (5), buracos (6), acidentes com moto (8), pontos de atenção
-            # (9), limites como trechos (10), câmeras de fiscalização (11)
+            # (9), limites como trechos (10), câmeras de fiscalização (11), banco SQLite (12)
             with open(os.path.join(d, "GO", "radares.csv"), encoding="utf-8") as f:
                 rows = list(csv.DictReader(f))
             with open(os.path.join(d, "GO", "manifesto.json"), encoding="utf-8") as f:
@@ -102,12 +102,12 @@ class Pack(unittest.TestCase):
         self.assertEqual(on_disk, m)
         self.assertEqual([(r["source"], r["direction_deg"]) for r in rows], [("OSM", ""), ("DER-GO", "90")])
         self.assertEqual(set(m), {"schema", "uf", "bbox", "built_at", "artifact_built_at", "sources",
-                                  "tiles", "counts", "files"})
+                                  "tiles", "counts", "files", "sqlite"})
         self.assertEqual(m["counts"], {"cameras": 2, "cameras_with_limit": 2, "cameras_inactive": 0,
                                        "sections": 1, "red_lights": 0, "limits": 2, "structs": 1, "bumps": 0, "hazards": 0, "tolls": 0,
                                        "portable_radar": 0, "potholes": 0, "moto_accidents": 0, "limit_lines": 0,
                                        "enforcement_cameras": 0})
-        self.assertEqual((m["schema"], m["artifact_built_at"], m["sources"]), (11, "2026-09-30T00:00:00Z",
+        self.assertEqual((m["schema"], m["artifact_built_at"], m["sources"]), (12, "2026-09-30T00:00:00Z",
                                                                              [{"name": "teste"}]))
         want = {tile_of(-16.0, -49.0), tile_of(-16.1, -49.1), tile_of(-16.3, -49.3)}
         self.assertEqual(m["tiles"], [list(t) for t in sorted(want)])

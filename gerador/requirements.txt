@@ -7,3 +7,4 @@ shapely==2.1.2     # UF de cada ponto pelo polígono do IBGE (opcional — sem e
 numpy==2.4.2       # deduplicação do arquivo do Brasil sem carregar as linhas (e dependência do shapely)
 pyshp==3.1.6       # shapefiles do SNV (DNIT)
 pypdf==6.14.2      # lista de radares do Rio (PDF)
+zstandard==0.25.0  # compactação dos bancos SQLite por estado (.sqlite.zst), a mesma versão do Sabiá

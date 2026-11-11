@@ -14,13 +14,13 @@ import json
 import math
 import os
 from datetime import datetime, timezone
-from typing import Iterable, List, Optional, Tuple
+from typing import Dict, Iterable, List, Optional, Tuple
 
 from datakit.common import (AccidentZone, Bump, Camera, CameraKind, EnforcementCamera, Hazard, Limit, LimitLine, PotholeZone, RadarZone, Struct, Toll, merge_cameras,
                              merge_limits)
 from datakit.common.ufs import uf_bbox
 
-SCHEMA = 11  # 1 = base (radares+limites); 2 = + estruturas.csv (ponte/túnel); 3 = + lombadas.csv; 4 = + pedagios.csv;
+SCHEMA = 12  # 1 = base (radares+limites); 2 = + estruturas.csv (ponte/túnel); 3 = + lombadas.csv; 4 = + pedagios.csv;
 # 5 = + radar_portatil.csv (trechos aptos ao radar portátil da PRF); 6 = + buracos.csv (ICM do DNIT);
 # 7 = + speed_fines_12m no radar_portatil.csv (multas de velocidade da PRF por trecho);
 # 8 = + acidentes_moto.csv (trechos com muitos acidentes com moto, PRF);
@@ -28,7 +28,9 @@ SCHEMA = 11  # 1 = base (radares+limites); 2 = + estruturas.csv (ponte/túnel); 
 #     queda de barreira e painel de velocidade, do OSM);
 # 10 = + limites_trechos.csv (o limite como trecho de via, com a geometria: OSM e fontes oficiais);
 # 11 = + cameras_fiscalizacao.csv (câmeras de fiscalização que não medem velocidade: faixa exclusiva, conversão
-#      proibida, rodízio, parada sobre a faixa...).
+#      proibida, rodízio, parada sobre a faixa...);
+# 12 = + pardal.sqlite (o pacote num banco SQLite, build_sqlite.py; publicado só na release, pardal-<UF>.sqlite.zst,
+#      com a entrada `sqlite` no catálogo).
 # Leitor tolera ausência.
 # Nomes dos arquivos: os mesmos do pacote ao repositório publicado (estados/<UF>/radares.csv...).
 CAMERAS_FILE = "radares.csv"
@@ -61,8 +63,10 @@ def build(uf: str, packs_dir: str, cams: Iterable[Camera], lims: Iterable[Limit]
           bumps: Iterable[Bump] = (), tolls: Iterable[Toll] = (),
           radar_zones: Iterable[RadarZone] = (), potholes: Iterable[PotholeZone] = (),
           moto_accidents: Iterable[AccidentZone] = (), hazards: Iterable[Hazard] = (),
-          limit_lines: Iterable[LimitLine] = (), enforcement_cameras: Iterable[EnforcementCamera] = ()) -> dict:
-    """`built_at`: quando as listas foram montadas (vai como `artifact_built_at`)."""
+          limit_lines: Iterable[LimitLine] = (), enforcement_cameras: Iterable[EnforcementCamera] = (),
+          source_dates: Optional[Dict[str, str]] = None) -> dict:
+    """`built_at`: quando as listas foram montadas (vai como `artifact_built_at`). `source_dates`: a data do dado de
+    cada fonte (source_cache.dates()), para o `observed_at` do banco SQLite do pacote (build_sqlite.py)."""
     uf = uf.upper()
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     cams = merge_cameras(cams)
@@ -74,7 +78,7 @@ def build(uf: str, packs_dir: str, cams: Iterable[Camera], lims: Iterable[Limit]
     zone_list = sorted(radar_zones, key=lambda z: (z.road, z.km_from))
     hole_list = sorted(potholes, key=lambda z: (z.road, z.direction, z.km_from))
     accident_list = sorted(moto_accidents, key=lambda z: (z.road, z.km_from))
-    line_rows = _dedupe_lines(limit_lines)
+    line_list = _dedupe_lines(limit_lines)
     enforcement_list = _dedupe_enforcement(enforcement_cameras)
     tiles = sorted({tile_of(c.lat, c.lng) for c in cams} | {tile_of(x.lat, x.lng) for x in lims}
                    | {tile_of(s.lat1, s.lng1) for s in structs})
@@ -101,7 +105,7 @@ def build(uf: str, packs_dir: str, cams: Iterable[Camera], lims: Iterable[Limit]
     _write_csv(zfile, RadarZone.HEADER, (z.row() for z in zone_list))
     _write_csv(hfile, PotholeZone.HEADER, (z.row() for z in hole_list))
     _write_csv(afile, AccidentZone.HEADER, (z.row() for z in accident_list))
-    _write_csv(ltfile, LimitLine.HEADER, line_rows)
+    _write_csv(ltfile, LimitLine.HEADER, (x.row() for x in line_list))
     _write_csv(efile, EnforcementCamera.HEADER, (x.row() for x in enforcement_list))
 
     manifest: dict = {
@@ -141,21 +145,46 @@ def build(uf: str, packs_dir: str, cams: Iterable[Camera], lims: Iterable[Limit]
     manifest["counts"]["portable_radar"] = len(zone_list)
     manifest["counts"]["potholes"] = len(hole_list)
     manifest["counts"]["moto_accidents"] = len(accident_list)
-    manifest["counts"]["limit_lines"] = len(line_rows)
+    manifest["counts"]["limit_lines"] = len(line_list)
     manifest["counts"]["enforcement_cameras"] = len(enforcement_list)
+    from datakit.build_sqlite import Dates, PackData, osm_date
+    data = PackData(cameras=cams, limits=lims, limit_lines=line_list, structs=structs, bumps=bump_list,
+                    hazards=hazard_list, tolls=toll_list, radar_zones=zone_list, potholes=hole_list,
+                    moto_accidents=accident_list, enforcement_cameras=enforcement_list)
+    sqlite_meta = _write_sqlite(out, uf, data, Dates(dict(source_dates or {}), osm_date(sources)), now)
+    if sqlite_meta is not None:
+        manifest["sqlite"] = sqlite_meta
     with open(os.path.join(out, MANIFEST_FILE), "w", encoding="utf-8") as f:
         json.dump(manifest, f, ensure_ascii=False, indent=2)
     return manifest
 
 
-def _dedupe_lines(lines: Iterable[LimitLine]) -> List[List[str]]:
-    """As linhas do CSV, uma por geometria e valor (o mesmo trecho vindo de duas regiões do OSM ou de uma divisa), na
-    ordem do primeiro vértice."""
+def _write_sqlite(out: str, uf: str, data, dates, built_at: str) -> Optional[dict]:
+    """O banco SQLite do pacote (build_sqlite.py), das mesmas listas dos CSVs; o build_catalog confere e compacta.
+    Falha aqui não derruba o pacote (os CSVs já estão gravados): fica registrada e o estado sai sem o banco."""
+    from datakit import failures
+    from datakit.build_sqlite import SCHEMA_VERSION, SQLITE_FILE, write
+    path = os.path.join(out, SQLITE_FILE)
+    if os.path.exists(path):
+        os.remove(path)   # nunca o banco de um build anterior
+    try:
+        counts = write(path, uf, data, dates, built_at)
+    except Exception as e:  # noqa: BLE001
+        failures.record(f"sqlite {uf}", e)
+        if os.path.exists(path):
+            os.remove(path)
+        return None
+    return {"file": SQLITE_FILE, "schema_version": SCHEMA_VERSION, "bytes": os.path.getsize(path),
+            "sha256": _sha256(path), "counts": counts}
+
+
+def _dedupe_lines(lines: Iterable[LimitLine]) -> List[LimitLine]:
+    """Um trecho por linha do CSV, uma por geometria e valor (o mesmo trecho vindo de duas regiões do OSM ou de uma
+    divisa), na ordem do primeiro vértice."""
     best = {}
     for ln in lines:
-        row = ln.row()
-        best[tuple(row)] = (ln.points[0], row)
-    return [row for _, row in sorted(best.values(), key=lambda x: x[0])]
+        best[tuple(ln.row())] = (ln.points[0], ln)
+    return [ln for _, ln in sorted(best.values(), key=lambda x: x[0])]
 
 
 def _dedupe_enforcement(cameras: Iterable[EnforcementCamera]) -> List[EnforcementCamera]:

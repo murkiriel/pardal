@@ -20,7 +20,8 @@ import sys
 
 from datakit.build_catalog import build as build_catalog
 from datakit.build_pack import build as build_pack
-from datakit import accident_spots, failures, inmetro_addresses, inmetro_status, limit_lines, potholes, radar_zones
+from datakit import (accident_spots, failures, inmetro_addresses, inmetro_status, limit_lines, potholes, radar_zones,
+                     source_cache)
 from datakit.common import merge_cameras, merge_limits
 from datakit.common.model import merge_tolls
 from datakit.common.model import (absorb_osm, collapse_osm, deactivate_near, merge_cross_agency,
@@ -216,7 +217,8 @@ def build_one(uf: str, ctx: BuildContext, packs_dir: str, split: "_Split | None"
 
     manifest = build_pack(uf, packs_dir, cams, lims, structs, sources, bumps=bumps, tolls=tolls, radar_zones=zones,
                           potholes=holes, moto_accidents=accidents, hazards=hazards,
-                          limit_lines=limit_pieces, enforcement_cameras=enforcement)
+                          limit_lines=limit_pieces, enforcement_cameras=enforcement,
+                          source_dates=source_cache.dates())
     print(f"[build] pacote {uf}: {manifest['counts']}")
     return manifest
 
@@ -322,7 +324,6 @@ def _record_failures(dist_dir: str) -> None:
     path = os.path.join(dist_dir, "catalogo.json")
     with open(path, encoding="utf-8") as f:
         cat = json.load(f)
-    from datakit import source_cache
     cat["failures"] = failures.recorded()
     cat["warnings"] = failures.warnings()
     # a data do dado de cada fonte: a próxima edição que cair nesta herda a data, não a renova

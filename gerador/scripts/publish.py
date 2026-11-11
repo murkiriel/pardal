@@ -40,6 +40,10 @@ _PUBLISHED_NAME = re.compile(r"^(radares|limites_estimados|limites|estruturas|lo
 # mudando a cada geração com o OSM, fariam o repositório crescer GBs por ano. O catálogo publicado aponta
 # para o zip (release_asset/asset_path) em vez de um caminho no repositório.
 _RELEASE_ONLY_NAME = re.compile(r"^limites_trechos\.csv$")
+# O banco SQLite de cada estado (datakit/build_sqlite.py, em data/dist/estados/<UF>/): um anexo próprio da release, fora
+# do zip e nunca no commit (muda inteiro a cada geração). O catálogo publicado aponta para ele com "release_asset" (o
+# nome do anexo). Passa pelas mesmas travas: sha256 do catálogo, teto de 95 MB, e some do catálogo = queda (drops()).
+_RELEASE_ASSET_NAME = re.compile(r"^pardal-[A-Z]{2}\.sqlite\.zst$")
 _MANAGED = ("brasil", "estados")
 CATALOG = "catalogo.json"
 # Nome do catálogo até o schema 1: lido como o publicado anterior se o novo ainda não existir, e
@@ -73,6 +77,14 @@ def published_files(dist: str) -> List[str]:
     return sorted(out)
 
 
+def release_assets(dist: str) -> List[str]:
+    """Caminhos (relativos a dist, com /) dos anexos próprios da release que o build deixou em estados/<UF>/."""
+    out = []
+    for d, _, fs in os.walk(os.path.join(dist, "estados")):
+        out += [os.path.relpath(os.path.join(d, f), dist).replace(os.sep, "/") for f in fs if _RELEASE_ASSET_NAME.match(f)]
+    return sorted(out)
+
+
 def _sha(path: str) -> str:
     h = hashlib.sha256()
     with open(path, "rb") as f:
@@ -96,6 +108,9 @@ def drops(published: dict, new: dict, max_drop: float = MAX_DROP) -> List[str]:
             b = (current.get("counts") or {}).get(key) or 0
             if a and b < a * (1 - max_drop) and a - b >= MIN_DROP:
                 out.append(f"{uf}: {label} {a} -> {b} ({(b - a) / a:+.0%})")
+        # o banco SQLite (release_asset) tem as mesmas contagens dos CSVs (conferidas no build); sumir é queda
+        if old.get("sqlite") and not current.get("sqlite"):
+            out.append(f"{uf}: banco SQLite sumiu do catálogo")
     return out
 
 
@@ -103,7 +118,9 @@ def rewrite_catalog(cat: dict) -> dict:
     """O catálogo publicado: o do build sem as listas de falhas e avisos (só servem para barrar
     ou avisar na publicação; não vão para o repositório). Entrada de arquivo que vai só na release
     (_RELEASE_ONLY_NAME) troca "file" por "release_asset" (o zip do estado na release) e "asset_path"
-    (o caminho dentro dele); contagem, bytes e sha256 continuam os do CSV."""
+    (o caminho dentro dele); contagem, bytes e sha256 continuam os do CSV. Entrada de anexo próprio da release
+    (_RELEASE_ASSET_NAME, o banco SQLite) troca "file" por "release_asset" (o nome do anexo); bytes e sha256 são os
+    do arquivo compactado."""
     out = json.loads(json.dumps(cat))
     out.pop("failures", None)
     out.pop("warnings", None)
@@ -114,6 +131,9 @@ def rewrite_catalog(cat: dict) -> dict:
                 value.pop("file")
                 value["release_asset"] = f"pardal-{uf}.zip"
                 value["asset_path"] = f"{uf}/{path.rsplit('/', 1)[-1]}"
+            elif isinstance(path, str) and _RELEASE_ASSET_NAME.match(path.rsplit("/", 1)[-1]):
+                value.pop("file")
+                value["release_asset"] = path.rsplit("/", 1)[-1]
     return out
 
 
@@ -137,14 +157,15 @@ def main(argv=None) -> int:
 
     files = published_files(args.dist)
     large_files = [f"{n} ({os.path.getsize(os.path.join(args.dist, n)) / 1e6:.1f} MB)"
-                   for n in files if os.path.getsize(os.path.join(args.dist, n)) > MAX_FILE_BYTES]
+                   for n in files + release_assets(args.dist)
+                   if os.path.getsize(os.path.join(args.dist, n)) > MAX_FILE_BYTES]
     if large_files:
         sys.exit(f"arquivo acima de {MAX_FILE_BYTES / 1e6:.0f} MB (o GitHub recusa):\n  " + "\n  ".join(large_files))
 
     with open(os.path.join(args.dist, "catalogo.json"), encoding="utf-8") as f:
         cat = json.load(f)
     for uf, entry in cat["ufs"].items():
-        for key in ("cameras", "limits", "limits_estimated", "structs"):
+        for key in ("cameras", "limits", "limits_estimated", "structs", "sqlite"):
             meta = entry.get(key)
             if meta and meta.get("sha256") and _sha(os.path.join(args.dist, meta["file"])) != meta["sha256"]:
                 sys.exit(f"sha256 não confere: {meta['file']} ({uf})")
