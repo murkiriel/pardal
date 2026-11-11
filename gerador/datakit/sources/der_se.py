@@ -88,7 +88,8 @@ def parse(text: str, bbox=None, resolve: Optional[Callable[[str], Optional[str]]
         seen.add(key)
         m = _SPEED.search(row[3] if len(row) > 3 else "")
         limit = int(m.group(1)) if m and 20 <= int(m.group(1)) <= 130 else None
-        out.append(Camera(key[0], key[1], CameraKind.FIXED, limit, "DER-SE", True))
+        out.append(Camera(key[0], key[1], CameraKind.FIXED, limit, "DER-SE", True,
+                          source_ref=("DER-SE", row[0].strip())))
     return out
 
 

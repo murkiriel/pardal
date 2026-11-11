@@ -256,7 +256,7 @@ class PackAndCatalog(unittest.TestCase):
         self.assertEqual(list(rows[0]), list(EnforcementCamera.HEADER))
         self.assertEqual(m["counts"]["enforcement_cameras"], 3)
         self.assertIn("cameras_fiscalizacao.csv", m["files"])
-        self.assertEqual(m["schema"], 11)
+        self.assertEqual(m["schema"], 12)   # 11 = câmeras de fiscalização; 12 = banco SQLite
 
     def test_the_catalog_lists_them_only_for_a_state_that_has_them(self):
         from datakit import build_catalog

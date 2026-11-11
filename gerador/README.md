@@ -82,6 +82,7 @@ aviso (é o mesmo arquivo; não bloqueia a publicação).
 | `datakit/build_formats.py` | Radares em GeoJSON, KML e GPX a partir dos CSVs |
 | `datakit/limit_lines.py` | Limites como trechos de via (`limites_trechos.csv`): junta as vias contíguas de mesmos atributos, corta do OSM o que um trecho oficial de direção compatível cobre (a até 50 m) e entrega as linhas ao pacote |
 | `datakit/build_ufs.py` | `brasil/ufs.geojson`: contorno simplificado de cada UF (malha do IBGE) e a chave `ufs_geojson` do catálogo |
+| `datakit/build_sqlite.py` | O pacote de cada UF num banco SQLite (`pardal-<UF>.sqlite.zst`, só na release; a entrada `sqlite` do catálogo): gravado das listas do pacote (`build_pack.py`), conferido contra os CSVs da geração e compactado (`build_catalog.py`). Também gera os bancos a partir dos CSVs já publicados (`python run.py datakit.build_sqlite --states ../estados ...`). Formato em [`docs/FORMATO_SQLITE.md`](../docs/FORMATO_SQLITE.md) |
 | `scripts/publish.py` | Confere falhas, quedas e tamanhos e copia `data/dist/` (que já tem a estrutura `brasil/`, `estados/`, `catalogo.json`) para a raiz do repositório |
 | `datakit/failures.py` | Registro das fontes que falharam na execução |
 
@@ -125,10 +126,14 @@ O `publish.py` não monta os arquivos se:
 - o build ainda está rodando ou caiu no meio (`data/dist/BUILD_EM_ANDAMENTO`, que o build cria
   ao começar e apaga ao terminar; sem opção para passar por cima: rode o build de novo),
 - algum arquivo a publicar passa de 95 MB (o GitHub recusa acima de 100 MB; o build já registra
-  isso como falha),
+  isso como falha), inclusive o banco SQLite compactado de cada estado, que vai só na release,
 - alguma fonte falhou no build (`--accept-failures` para montar assim mesmo), ou
 - algum estado perdeu mais de 5% (e pelo menos 50 itens) de radares, limites ou estruturas em
-  relação ao `catalogo.json` já publicado (`--accept-drop`).
+  relação ao `catalogo.json` já publicado, ou ficou sem o banco SQLite que tinha (`--accept-drop`).
+
+O banco SQLite de cada estado não precisa de trava própria de contagem: o build confere que ele tem, por tipo, o mesmo
+número de registros dos CSVs da geração (e o `integrity_check`); se não tiver, o estado sai sem o banco e a falha
+(`sqlite <UF>`) barra a publicação. O sha256 dele é conferido como o dos CSVs.
 
 ## Publicação automática
 

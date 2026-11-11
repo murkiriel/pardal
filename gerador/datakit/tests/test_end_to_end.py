@@ -7,6 +7,7 @@ import csv
 import json
 import math
 import os
+import sqlite3
 import tempfile
 import unittest
 from collections import Counter
@@ -137,6 +138,10 @@ class EndToEnd(unittest.TestCase):
             marker = os.path.exists(os.path.join(tmp, "dist", build.IN_PROGRESS_MARKER))
             with open(os.path.join(tmp, "audit", "juncoes_RJ.csv"), encoding="utf-8") as f:
                 audit = list(csv.DictReader(f))
+            db = sqlite3.connect(os.path.join(pack, "pardal.sqlite"))
+            events = db.execute("SELECT type, source, source_id, source_id_from, observed_at FROM event").fetchall()
+            db.close()
+            zst = os.path.exists(os.path.join(tmp, "dist", "estados", "RJ", "pardal-RJ.sqlite.zst"))
 
         by_pos = {(round(float(c["lat"]), 5), round(float(c["lng"]), 5)): c for c in cams}
         joined = by_pos[(round(INLAND[0], 5), round(_east(*INLAND, 29.0), 5))]   # fica a posição oficial
@@ -169,6 +174,14 @@ class EndToEnd(unittest.TestCase):
         self.assertEqual([(t["kind"], t["name"], t["source"]) for t in tolls], [("PLAZA", "Pedágio Teste", "OSM")])
         self.assertEqual(catalog["failures"], [])
         self.assertIn("RJ", catalog["ufs"])
+        # o banco SQLite: o id do OSM nos que vêm só dele (o radar do OSM juntado ao da ANTT fica com o da ANTT, sem
+        # id), a data do extrato no OSM, as mesmas contagens do pacote
+        self.assertEqual({(t, sid, frm) for t, _, sid, frm, _ in events if sid},
+                         {("BUMP", "node/3", "OSM"), ("TOLL", "node/5", "OSM"), ("STRUCTURE", "way/101", "OSM")})
+        self.assertTrue(all(obs == "2026-09-30" for _, src, _, _, obs in events if src == "OSM"))
+        self.assertEqual(catalog["ufs"]["RJ"]["sqlite"]["counts"]["CAMERA"], 2)
+        self.assertEqual(catalog["ufs"]["RJ"]["sqlite"]["count"], len(events))
+        self.assertTrue(zst)
         self.assertFalse(marker)
 
 

@@ -92,7 +92,7 @@ class PackAndCatalog(unittest.TestCase):
                                 {"lat": "-16.000000", "lng": "-49.000000", "kind": "LEVEL_CROSSING"}])
         self.assertEqual(m["counts"]["hazards"], 2)
         self.assertIn("pontos_atencao.csv", m["files"])
-        self.assertEqual(m["schema"], 11)  # 11 desde as câmeras de fiscalização
+        self.assertEqual(m["schema"], 12)  # 12 desde o banco SQLite
 
     def test_the_catalog_lists_them_only_for_a_state_that_has_them(self):
         from datakit import build_catalog

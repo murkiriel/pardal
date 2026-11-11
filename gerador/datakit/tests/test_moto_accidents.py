@@ -154,7 +154,7 @@ class PackAndCatalog(unittest.TestCase):
                 rows = list(csv.DictReader(f))
             cat = build_catalog.build(packs, dist)
         self.assertEqual([("BR-153", "12", "1")], [(r["road"], r["accidents"], r["rider_deaths"]) for r in rows])
-        self.assertEqual((m["schema"], m["counts"]["moto_accidents"]), (11, 1))
+        self.assertEqual((m["schema"], m["counts"]["moto_accidents"]), (12, 1))   # 12 desde o banco SQLite
         self.assertIn("acidentes_moto.csv", m["files"])
         self.assertEqual((cat["ufs"]["GO"]["moto_accidents"]["file"], cat["ufs"]["GO"]["moto_accidents"]["count"]),
                          ("estados/GO/acidentes_moto.csv", 1))

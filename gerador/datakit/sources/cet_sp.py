@@ -109,6 +109,16 @@ ENFORCEMENT_KINDS = {
 SOURCE_CAMERAS = "CET-SP:CAM"   # código próprio: a reserva pela edição busca radares pelas partes de `source` do radares.csv
 
 
+def local_code(row: Dict) -> Optional[str]:
+    """O "CÓDIGO LOCAL" da CET, como texto ("100"; o Power BI às vezes dá número), ou None. Vai para o SQLite como o id
+    do registro na fonte (source_ref). Puro, testado."""
+    v = row.get("CÓDIGO LOCAL")
+    if isinstance(v, float) and v.is_integer():
+        v = int(v)
+    text = str(v).strip() if v is not None else ""
+    return text or None
+
+
 def rows_to_enforcement_cameras(rows: List[Dict]) -> List[EnforcementCamera]:
     """Locais ativos que fiscalizam outra infração além de velocidade e avanço de sinal: uma linha por tipo de
     infração (conversão à direita e à esquerda são uma só). Puro, testado."""
@@ -121,7 +131,9 @@ def rows_to_enforcement_cameras(rows: List[Dict]) -> List[EnforcementCamera]:
             continue
         kinds = {ENFORCEMENT_KINDS.get(c, "OTHER") for c in
                  (c.strip().upper() for c in str(r.get("ENQUADRAMENTOS") or "").split(",")) if c and c not in ("V", "A")}
-        out.extend(EnforcementCamera(round(lat, 6), round(lng, 6), k, SOURCE_CAMERAS) for k in sorted(kinds))
+        code = local_code(r)
+        ref = (SOURCE_CAMERAS, code) if code else None
+        out.extend(EnforcementCamera(round(lat, 6), round(lng, 6), k, SOURCE_CAMERAS, source_ref=ref) for k in sorted(kinds))
     return out
 
 
@@ -160,7 +172,9 @@ def rows_to_cameras(rows: List[Dict], bbox: Optional[Tuple[float, float, float, 
         m = re.match(r"\s*(\d{2,3})", str(r.get("VELOCIDADE") or ""))
         limit = int(m.group(1)) if kind == CameraKind.FIXED and m and 20 <= int(m.group(1)) <= 130 else None
         hint = center_suburb_hint(r.get("DESCRIÇÃO DO LOCAL") or "", lat, lng) or "*"
-        out.append(Camera(round(lat, 6), round(lng, 6), kind, limit, "CET-SP", True, heading_hint=hint))
+        code = local_code(r)
+        out.append(Camera(round(lat, 6), round(lng, 6), kind, limit, "CET-SP", True, heading_hint=hint,
+                          source_ref=("CET-SP", code) if code else None))
     return out
 
 

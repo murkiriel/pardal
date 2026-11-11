@@ -210,7 +210,8 @@ def load_tolls(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] 
         if not loc.valid() or (bbox is not None and not in_bbox(bbox, loc.lat, loc.lon)):
             continue
         kind = "FREE_FLOW" if o.tags.get("highway") == "toll_gantry" else "PLAZA"
-        tolls.append(Toll(loc.lat, loc.lon, kind, (o.tags.get("name") or "").strip(), "OSM"))
+        tolls.append(Toll(loc.lat, loc.lon, kind, (o.tags.get("name") or "").strip(), "OSM",
+                          source_ref=("OSM", f"node/{o.id}")))
     return tolls
 
 
@@ -226,16 +227,16 @@ def load_bumps(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] 
         if kind is None:
             continue
         if o.is_node():
-            loc = o.location
+            loc, ref = o.location, f"node/{o.id}"
         elif o.is_way() and len(o.nodes) > 0:
-            loc = o.nodes[len(o.nodes) // 2].location
+            loc, ref = o.nodes[len(o.nodes) // 2].location, f"way/{o.id}"
         else:
             continue
         if not loc.valid():
             continue
         if bbox is not None and not in_bbox(bbox, loc.lat, loc.lon):
             continue
-        bumps.append(Bump(loc.lat, loc.lon, kind))
+        bumps.append(Bump(loc.lat, loc.lon, kind, source_ref=("OSM", ref)))
     return bumps
 
 
@@ -273,16 +274,16 @@ def load_hazards(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]
     lat máx., lng máx.)."""
     out: List[Hazard] = []
 
-    def keep(kind: Optional[str], loc) -> None:
+    def keep(kind: Optional[str], loc, ref: str) -> None:
         if kind is not None and loc.valid() and (bbox is None or in_bbox(bbox, loc.lat, loc.lon)):
-            out.append(Hazard(loc.lat, loc.lon, kind))
+            out.append(Hazard(loc.lat, loc.lon, kind, source_ref=("OSM", ref)))
 
     # nós: uma passada sem índice de posições (o nó já traz a dele)
     nodes = (osmium.FileProcessor(pbf_path)
              .with_filter(osmium.filter.EntityFilter(osmium.osm.NODE))
              .with_filter(osmium.filter.KeyFilter("hazard", "railway", "highway")))
     for o in nodes:
-        keep(hazard_kind(o.tags), o.location)
+        keep(hazard_kind(o.tags), o.location, f"node/{o.id}")
     # vias com hazard=*: o nó do meio, com o índice de posições
     ways = (osmium.FileProcessor(pbf_path)
             .with_locations()
@@ -290,7 +291,7 @@ def load_hazards(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]
             .with_filter(osmium.filter.KeyFilter("hazard")))
     for o in ways:
         if len(o.nodes) > 0:
-            keep(hazard_kind(o.tags), o.nodes[len(o.nodes) // 2].location)
+            keep(hazard_kind(o.tags), o.nodes[len(o.nodes) // 2].location, f"way/{o.id}")
     return out
 
 
@@ -340,6 +341,7 @@ def load(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] = None
                 lat=lat, lng=lng, kind=_kind(tags), limit_kmh=_cam_limit(tags),
                 source="OSM", active=tags.get("disused") != "yes" and tags.get("abandoned") != "yes",
                 direction_deg=_cam_direction(tags) if USE_OSM_DIRECTION else None,
+                source_ref=("OSM", f"node/{o.id}"),
             ))
         elif o.is_way():
             hw = tags.get("highway")
@@ -363,7 +365,7 @@ def load(pbf_path: str, bbox: Optional[Tuple[float, float, float, float]] = None
             if struct_kind is not None:
                 a, b = pts[0], pts[-1]
                 if in_bbox(bbox, a[0], a[1]) or in_bbox(bbox, b[0], b[1]):
-                    structs.append(Struct(a[0], a[1], b[0], b[1], struct_kind))
+                    structs.append(Struct(a[0], a[1], b[0], b[1], struct_kind, source_ref=("OSM", f"way/{o.id}")))
 
             w = _URBAN_WEIGHT.get(hw)
             if w:
@@ -726,6 +728,7 @@ def _apply_enforcement_relations(rels, node_pt, cam_idx_by_nid, cams, bbox) -> N
             cams.append(Camera(
                 lat=start[0], lng=start[1], kind=kind, limit_kmh=lim, source="OSM", active=True,
                 end_lat=end[0] if end else None, end_lng=end[1] if end else None,
+                source_ref=("OSM", f"node/{anchor}"),
             ))
 
 

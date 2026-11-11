@@ -16,6 +16,8 @@ dados-AAAA-MM-DD (data de geração do catalogo.json, UTC) apontando para o comm
 Anexos:
     pardal-<UF>.zip               um estado: todos os arquivos dele, inclusive os limites em trechos
                                   (limites_trechos.csv, que só existe aqui)
+    pardal-<UF>.sqlite.zst        o estado num banco SQLite compactado (zstd), tirado do build (--dist);
+                                  formato em docs/FORMATO_SQLITE.md
     (cada zip leva o LICENCA-DADOS.txt: ODbL, © colaboradores do OpenStreetMap e as fontes)
     pardal-brasil.zip             o Brasil inteiro (os mesmos arquivos de brasil/)
     pardal-brasil-radares.zip     só os radares do Brasil, nos quatro formatos (para GPS e apps)
@@ -36,7 +38,7 @@ from typing import Dict, List, Optional, Set, Tuple
 GENERATOR_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(GENERATOR_DIR)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from publish import _RELEASE_ONLY_NAME  # noqa: E402
+from publish import _RELEASE_ASSET_NAME, _RELEASE_ONLY_NAME  # noqa: E402
 
 CAMERA_FILES = ("radares.csv", "radares.geojson", "radares.kml", "radares.gpx")
 
@@ -130,11 +132,29 @@ def _release_only(dist: Optional[str], uf: str) -> List[str]:
     return [os.path.join(d, f) for f in os.listdir(d) if _RELEASE_ONLY_NAME.match(f)]
 
 
+def _sqlite_assets(catalog: dict, dist: Optional[str], out: str) -> List[str]:
+    """Os bancos SQLite (pardal-<UF>.sqlite.zst) do build em `dist`, copiados para out/: só os que o catálogo lista
+    (entrada `sqlite`, release_asset), e com o sha256 dele (outro arquivo é erro: o app recusaria o download)."""
+    import shutil
+    out_files: List[str] = []
+    for uf, entry in sorted((catalog.get("ufs") or {}).items()):
+        meta = (entry or {}).get("sqlite") if isinstance(entry, dict) else None
+        name = (meta or {}).get("release_asset") or os.path.basename((meta or {}).get("file") or "")
+        if not dist or not meta or not _RELEASE_ASSET_NAME.match(name):
+            continue
+        src = os.path.join(dist, "estados", uf, name)
+        if not os.path.isfile(src) or _sha(src) != meta.get("sha256"):
+            raise SystemExit(f"{name}: o arquivo do build ({src}) não é o que o catálogo lista")
+        out_files.append(os.path.join(out, name))
+        shutil.copyfile(src, out_files[-1])
+    return out_files
+
+
 def build_assets(repo: str, out: str, dist: Optional[str] = None,
                  repo_url: str = "https://github.com/murkiriel/pardal") -> List[str]:
     """Monta os zips em out/ a partir de brasil/ e estados/ do repositório, mais os arquivos de cada
-    estado que vão só na release (do build em `dist`); cada zip leva o LICENCA-DADOS.txt. Devolve os
-    anexos."""
+    estado que vão só na release (do build em `dist`); cada zip leva o LICENCA-DADOS.txt. Os bancos SQLite
+    dos estados (do build) vão como anexos próprios. Devolve os anexos."""
     os.makedirs(out, exist_ok=True)
     with open(_catalog_path(repo), encoding="utf-8") as f:
         catalog = json.load(f)
@@ -147,6 +167,7 @@ def build_assets(repo: str, out: str, dist: Optional[str] = None,
         if files:
             assets.append(os.path.join(out, f"pardal-{uf}.zip"))
             _zip(assets[-1], files, uf, license_text(catalog, uf, repo_url))
+    assets += _sqlite_assets(catalog, dist, out)
     br = os.path.join(repo, "brasil")
     files = sorted(os.path.join(br, f) for f in os.listdir(br) if os.path.isfile(os.path.join(br, f)))
     assets.append(os.path.join(out, "pardal-brasil.zip"))
@@ -172,7 +193,8 @@ def tag_for(cat: dict) -> str:
 
 def data_fingerprint(cat: Optional[dict]) -> set:
     """(arquivo, sha256) de cada arquivo de dado do catálogo (por estado e do Brasil), sem as datas:
-    dois catálogos com a mesma impressão têm exatamente os mesmos dados. Puro, testado."""
+    dois catálogos com a mesma impressão têm exatamente os mesmos dados. O banco SQLite (`sqlite`) fica de fora:
+    é feito dos mesmos CSVs e traz as datas da geração (built_at, observed_at). Puro, testado."""
     out: Set[Tuple[str, str]] = set()
     if not cat:
         return out
@@ -184,8 +206,9 @@ def data_fingerprint(cat: Optional[dict]) -> set:
         add(value)
     for entry in (cat.get("ufs") or {}).values():
         if isinstance(entry, dict):
-            for value in entry.values():
-                add(value)
+            for key, value in entry.items():
+                if key != "sqlite":
+                    add(value)
     return out
 
 
@@ -211,6 +234,8 @@ def release_notes(cat: dict, previous: Optional[dict], warnings: List[str], repo
     L += ["", "## Downloads", "",
           "- `pardal-<UF>.zip` — um estado: todos os arquivos dele, inclusive os limites em trechos "
           "(`limites_trechos.csv`, que só existe aqui, não no repositório)",
+          "- `pardal-<UF>.sqlite.zst` — o mesmo estado num banco SQLite compactado (zstd), com id estável, "
+          "índice por célula e os trechos sem WKT (formato em `docs/FORMATO_SQLITE.md`)",
           "- `pardal-brasil.zip` — o Brasil inteiro",
           "- `pardal-brasil-radares.zip` — só os radares do Brasil, nos quatro formatos (GPS e apps)",
           "- `catalogo.json` — índice dos pacotes; `SHA256SUMS.txt` — para conferir os arquivos",
