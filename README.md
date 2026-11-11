@@ -186,6 +186,13 @@ motocicleta, motoneta ou ciclomotor nos 12 meses mais novos publicados, juntados
 (`AAAA-MM/AAAA-MM`) e `wkt` a linha da rodovia pelo SNV. Só contagens por lugar, sem data, hora nem pessoa. No
 `catalogo.json`, a entrada `moto_accidents` (pacote no schema 8).
 
+**Banco SQLite por estado (só na release):** `pardal-<UF>.sqlite.zst`, ao lado do zip de cada estado na release. Os mesmos
+registros de todos os arquivos do estado (inclusive os trechos de limite) numa tabela só, com id estável entre gerações, índice
+por célula (zoom 13) para buscar por proximidade, os trechos sem WKT e, por registro, sentido (`direction_scope`), precisão,
+confiança e data do dado. Abre no SQLite do Android 10 (3.22). No `catalogo.json`, a entrada `sqlite` de cada estado
+(`release_asset`, `bytes`, `sha256`, `uncompressed_bytes`, `schema_version`). Os CSVs continuam iguais. Formato, regra do
+id e limitações em [`docs/FORMATO_SQLITE.md`](docs/FORMATO_SQLITE.md).
+
 Todos em UTF-8, coordenadas em graus decimais (WGS84/SIRGAS 2000).
 
 ## Para quem faz app de alerta
