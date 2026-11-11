@@ -167,7 +167,13 @@ jobs:
           down() { echo "::warning::$1; seguindo sem o túnel (as fontes de TUNNEL_HOSTS usam as cópias guardadas)"
                    sudo wg-quick down wg0 >/dev/null 2>&1 || true; exit 0; }
           if [ -z "$WG_CONF" ]; then down "segredo MULLVAD_WG_CONF não configurado"; fi
-          sudo apt-get install -y -qq wireguard-tools >/dev/null
+          # o índice do apt da imagem pode estar velho (o .deb some do espelho: "Failed to fetch ... 404"); sem
+          # o || down, o bash -e derrubava o job inteiro aqui (2026-11-11) em vez de seguir sem o túnel
+          for i in 1 2 3; do
+            sudo apt-get update -qq >/dev/null 2>&1 && sudo apt-get install -y -qq wireguard-tools >/dev/null && break
+            sleep $((i * 10))
+          done
+          command -v wg-quick >/dev/null || down "não deu para instalar o wireguard-tools (apt)"
           IPS=$(for h in $TUNNEL_HOSTS; do getent ahostsv4 "$h" | awk '{print $1}'; done | sort -u | sed 's#$#/32#' | paste -sd, -)
           echo "pelo túnel: $IPS"
           printf '%s\n' "$WG_CONF" \

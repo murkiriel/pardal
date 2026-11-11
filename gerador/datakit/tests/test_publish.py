@@ -620,3 +620,31 @@ class ForkSchedule(unittest.TestCase):
         guard = [ln.strip() for ln in job.splitlines() if ln.startswith("    if:")]
         # o repositório passou a murkiriel/pardal (minúsculo); a expressão do GitHub ignora maiúsculas
         self.assertEqual(guard, ["if: github.event_name != 'schedule' || github.repository == 'murkiriel/pardal'"])
+
+
+class TunnelStepNeverFailsTheJob(unittest.TestCase):
+    """O passo do túnel roda com bash -e: qualquer comando que falhe fora de um `|| down` derruba a geração
+    inteira, quando a intenção é seguir sem o túnel (as fontes de TUNNEL_HOSTS caem nas cópias guardadas).
+    Em 2026-11-11 o `apt-get install wireguard-tools` falhou com o índice do apt velho e derrubou o job."""
+
+    def _tunnel_step(self):
+        path = os.path.join(os.path.dirname(__file__), "..", "..", "..", ".github", "workflows", "gerar-dados.yml")
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        return text.split("- name: Túnel para", 1)[1].split("\n      - name: ", 1)[0]
+
+    def test_apt_runs_inside_a_retry_loop_after_an_update(self):
+        step = self._tunnel_step()
+        apt = [ln.strip() for ln in step.splitlines() if "apt-get" in ln and not ln.strip().startswith("#")]
+        self.assertEqual(len(apt), 1, apt)
+        self.assertRegex(apt[0], r"apt-get update .*&& sudo apt-get install .*wireguard-tools.*&& break$")
+        self.assertIn('command -v wg-quick >/dev/null || down "', step)
+
+    def test_every_network_command_falls_back_to_down(self):
+        step = self._tunnel_step()
+        for cmd in ("wg-quick up", "curl -s"):
+            lines = [i for i, ln in enumerate(step.splitlines()) if cmd in ln]
+            self.assertTrue(lines, cmd)
+            for i in lines:
+                block = " ".join(step.splitlines()[i:i + 2])
+                self.assertIn("|| down", block, cmd)
