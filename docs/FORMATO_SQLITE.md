@@ -3,19 +3,23 @@
 Além dos CSVs (que continuam iguais, byte a byte), cada estado sai também num banco **SQLite**, com os mesmos
 registros de todos os arquivos do estado numa tabela só, um **id estável** entre gerações, um **índice espacial por
 célula** e os campos de segurança (sentido, precisão, confiança, datas) que dão para tirar dos dados sem inventar
-nada. É a decisão D-04 da especificação do navegador offline (ETD, §16): CSV mantido + SQLite por UF com esquema
-versionado e id estável.
+nada. Os CSVs continuam sendo o formato principal; o banco é para quem precisa de um id estável e de busca por
+proximidade sem montar um índice próprio.
+
+> **Situação (2026-11-11).** O código entrou no `main` em 2026-11-11: o banco sai a partir da próxima release. As
+> releases até `dados-2026-11-10` não têm o `pardal-<UF>.sqlite.zst`, e o `catalogo.json` do repositório só ganha a
+> entrada `sqlite` no commit semanal seguinte. Os números deste documento vêm da prova com os dados de 2026-11-08.
 
 - **Onde baixar:** só na release, como anexo próprio: `pardal-<UF>.sqlite.zst`
   (`https://github.com/Murkiriel/pardal/releases/latest/download/pardal-SP.sqlite.zst`). Não fica no repositório: o
   banco muda inteiro a cada geração e o commit semanal incharia o histórico.
 - **Compactação:** zstd nível 19, com o tamanho original e o checksum no quadro. Descompacte uma vez, na instalação, e
-  abra o `.sqlite` no lugar, só leitura. É o mesmo formato do Sabiá (`sabia-<UF>.sqlite.zst`), que o app já instala
-  com o zstd-jni.
+  abra o `.sqlite` no lugar, só leitura. É o mesmo formato do [Sabiá](https://github.com/Murkiriel/sabia)
+  (`sabia-<UF>.sqlite.zst`): quem já descompacta um (no Android, com o zstd-jni, por exemplo) descompacta o outro.
 - **Piso técnico (o do Sabiá):** só o que o SQLite do Android 10 (3.22) tem: sem FTS5, sem R-Tree, sem colunas
   geradas; arquivo em modo rollback (journal `DELETE`, não WAL); índice comum (B-tree) por célula do zoom 13.
   Conferido em cada geração (`integrity_check`, esquema, modo do arquivo) e aberto no SQLite 3.22.0 na prova com os
-  dados de 08/11/2026.
+  dados de 2026-11-08.
 - **No catálogo:** a entrada `sqlite` de cada estado no `catalogo.json` (abaixo). Quem não conhece a chave a ignora.
 
 ## Catálogo
@@ -256,11 +260,11 @@ WHERE seq IN (SELECT seq FROM event_cell WHERE cell IN (?, ?, ?, ?, ?, ?, ?, ?, 
 Depois, no app, a distância exata (e a distância até cada segmento de `coords`, nos trechos), o sentido e o resto da
 regra de alerta. Os registros vão no arquivo em ordem de célula: uma consulta lê páginas vizinhas.
 
-Medido nos bancos da edição de 08/11/2026 (num PC com Linux, cache quente): perto da Av. Paulista (SP), os 9
+Medido nos bancos da edição de 2026-11-08 (num PC com Linux, cache quente): perto da Av. Paulista (SP), os 9
 quadrados têm 24.058 registros, 500 deles radares ativos; a consulta dos radares ativos leva ~6 ms no SQLite 3.22.0,
 e trazer todos os 24.058 registros, ~26 ms no SQLite 3.45.
 
-## Tamanhos (edição de 08/11/2026)
+## Tamanhos (edição de 2026-11-08)
 
 27 estados: 444 MB de bancos, 105 MB compactados. O maior, SP: 686.120 registros, 78,4 MB (18,2 MB compactado); o
 menor, AP: 6.010 registros, 0,7 MB (0,2 MB). A maior parte é limite: em SP, 461.290 pontos e 159.701 trechos.

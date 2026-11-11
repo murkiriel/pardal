@@ -163,7 +163,7 @@ As cópias das fontes (`data/raw/` sem os extratos do OSM) ficam no cache do Act
 logo depois do build, mesmo quando o build ou a publicação falham. Com o build diário o cache é
 usado todo dia; o GitHub só apaga um cache que fica 7 dias sem uso.
 
-**Só a geração corrente é reproduzível** (decisão D-12). O código, as actions (por SHA) e as
+**Só a geração corrente é reproduzível.** O código, as actions (por SHA) e as
 dependências (com hash) ficam travados, então dá para repetir a geração de hoje com o mesmo
 ambiente; mas as entradas são lidas ao vivo (portais dos órgãos, extratos `-latest` da Geofabrik) e
 não são arquivadas, e as cópias guardadas das fontes vivem só no cache do Actions, que o GitHub
@@ -179,7 +179,8 @@ nem compactado couber o build registra falha e o `publish.py` não monta.
 
 Cada publicação vira também uma **release** (`dados-AAAA-MM-DD`), com a nota das contagens por
 estado (e a diferença para a geração anterior) e os anexos `pardal-<UF>.zip`, `pardal-brasil.zip`,
-`pardal-brasil-radares.zip`, `catalogo.json` e `SHA256SUMS.txt`; cada zip leva o `LICENCA-DADOS.txt` (ODbL, ©
+`pardal-brasil-radares.zip`, `pardal-<UF>.sqlite.zst` (o banco de cada estado, nas gerações depois de 2026-11-11),
+`catalogo.json` e `SHA256SUMS.txt`; cada zip leva o `LICENCA-DADOS.txt` (ODbL, ©
 colaboradores do OpenStreetMap e as fontes do pacote) (`scripts/release.py`; roda também
 à mão depois de um `publish.py --commit`). O link
 `https://github.com/Murkiriel/pardal/releases/latest/download/pardal-SP.zip` sempre aponta para a
