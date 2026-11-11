@@ -158,7 +158,7 @@ class ReleaseOnlyGenerationTest(PublishedTestCase):
         self.assertEqual({"data": "ODbL-1.0", "code": "MIT", "attribution": build_sqlite.ATTRIBUTION}, b["license"])
         self.assertEqual({"crs": "EPSG:4326", "bbox_order": "lat_min,lon_min,lat_max,lon_max"}, b["coordinates"])
         self.assertEqual(self.generator_commit, b["generator"]["commit"])
-        self.assertEqual("https://github.com/Murkiriel/pardal", b["generator"]["repository"])
+        self.assertEqual("https://github.com/murkiriel/pardal", b["generator"]["repository"])
 
     def test_build_id_is_the_date_and_the_hash_of_the_data(self):
         published = pub.rewrite_catalog(self.build_cat)
@@ -177,7 +177,7 @@ class ReleaseOnlyGenerationTest(PublishedTestCase):
         self.assertEqual(expected, set(self.files))
 
     def test_absolute_urls_on_the_release_of_the_generation(self):
-        release_url = "https://github.com/Murkiriel/pardal/releases/download/dados-2026-11-08/"
+        release_url = "https://github.com/murkiriel/pardal/releases/download/dados-2026-11-08/"
         self.assertEqual(release_url, self.block["release_url"])
         self.assertEqual(rel.tag_for(self.cat), catalog_contract.release_tag(BUILT_AT))
         for f in self.files.values():
@@ -254,7 +254,7 @@ class ReleaseOnlyGenerationTest(PublishedTestCase):
         self.assertEqual(catalog_contract.ATTRIBUTION, build_sqlite.ATTRIBUTION)
         self.assertEqual("3.22.0", pardal["sqlite_min_version"])
         self.assertIn("SQLite 3.22.0", (DOCS / "FORMATO_SQLITE.md").read_text(encoding="utf-8"))
-        self.assertEqual(f"https://github.com/Murkiriel/pardal/blob/{self.generator_commit}/docs/FORMATO_SQLITE.md",
+        self.assertEqual(f"https://github.com/murkiriel/pardal/blob/{self.generator_commit}/docs/FORMATO_SQLITE.md",
                          pardal["sqlite_spec"])
         self.assertEqual("lat,lng", pardal["coordinate_order"]["csv"])
         self.assertEqual("lng,lat", pardal["coordinate_order"]["geojson"])
@@ -293,7 +293,7 @@ class WeeklyCommitGenerationTest(PublishedTestCase):
     def test_valid_and_repository_files_point_to_the_tag(self):
         self.assertEqual([], contract_check.problems(self.cat, DOCS))
         go = self.files["estados/GO/radares.csv"]
-        self.assertEqual("https://raw.githubusercontent.com/Murkiriel/pardal/dados-2026-11-08/estados/GO/radares.csv",
+        self.assertEqual("https://raw.githubusercontent.com/murkiriel/pardal/dados-2026-11-08/estados/GO/radares.csv",
                          go["url"])
         self.assertEqual(("pardal-GO.zip", "GO/radares.csv"), (go["container"], go["member"]))
         # o que só existe no zip continua apontando para o zip
