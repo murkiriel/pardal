@@ -1,0 +1,225 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "catalogo-v1.schema.json",
+  "title": "Contrato de catálogo comum, versão 1",
+  "description": "A chave `contract` do catalogo.json dos quatro geradores (docs/CATALOGO.md). Chaves a mais são aceitas em todo nível: o leitor ignora o que não conhece.",
+  "type": "object",
+  "required": ["contract"],
+  "properties": {
+    "contract": {"$ref": "#/$defs/contract"}
+  },
+  "$defs": {
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "utc": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z$"},
+    "date_or_utc": {
+      "type": ["string", "null"],
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}(T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]+)?Z)?$"
+    },
+    "https_url": {"type": "string", "pattern": "^https://[^\\s]+$"},
+    "spdx": {"type": "string", "pattern": "^[A-Za-z0-9.+-]+( (AND|OR|WITH) [A-Za-z0-9.+-]+)*$"},
+    "bbox": {
+      "type": ["array", "null"],
+      "items": {"type": "number"},
+      "minItems": 4,
+      "maxItems": 4
+    },
+    "contract": {
+      "type": "object",
+      "required": ["name", "version", "min_reader_version", "dataset", "build_id", "built_at", "release_url",
+                   "generator", "license", "coordinates", "osm_snapshot", "sources", "compatibility", "files"],
+      "properties": {
+        "name": {"const": "catalogo-comum"},
+        "version": {"type": "integer", "minimum": 1},
+        "min_reader_version": {"type": "integer", "minimum": 1},
+        "dataset": {"enum": ["carcara", "andorinha", "sabia", "pardal"]},
+        "build_id": {"type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9a-f]{8}$"},
+        "built_at": {"$ref": "#/$defs/utc"},
+        "release_url": {"type": "string", "pattern": "^https://[^\\s]+/$"},
+        "generator": {
+          "type": "object",
+          "required": ["repository", "commit"],
+          "properties": {
+            "repository": {"$ref": "#/$defs/https_url"},
+            "commit": {"type": ["string", "null"], "pattern": "^[0-9a-f]{40}$"}
+          }
+        },
+        "license": {
+          "type": "object",
+          "required": ["data", "code", "attribution"],
+          "properties": {
+            "data": {"$ref": "#/$defs/spdx"},
+            "code": {"$ref": "#/$defs/spdx"},
+            "attribution": {"type": "string", "minLength": 1}
+          }
+        },
+        "coordinates": {
+          "type": "object",
+          "required": ["crs", "bbox_order"],
+          "properties": {
+            "crs": {"const": "EPSG:4326"},
+            "bbox_order": {"const": "lat_min,lon_min,lat_max,lon_max"}
+          }
+        },
+        "osm_snapshot": {
+          "type": "object",
+          "required": ["date", "md5"],
+          "properties": {
+            "date": {"$ref": "#/$defs/date_or_utc"},
+            "md5": {"type": ["string", "null"], "pattern": "^[0-9a-f]{32}$"}
+          }
+        },
+        "sources": {"type": "array", "items": {"$ref": "#/$defs/source"}},
+        "compatibility": {"$ref": "#/$defs/compatibility"},
+        "files": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/file"}}
+      }
+    },
+    "source": {
+      "type": "object",
+      "required": ["id", "date", "checksums"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+        "name": {"type": "string", "minLength": 1},
+        "url": {"type": ["string", "null"], "pattern": "^https://[^\\s]+$"},
+        "date": {"$ref": "#/$defs/date_or_utc"},
+        "version": {"type": "string", "minLength": 1},
+        "license": {"type": ["string", "null"], "pattern": "^[A-Za-z0-9.+-]+( (AND|OR|WITH) [A-Za-z0-9.+-]+)*$"},
+        "checksums": {
+          "type": "object",
+          "properties": {
+            "sha256": {"$ref": "#/$defs/sha256"},
+            "md5": {"type": "string", "pattern": "^[0-9a-f]{32}$"},
+            "b3sum": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+          }
+        },
+        "note": {"type": "string", "minLength": 1}
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "required": ["mix_generations", "data_format"],
+      "properties": {
+        "mix_generations": {"type": "boolean"},
+        "data_format": {
+          "type": "object",
+          "required": ["name", "version"],
+          "properties": {
+            "name": {"type": "string", "minLength": 1},
+            "version": {"type": "string", "minLength": 1}
+          }
+        },
+        "carcara": {"$ref": "#/$defs/compat_carcara"},
+        "andorinha": {"$ref": "#/$defs/compat_andorinha"},
+        "sabia": {"$ref": "#/$defs/compat_sabia"},
+        "pardal": {"$ref": "#/$defs/compat_pardal"}
+      }
+    },
+    "compat_carcara": {
+      "type": "object",
+      "required": ["tileset", "pmtiles_version", "tile_type", "tile_compression", "glyphs", "sprites"],
+      "properties": {
+        "tileset": {
+          "type": "object",
+          "required": ["name", "version", "major"],
+          "properties": {
+            "name": {"const": "protomaps-basemap"},
+            "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+            "major": {"type": "integer", "minimum": 1}
+          }
+        },
+        "pmtiles_version": {"type": "integer", "minimum": 3},
+        "tile_type": {"const": "mvt"},
+        "tile_compression": {"const": "gzip"},
+        "glyphs": {
+          "type": "object",
+          "required": ["file", "template", "fontstacks"],
+          "properties": {
+            "file": {"type": "string"},
+            "template": {"type": "string"},
+            "fontstacks": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+          }
+        },
+        "sprites": {
+          "type": "object",
+          "required": ["file", "template", "flavors"],
+          "properties": {
+            "file": {"type": "string"},
+            "template": {"type": "string"},
+            "flavors": {"type": "array", "minItems": 1, "items": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "compat_andorinha": {
+      "type": "object",
+      "required": ["engine", "valhalla_engine_version", "valhalla_commit", "tile_format_version",
+                   "valhalla_mobile_version", "valhalla_mobile_artifact", "valhalla_mobile_aar_sha256",
+                   "valhalla_mobile_abis", "required_config"],
+      "properties": {
+        "engine": {"const": "valhalla"},
+        "valhalla_engine_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "valhalla_commit": {"type": "string", "pattern": "^[0-9a-f]{40}$"},
+        "tile_format_version": {"type": "string", "minLength": 1},
+        "valhalla_mobile_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "valhalla_mobile_artifact": {"type": "string", "minLength": 1},
+        "valhalla_mobile_aar_sha256": {"$ref": "#/$defs/sha256"},
+        "valhalla_mobile_abis": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "pattern": "^[a-z0-9_-]+$"}
+        },
+        "required_config": {"type": "object"}
+      }
+    },
+    "compat_sabia": {
+      "type": "object",
+      "required": ["format_version", "sqlite_min_version", "sqlite_modules", "sqlite_not_used", "format_spec",
+                   "search_spec", "search_reference"],
+      "properties": {
+        "format_version": {"type": "integer", "minimum": 1},
+        "sqlite_min_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "sqlite_modules": {"type": "array", "items": {"type": "string"}},
+        "sqlite_not_used": {"type": "array", "items": {"type": "string"}},
+        "format_spec": {"$ref": "#/$defs/https_url"},
+        "search_spec": {"$ref": "#/$defs/https_url"},
+        "search_reference": {"$ref": "#/$defs/https_url"}
+      }
+    },
+    "compat_pardal": {
+      "type": "object",
+      "required": ["pack_schema", "sqlite_schema_version", "sqlite_min_version", "sqlite_spec", "coordinate_order"],
+      "properties": {
+        "pack_schema": {"type": "integer", "minimum": 1},
+        "sqlite_schema_version": {"type": "integer", "minimum": 1},
+        "sqlite_min_version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"},
+        "sqlite_spec": {"$ref": "#/$defs/https_url"},
+        "coordinate_order": {"type": "object"}
+      }
+    },
+    "file": {
+      "type": "object",
+      "required": ["id", "kind", "region", "url", "sha256", "bytes", "bytes_unpacked", "media_type", "unpack",
+                   "format", "bbox", "coverage_level", "requires"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$"},
+        "kind": {"type": "string", "pattern": "^[a-z][a-z_]*$"},
+        "region": {
+          "type": ["string", "null"],
+          "pattern": "^(BR|AC|AL|AM|AP|BA|CE|DF|ES|GO|MA|MG|MS|MT|PA|PB|PE|PI|PR|RJ|RN|RO|RR|RS|SC|SE|SP|TO)$"
+        },
+        "url": {"$ref": "#/$defs/https_url"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "bytes_unpacked": {"type": ["integer", "null"], "minimum": 1},
+        "media_type": {"type": "string", "pattern": "^[a-z]+/[a-z0-9.+-]+$"},
+        "unpack": {"type": "array", "items": {"type": "string", "pattern": "^[a-z0-9]+$"}},
+        "format": {"type": "string", "pattern": "^[a-z0-9][a-z0-9.+-]*$"},
+        "bbox": {"$ref": "#/$defs/bbox"},
+        "coverage_level": {"enum": ["DETAILED", "BASE_HIGHWAYS_ONLY", null]},
+        "requires": {"type": "array", "items": {"type": "string"}},
+        "container": {"type": "string"},
+        "member": {"type": "string", "minLength": 1},
+        "license": {"$ref": "#/$defs/spdx"}
+      }
+    }
+  }
+}

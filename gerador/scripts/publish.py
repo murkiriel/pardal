@@ -26,12 +26,12 @@ import re
 import shutil
 import subprocess
 import sys
-from typing import List
+from typing import List, Optional
 
 GENERATOR_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(GENERATOR_DIR)
-# Os mesmos de datakit/build_brazil.py (PUBLISHED_NAME, MANAGED_DIRS): este script não importa
-# o datakit.
+# Os mesmos de datakit/build_brazil.py (PUBLISHED_NAME, MANAGED_DIRS): este script não importa o
+# build do datakit, só o datakit/catalog_contract.py (biblioteca padrão e a tabela de UFs), no catalog_block.
 # Todo arquivo de dado do pacote (datakit/build_pack.py, *_FILE) está aqui ou em _RELEASE_ONLY_NAME:
 # um nome que falte nos dois fica fora de tudo e o catálogo aponta para o nada (testado).
 _PUBLISHED_NAME = re.compile(r"^(radares|limites_estimados|limites|estruturas|lombadas|pedagios|radar_portatil|buracos|acidentes_moto"
@@ -137,10 +137,46 @@ def rewrite_catalog(cat: dict) -> dict:
     return out
 
 
+def _git_head(repo: str) -> Optional[str]:
+    """O SHA completo do HEAD de `repo` (antes do commit dos dados: o commit do gerador), ou None sem git."""
+    done = subprocess.run(["git", "-C", repo, "rev-parse", "--verify", "--quiet", "HEAD^{commit}"],
+                          capture_output=True, text=True)
+    sha = done.stdout.strip()
+    return sha if done.returncode == 0 and len(sha) == 40 else None
+
+
+def _manifests(packs: str) -> List[dict]:
+    out = []
+    for name in sorted(os.listdir(packs)) if os.path.isdir(packs) else []:
+        path = os.path.join(packs, name, "manifesto.json")
+        if os.path.isfile(path):
+            with open(path, encoding="utf-8") as f:
+                out.append(json.load(f))
+    return out
+
+
+def catalog_block(published: dict, dist: str, repo: str, committed: bool, packs: str) -> dict:
+    """O bloco `contract` do catálogo publicado (docs/CATALOGO.md, datakit/catalog_contract.py): os arquivos que vão
+    para o repositório (sha256 do build), os zips que o release.py vai montar (iguais byte a byte; ele confere antes de
+    criar a release) e o banco de cada estado. `committed`: os arquivos vão no commit desta geração."""
+    sys.path.insert(0, GENERATOR_DIR)
+    from datakit import catalog_contract
+    sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+    import release
+    repo_files = {rel: (_sha(os.path.join(dist, rel)), os.path.getsize(os.path.join(dist, rel)))
+                  for rel in published_files(dist)}
+    slug = os.environ.get("PARDAL_REPO") or os.environ.get("GITHUB_REPOSITORY") or catalog_contract.DEFAULT_REPO
+    return catalog_contract.contract(
+        published, repo_files=repo_files, zips=release.predict_zips(dist, published), committed=committed,
+        generator_commit=_git_head(repo), repo=slug, extracts=catalog_contract.osm_extracts(_manifests(packs)))
+
+
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--repo", default=REPO, help="raiz do repositório (padrão: pasta acima de gerador/)")
     ap.add_argument("--dist", default=os.path.join(GENERATOR_DIR, "data", "dist"))
+    ap.add_argument("--packs", default=os.path.join(GENERATOR_DIR, "data", "packs"),
+                    help="pacotes do build (manifesto.json de cada estado: os extratos do OpenStreetMap usados)")
     ap.add_argument("--commit", action="store_true", help="faz commit no repositório")
     ap.add_argument("--push", action="store_true", help="publica (exige --commit)")
     ap.add_argument("--accept-drop", action="store_true",
@@ -199,8 +235,13 @@ def main(argv=None) -> int:
         dst = os.path.join(args.repo, *rel.split("/"))
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copy2(src, dst)
+    published_cat = rewrite_catalog(cat)
+    if published_cat.get("built_at"):   # todo build grava; sem ele não há etiqueta de release para as URLs
+        published_cat["contract"] = catalog_block(published_cat, args.dist, args.repo, args.commit, args.packs)
+    else:
+        print("aviso: catálogo sem built_at; sai sem o bloco contract")
     with open(os.path.join(args.repo, CATALOG), "w", encoding="utf-8") as f:
-        json.dump(rewrite_catalog(cat), f, ensure_ascii=False, indent=1)
+        json.dump(published_cat, f, ensure_ascii=False, indent=1)
     if os.path.exists(os.path.join(args.repo, OLD_CATALOG)):
         os.remove(os.path.join(args.repo, OLD_CATALOG))
     print(f"{len(wanted)} arquivos montados em {args.repo}")

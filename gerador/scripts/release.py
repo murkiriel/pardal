@@ -38,9 +38,11 @@ from typing import Dict, List, Optional, Set, Tuple
 GENERATOR_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.dirname(GENERATOR_DIR)
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from publish import _RELEASE_ASSET_NAME, _RELEASE_ONLY_NAME  # noqa: E402
+from publish import _PUBLISHED_NAME, _RELEASE_ASSET_NAME, _RELEASE_ONLY_NAME  # noqa: E402
 
 CAMERA_FILES = ("radares.csv", "radares.geojson", "radares.kml", "radares.gpx")
+# O endereço do repositório escrito no LICENCA-DADOS.txt de cada zip (--repo-url muda; o publish.py usa este).
+REPO_URL = "https://github.com/murkiriel/pardal"
 
 
 def _catalog_path(repo: str) -> str:
@@ -108,12 +110,26 @@ def license_text(cat: dict, uf: Optional[str], repo_url: str) -> str:
     ])
 
 
+# Data fixa de cada arquivo dentro dos zips: o mesmo conteúdo dá o mesmo zip, byte a byte, em qualquer montagem. É o que
+# deixa o publish.py pôr no catálogo o sha256 do zip antes de o release.py montá-lo (contrato de catálogo,
+# datakit/catalog_contract.py); o release.py confere os dois antes de criar a release.
+ZIP_DATE = (1980, 1, 1, 0, 0, 0)
+
+
+def _zip_entry(name: str) -> zipfile.ZipInfo:
+    info = zipfile.ZipInfo(name, ZIP_DATE)
+    info.compress_type = zipfile.ZIP_DEFLATED
+    info.external_attr = 0o644 << 16
+    return info
+
+
 def _zip(path: str, files: List[str], arcdir: str, license: Optional[str] = None) -> None:
     with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED, compresslevel=9) as z:
         for f in files:
-            z.write(f, f"{arcdir}/{os.path.basename(f)}")
+            with open(f, "rb") as fh:
+                z.writestr(_zip_entry(f"{arcdir}/{os.path.basename(f)}"), fh.read(), compresslevel=9)
         if license is not None:
-            z.writestr(f"{arcdir}/{LICENSE_FILE}", license)
+            z.writestr(_zip_entry(f"{arcdir}/{LICENSE_FILE}"), license, compresslevel=9)
 
 
 def _sha(path: str) -> str:
@@ -150,8 +166,48 @@ def _sqlite_assets(catalog: dict, dist: Optional[str], out: str) -> List[str]:
     return out_files
 
 
+def zip_inputs(root: str, catalog: dict, dist: Optional[str] = None, repo_url: str = REPO_URL,
+               published_only: bool = False) -> List[Tuple[str, List[str], str, str]]:
+    """[(nome do anexo, arquivos, pasta dentro do zip, LICENCA-DADOS.txt)] dos zips, a partir de root/estados e
+    root/brasil (o repositório), mais os arquivos de cada estado que vão só na release (do build em `dist`).
+    `published_only`: root é o próprio build (data/dist), e só entram os nomes publicados (publish._PUBLISHED_NAME),
+    os mesmos que o publish.py copia para o repositório."""
+    def keep(name: str) -> bool:
+        return not published_only or bool(_PUBLISHED_NAME.match(name))
+    out: List[Tuple[str, List[str], str, str]] = []
+    est = os.path.join(root, "estados")
+    for uf in sorted(os.listdir(est)) if os.path.isdir(est) else []:
+        d = os.path.join(est, uf)
+        files = sorted([os.path.join(d, f) for f in os.listdir(d) if os.path.isfile(os.path.join(d, f)) and keep(f)]
+                       + _release_only(dist, uf), key=os.path.basename)
+        if files:
+            out.append((f"pardal-{uf}.zip", files, uf, license_text(catalog, uf, repo_url)))
+    br = os.path.join(root, "brasil")
+    if os.path.isdir(br):
+        files = sorted(os.path.join(br, f) for f in os.listdir(br) if os.path.isfile(os.path.join(br, f)) and keep(f))
+        brazil = license_text(catalog, None, repo_url)
+        out.append(("pardal-brasil.zip", files, "brasil", brazil))
+        out.append(("pardal-brasil-radares.zip", [f for f in files if os.path.basename(f) in CAMERA_FILES], "brasil",
+                    brazil))
+    return out
+
+
+def predict_zips(dist: str, catalog: dict, repo_url: str = REPO_URL) -> Dict[str, Tuple[str, int]]:
+    """{nome do zip: (sha256, bytes)} dos zips que build_assets vai montar do repositório depois que o publish.py copiar
+    para lá o build em `dist`: montados aqui do próprio build, num diretório provisório, iguais byte a byte (ZIP_DATE)."""
+    import tempfile
+    out: Dict[str, Tuple[str, int]] = {}
+    with tempfile.TemporaryDirectory() as tmp:
+        for name, files, arcdir, license in zip_inputs(dist, catalog, dist, repo_url, published_only=True):
+            path = os.path.join(tmp, name)
+            _zip(path, files, arcdir, license)
+            out[name] = (_sha(path), os.path.getsize(path))
+            os.remove(path)
+    return out
+
+
 def build_assets(repo: str, out: str, dist: Optional[str] = None,
-                 repo_url: str = "https://github.com/murkiriel/pardal") -> List[str]:
+                 repo_url: str = REPO_URL) -> List[str]:
     """Monta os zips em out/ a partir de brasil/ e estados/ do repositório, mais os arquivos de cada
     estado que vão só na release (do build em `dist`); cada zip leva o LICENCA-DADOS.txt. Os bancos SQLite
     dos estados (do build) vão como anexos próprios. Devolve os anexos."""
@@ -159,22 +215,17 @@ def build_assets(repo: str, out: str, dist: Optional[str] = None,
     with open(_catalog_path(repo), encoding="utf-8") as f:
         catalog = json.load(f)
     assets: List[str] = []
-    est = os.path.join(repo, "estados")
-    for uf in sorted(os.listdir(est)):
-        d = os.path.join(est, uf)
-        files = sorted([os.path.join(d, f) for f in os.listdir(d) if os.path.isfile(os.path.join(d, f))]
-                       + _release_only(dist, uf), key=os.path.basename)
-        if files:
-            assets.append(os.path.join(out, f"pardal-{uf}.zip"))
-            _zip(assets[-1], files, uf, license_text(catalog, uf, repo_url))
+    inputs = zip_inputs(repo, catalog, dist, repo_url)
+    for name, files, arcdir, license in inputs:
+        if name.startswith("pardal-brasil"):
+            continue
+        assets.append(os.path.join(out, name))
+        _zip(assets[-1], files, arcdir, license)
     assets += _sqlite_assets(catalog, dist, out)
-    br = os.path.join(repo, "brasil")
-    files = sorted(os.path.join(br, f) for f in os.listdir(br) if os.path.isfile(os.path.join(br, f)))
-    assets.append(os.path.join(out, "pardal-brasil.zip"))
-    _zip(assets[-1], files, "brasil", license_text(catalog, None, repo_url))
-    assets.append(os.path.join(out, "pardal-brasil-radares.zip"))
-    _zip(assets[-1], [f for f in files if os.path.basename(f) in CAMERA_FILES], "brasil",
-         license_text(catalog, None, repo_url))
+    for name, files, arcdir, license in inputs:
+        if name.startswith("pardal-brasil"):
+            assets.append(os.path.join(out, name))
+            _zip(assets[-1], files, arcdir, license)
     cat = os.path.join(out, "catalogo.json")
     with open(_catalog_path(repo), "rb") as fi, open(cat, "wb") as fo:
         fo.write(fi.read())
@@ -185,6 +236,27 @@ def build_assets(repo: str, out: str, dist: Optional[str] = None,
             f.write(f"{_sha(a)}  {os.path.basename(a)}\n")
     assets.append(sums)
     return assets
+
+
+def contract_mismatches(catalog: dict, assets: List[str]) -> List[str]:
+    """Os anexos que o bloco `contract` do catálogo lista e que não saíram como ele diz (sha256 ou tamanho), ou que
+    não saíram. Vazio = o catálogo descreve a release. Catálogo sem o bloco: nada a conferir."""
+    block = catalog.get("contract")
+    if not block:
+        return []
+    built = {os.path.basename(a): a for a in assets}
+    prefix = block["release_url"]
+    problems = []
+    for f in block["files"]:
+        if "member" in f or not f["url"].startswith(prefix):
+            continue   # membro de um zip (conferido pelo zip) ou arquivo do repositório
+        name = f["url"][len(prefix):]
+        path = built.get(name)
+        if path is None:
+            problems.append(f"{name}: o catálogo lista, mas não foi montado")
+        elif (_sha(path), os.path.getsize(path)) != (f["sha256"], f["bytes"]):
+            problems.append(f"{name}: sha256 ou tamanho diferente do catálogo")
+    return problems
 
 
 def tag_for(cat: dict) -> str:
@@ -273,7 +345,7 @@ def main(argv=None) -> int:
     ap.add_argument("--dist", default=os.path.join(GENERATOR_DIR, "data", "dist"),
                     help="saída do build, de onde vêm os arquivos que vão só na release (limites_trechos.csv)")
     ap.add_argument("--create", action="store_true", help="cria a release no GitHub (gh)")
-    ap.add_argument("--repo-url", default="https://github.com/murkiriel/pardal")
+    ap.add_argument("--repo-url", default=REPO_URL)
     ap.add_argument("--release-only", action="store_true",
                     help="dados só na release, sem commit no repositório (dias que não são domingo)")
     ap.add_argument("--skip-if-same", action="store_true",
@@ -291,10 +363,20 @@ def main(argv=None) -> int:
         with open(args.warnings, encoding="utf-8-sig") as f:
             warnings = json.load(f).get("warnings") or []
 
+    # O catálogo com o bloco `contract` aponta os arquivos do repositório e os anexos para a etiqueta desta geração: no
+    # commit semanal (sem --release-only) a release sai mesmo com os dados iguais aos da anterior, senão os endereços
+    # do catálogo que acabou de ir para o repositório ficariam sem release.
+    contract = cat.get("contract")
     if args.skip_if_same and previous and data_fingerprint(cat) == data_fingerprint(previous):
-        print("Os dados são os mesmos da geração anterior: sem release.")
-        return 0
+        if not contract or args.release_only:
+            print("Os dados são os mesmos da geração anterior: sem release.")
+            return 0
+        print("Os dados são os mesmos da geração anterior, mas o catálogo do repositório aponta para esta release.")
     assets = build_assets(args.repo, args.out, args.dist, args.repo_url)
+    problems = contract_mismatches(cat, assets)
+    if problems:
+        raise SystemExit("o catálogo (contract) não descreve os anexos montados; nada foi publicado:\n  "
+                         + "\n  ".join(problems))
     notes_path = os.path.join(args.out, "NOTAS.md")
     with open(notes_path, "w", encoding="utf-8", newline="\n") as f:
         f.write(release_notes(cat, previous, warnings, args.repo_url, in_repo=not args.release_only))
@@ -309,6 +391,9 @@ def main(argv=None) -> int:
         return subprocess.run(["gh", *a], cwd=args.repo, check=check, capture_output=True, text=True)
 
     if gh("release", "view", tag, check=False).returncode == 0:   # segunda geração no mesmo dia
+        if contract:
+            raise SystemExit(f"a release {tag} já existe e o catálogo (contract) aponta para ela; apague a outra "
+                             "release do dia ou gere de novo amanhã")
         tag = f"{tag}-{d[11:13]}{d[14:16]}"
         title += f" ({d[11:16]} UTC)"
     sha = subprocess.run(["git", "-C", args.repo, "rev-parse", "HEAD"], check=True,
