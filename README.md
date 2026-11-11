@@ -3,7 +3,8 @@
 **Lista de radares do Brasil** (fixos, lombadas eletrônicas, radares de trecho e avanço de
 sinal) e **limites de velocidade das vias**, com localização (latitude e longitude), em
 arquivos para baixar e usar offline: **CSV**, **GeoJSON**, **KML** (Google Earth) e **GPX**
-(GPS e apps de navegação). Um conjunto do Brasil inteiro e um por estado.
+(GPS e apps de navegação), e um banco **SQLite** por estado na release. Um conjunto do Brasil inteiro e um
+por estado.
 
 "Pardal" é o apelido popular do radar fixo. O conjunto junta, num formato só, o que DNIT,
 ANTT, Inmetro, DERs estaduais e prefeituras publicam em dezenas de lugares diferentes, mais
@@ -17,8 +18,36 @@ o que a comunidade do OpenStreetMap mapeia.
 [`limites.csv`](brasil/limites.csv) · [`limites_estimados.csv`](brasil/limites_estimados.csv) ·
 [`estruturas.csv`](brasil/estruturas.csv) · [`ufs.geojson`](brasil/ufs.geojson) (contorno dos estados)
 **Por estado:** pasta [`estados/`](estados), por exemplo [`estados/SP/`](estados/SP).
+**Índice:** [`catalogo.json`](catalogo.json) · **Versão do dia:** [release mais recente](https://github.com/Murkiriel/pardal/releases/latest)
 
-## Organização
+## Situação
+
+Em 2026-11-11:
+
+| Item | Como está |
+|---|---|
+| Release mais recente | `dados-2026-11-10`, com dados de 2026-11-10 (20.809 radares no Brasil). O link `releases/latest/download/` aponta sempre para a mais nova |
+| Arquivos do repositório | Os do commit semanal de 2026-11-08 (`built_at` do [`catalogo.json`](catalogo.json)); o próximo sai a partir do domingo, 2026-11-15 |
+| Banco SQLite por estado | Entra a partir da próxima release: o código foi para o `main` em 2026-11-11, e as releases até `dados-2026-11-10` ainda não têm o `pardal-<UF>.sqlite.zst` |
+| Geração | A agendada de 2026-11-11 falhou; a [issue](https://github.com/Murkiriel/pardal/issues) "Geração falhando" fica aberta até a próxima passar, e a release anterior continua no ar |
+| Cadência | Geração todo dia, com release quando algum dado muda; commit no repositório uma vez por semana; releases guardadas por 90 dias, menos as semanais ([Geração e reprodutibilidade](#geração-e-reprodutibilidade)) |
+| Formato | CSV, GeoJSON, KML e GPX; SQLite (`schema_version` 1) na release; catálogo no `schema` 2 |
+
+## Baixar e usar
+
+Os arquivos estão em dois lugares, no mesmo formato:
+
+- **no repositório** (`brasil/`, `estados/`, `catalogo.json`), atualizado uma vez por semana: bom para baixar um
+  arquivo solto pelo navegador ou acompanhar o histórico;
+- **na release mais recente**, gerada todo dia em que algum dado muda: `pardal-<UF>.zip` (todos os arquivos do
+  estado, inclusive o `limites_trechos.csv`), `pardal-<UF>.sqlite.zst` (o estado num banco SQLite, a partir da
+  próxima release), `pardal-brasil.zip`, `pardal-brasil-radares.zip`, `catalogo.json` e `SHA256SUMS.txt`. O link
+  `https://github.com/Murkiriel/pardal/releases/latest/download/pardal-<UF>.zip` traz sempre a mais nova.
+
+Num app: leia o `catalogo.json`, baixe só os estados de que precisa, confira o `sha256` de cada arquivo e só então
+troque o que o aparelho já tem (ver "Para quem faz app de alerta").
+
+### O que tem no repositório
 
 ```
 brasil/                 o país inteiro
@@ -57,6 +86,22 @@ arquivo à parte, para caber no limite de 100 MB por arquivo do GitHub). Para te
 deles em GeoJSON, use o `scripts/to_geojson.py`.
 Limites não saem em GPX nem KML: aparelhos de GPS usam esses formatos para pontos de
 interesse, e o limite é um valor da via, não um lugar.
+
+### Converter para GeoJSON
+
+O `scripts/to_geojson.py` converte qualquer CSV do Pardal (radares, limites, limites estimados,
+estruturas, inclusive `.csv.gz`) para GeoJSON. Só precisa de Python 3.8 ou mais novo, sem
+instalar nada:
+
+```
+python scripts/to_geojson.py estados/GO/limites.csv                   # gera estados/GO/limites.geojson
+python scripts/to_geojson.py estados/GO/limites.csv --no-estimated   # só os limites sinalizados
+python scripts/to_geojson.py brasil/limites_estimados.csv -o estimados.geojson
+```
+
+Pontos viram `Point`, estruturas viram `LineString` e as demais colunas viram propriedades
+(`active` e `estimated` como verdadeiro/falso). Arquivos grandes são convertidos sem
+carregar tudo na memória (o Brasil inteiro, 1,4 milhão de pontos, leva cerca de 10 s).
 
 ## Formato
 
@@ -227,12 +272,22 @@ motocicleta, motoneta ou ciclomotor nos 12 meses mais novos publicados, juntados
 (`AAAA-MM/AAAA-MM`) e `wkt` a linha da rodovia pelo SNV. Só contagens por lugar, sem data, hora nem pessoa. No
 `catalogo.json`, a entrada `moto_accidents` (pacote no schema 8).
 
-**Banco SQLite por estado (só na release):** `pardal-<UF>.sqlite.zst`, ao lado do zip de cada estado na release. Os mesmos
+**Banco SQLite por estado (só na release, a partir da próxima):** `pardal-<UF>.sqlite.zst`, ao lado do zip de cada
+estado na release. Os mesmos
 registros de todos os arquivos do estado (inclusive os trechos de limite) numa tabela só, com id estável entre gerações, índice
 por célula (zoom 13) para buscar por proximidade, os trechos sem WKT e, por registro, sentido (`direction_scope`), precisão,
 confiança e data do dado. Abre no SQLite do Android 10 (3.22). No `catalogo.json`, a entrada `sqlite` de cada estado
 (`release_asset`, `bytes`, `sha256`, `uncompressed_bytes`, `schema_version`). Os CSVs continuam iguais. Formato, regra do
 id e limitações em [`docs/FORMATO_SQLITE.md`](docs/FORMATO_SQLITE.md).
+
+**Catálogo (`catalogo.json`, `schema` 2):** `built_at` (a geração, em UTC), `source_dates` (a data do dado de cada
+fonte), `ufs_geojson` (o contorno dos estados) e `ufs`, com uma entrada por UF e uma `BR` (o Brasil inteiro). Cada
+entrada traz `name`, `bbox`, `built_at`, `coverage` (`level`: de que esfera vêm os radares, `federal`, `state` e
+`municipal`, juntos com `+`; `sources`: as fontes), `counts` e, para cada arquivo, `file`, `bytes`, `sha256` e
+`count`; os que só existem na release (`limit_lines`, `sqlite`) trazem `release_asset` no lugar de `file`. O `bbox` é
+`[lat_min, lon_min, lat_max, lon_max]`, **latitude primeiro**, no WGS84, ao contrário do GeoJSON. É um retângulo
+aproximado da UF: difere em até 0,07° do retângulo da malha do IBGE e deixa de fora as ilhas oceânicas de PE e do
+ES. Serve para uma triagem; para saber em que estado fica um ponto, use o `ufs.geojson`.
 
 Todos em UTF-8, coordenadas em graus decimais WGS84, na ordem de cada formato (ver o quadro no começo
 desta seção: CSV `lat,lng`; GeoJSON `[lng, lat]`; WKT `lng lat`).
@@ -270,22 +325,6 @@ que já existem:
   conversão proibida, rodízio; por `kind`).
 - **Fale pouco.** Dois avisos por radar (longe e perto) bastam, e silêncio se o veículo já estiver abaixo do limite;
   `active = 0` não deve avisar.
-
-## Converter para GeoJSON
-
-O `scripts/to_geojson.py` converte qualquer CSV do Pardal (radares, limites, limites estimados,
-estruturas, inclusive `.csv.gz`) para GeoJSON. Só precisa de Python 3.8 ou mais novo, sem
-instalar nada:
-
-```
-python scripts/to_geojson.py estados/GO/limites.csv                   # gera estados/GO/limites.geojson
-python scripts/to_geojson.py estados/GO/limites.csv --no-estimated   # só os limites sinalizados
-python scripts/to_geojson.py brasil/limites_estimados.csv -o estimados.geojson
-```
-
-Pontos viram `Point`, estruturas viram `LineString` e as demais colunas viram propriedades
-(`active` e `estimated` como verdadeiro/falso). Arquivos grandes são convertidos sem
-carregar tudo na memória (o Brasil inteiro, 1,4 milhão de pontos, leva cerca de 10 s).
 
 ## Perguntas frequentes
 
@@ -349,7 +388,70 @@ estado mais perto, a até 5 km. Ponte ou túnel na divisa sai nos dois estados.
 **Posso usar no meu app ou projeto?** Pode, seguindo a licença ODbL (abaixo): citar as
 fontes e manter a mesma licença em bases derivadas.
 
-## Fontes
+## Cobertura e limitações
+
+- **Não é fonte oficial.** O conjunto junta o que os órgãos publicam e o que o OpenStreetMap mapeia: um radar novo,
+  removido ou desligado pode demorar a aparecer, e o radar que nenhuma fonte publica não está aqui.
+- **A cobertura muda de estado para estado.** Na edição de 2026-11-08, em 12 UFs (AC, AL, AM, AP, ES, MS, MT, PA, PI,
+  RN, RR e SC) os radares vêm só das fontes federais e do OpenStreetMap, sem órgão estadual nem municipal. O
+  `coverage` de cada UF no catálogo diz quais fontes entraram.
+- **Sentido:** só 17,9% dos radares têm `direction_deg` (geração de 2026-11-08), e o vazio não separa "os dois
+  sentidos" de "desconhecido" (ver "Sentido do radar").
+- **Posição aproximada** nos radares que só o Inmetro conhece (pelo endereço: cerca de 1 em 10 fica a mais de 100 m)
+  e nos trechos postos pelo km do SNV (radar portátil, buracos, acidentes com moto); o banco SQLite traz essa margem
+  em `position_accuracy_m`.
+- **Limite estimado** (`estimated=1`) é a regra geral do Código de Trânsito para o tipo de via, não a placa, e só
+  existe na rede principal.
+- **Câmeras de outras infrações** só em SP, MG e PR (São Paulo, Belo Horizonte e Curitiba publicam os locais com
+  coordenada); **pedágios sem preço**.
+- **O repositório pode estar até uma semana atrás** da release mais nova; o `limites_trechos.csv` e o banco SQLite só
+  existem na release.
+- **Fonte fora do ar** fica com a última leitura boa; a data do dado de cada fonte está em `source_dates`.
+
+## Geração e reprodutibilidade
+
+O código que baixa as fontes, junta, calcula o sentido e gera todos os arquivos está em
+[`gerador/`](gerador) (Python). Lá estão como rodar, como funciona cada parte, a
+investigação das fontes com as medições ([`FONTES.md`](gerador/FONTES.md)) e o que ainda
+falta ([`PENDENCIAS.md`](gerador/PENDENCIAS.md)).
+
+| O quê | Quando | Onde |
+|---|---|---|
+| Geração completa e **release** `dados-AAAA-MM-DD` (zips por estado, Brasil, catálogo e sha256; a partir da próxima, também os bancos SQLite) | **todo dia**, se algum arquivo mudou em relação à última release (dia sem dado novo não gera release) | Releases; `releases/latest/download/pardal-<UF>.zip` traz sempre a mais nova |
+| **Commit** dos arquivos do repositório (`brasil/`, `estados/`, `catalogo.json`) | **uma vez por semana**: na primeira geração que passar a partir do **domingo** (se o domingo falhar, segunda tenta de novo, e assim por diante) | este repositório |
+| **Retenção** | releases com mais de **90 dias** são apagadas, menos as semanais (as que foram para o repositório) e a mais nova | — |
+
+A geração dispara às 03:17 de Brasília e de novo às 09:17, que só gera se a primeira não tiver
+passado; o GitHub às vezes atrasa ou pula disparos agendados. Por isso o repositório pode estar até
+uma semana atrás da release mais nova: para o dado mais novo, use a release. Arquivo acima de 95 MB
+(o GitHub recusa a partir de 100 MB) sai compactado (`.csv.gz`), e o catálogo aponta para ele.
+
+Cada fonte é atualizada quando responde; uma fonte fora do ar fica com a última leitura boa (ou com
+o que tinha na edição anterior), e as outras seguem normalmente. A data do dado de cada fonte está no
+campo `source_dates` do `catalogo.json`, e a data de cada pacote, no campo `built_at`.
+
+Se uma geração agendada falhar, a release anterior continua no ar e fica aberta uma
+[issue](https://github.com/Murkiriel/pardal/issues) "Geração falhando" até a próxima passar.
+
+**Só a geração corrente é reproduzível.** O código, o Python 3.12, as dependências (todas, transitivas incluídas, com
+versão exata e hash: `gerador/requirements.in` → `gerador/requirements.txt`, instaladas com
+`pip install --require-hashes`) e as actions do GitHub (pelo SHA do commit) ficam travados, mas as fontes são
+lidas ao vivo e não são arquivadas, e as cópias guardadas delas ficam só no cache do GitHub Actions, que some depois
+de 7 dias sem uso. Uma geração antiga não se refaz: para ter o dado de uma data, guarde a release dela.
+
+## Licença e atribuição
+
+Os **dados** são uma base derivada do OpenStreetMap, distribuída sob a
+**Open Database License (ODbL) 1.0** (texto em [`LICENSE`](LICENSE)).
+
+- Cite "© colaboradores do OpenStreetMap" e as fontes da tabela abaixo.
+- Se você publicar uma base derivada deste conjunto, ela precisa manter a ODbL.
+- Cada zip da release traz um `LICENCA-DADOS.txt` com este aviso e as fontes daquele pacote; o banco SQLite traz
+  a atribuição na tabela `meta`.
+
+O **código** (pastas `gerador/` e `scripts/`) é **MIT** ([`gerador/LICENSE`](gerador/LICENSE)).
+
+### Fontes
 
 | Fonte | O que entra | Licença |
 |---|---|---|
@@ -381,57 +483,36 @@ fontes e manter a mesma licença em bases derivadas.
 | Transalvador (Salvador) | Radares fixos, com limite (mapa de equipamentos da Transalvador) | Dado aberto municipal |
 | SEMTRAN (Porto Velho) | Radares fixos, com a validade da aferição (planilha publicada pela SEMTRAN) | Dado aberto municipal |
 
-## Como os arquivos são gerados
+## Projetos irmãos
 
-O código que baixa as fontes, junta, calcula o sentido e gera todos os arquivos está em
-[`gerador/`](gerador) (Python). Lá estão como rodar, como funciona cada parte, a
-investigação das fontes com as medições ([`FONTES.md`](gerador/FONTES.md)) e o que ainda
-falta ([`PENDENCIAS.md`](gerador/PENDENCIAS.md)).
+Quatro geradores independentes de dados abertos do Brasil para uso offline, um pacote por UF:
 
-## Licença
+- [**Carcará**](https://github.com/Murkiriel/carcara): o mapa base, em PMTiles.
+- [**Andorinha**](https://github.com/Murkiriel/andorinha): as rotas, em tiles do Valhalla.
+- [**Sabiá**](https://github.com/Murkiriel/sabia): a busca de lugares e endereços, em SQLite.
+- **Pardal** (este): os radares e os limites de velocidade, em CSV, GeoJSON, KML, GPX e SQLite.
 
-Os **dados** são uma base derivada do OpenStreetMap, distribuída sob a
-**Open Database License (ODbL) 1.0** (texto em [`LICENSE`](LICENSE)).
-
-- Cite "© colaboradores do OpenStreetMap" e as fontes da tabela acima.
-- Se você publicar uma base derivada deste conjunto, ela precisa manter a ODbL.
-- Cada zip da release traz um `LICENCA-DADOS.txt` com este aviso e as fontes daquele pacote.
-
-O **código** (pasta `gerador/` e `scripts/`) é MIT ([`gerador/LICENSE`](gerador/LICENSE)).
-
-## Atualização
-
-| O quê | Quando | Onde |
-|---|---|---|
-| Geração completa e **release** `dados-AAAA-MM-DD` (zips por estado, Brasil, catálogo e sha256) | **todo dia**, se algum arquivo mudou em relação à última release (dia sem dado novo não gera release) | Releases; `releases/latest/download/pardal-<UF>.zip` traz sempre a mais nova |
-| **Commit** dos arquivos do repositório (`brasil/`, `estados/`, `catalogo.json`) | **uma vez por semana**: na primeira geração que passar a partir do **domingo** (se o domingo falhar, segunda tenta de novo, e assim por diante) | este repositório |
-| **Retenção** | releases com mais de **90 dias** são apagadas, menos as semanais (as que foram para o repositório) e a mais nova | — |
-
-A geração dispara às 03:17 de Brasília e de novo às 09:17, que só gera se a primeira não tiver
-passado; o GitHub às vezes atrasa ou pula disparos agendados. Por isso o repositório pode estar até
-uma semana atrás da release mais nova: para o dado mais novo, use a release. Arquivo acima de 95 MB
-(o GitHub recusa a partir de 100 MB) sai compactado (`.csv.gz`), e o catálogo aponta para ele.
-
-Cada fonte é atualizada quando responde; uma fonte fora do ar fica com a última leitura boa (ou com
-o que tinha na edição anterior), e as outras seguem normalmente. A data do dado de cada fonte está no
-campo `source_dates` do `catalogo.json`, e a data de cada pacote, no campo `built_at`.
-
-**Só a geração corrente é reproduzível.** O código, as dependências (com hash) e as actions do
-GitHub (por SHA) ficam travados, mas as fontes são lidas ao vivo e não são arquivadas, e as cópias
-guardadas delas ficam só no cache do GitHub Actions, que some depois de 7 dias sem uso. Uma geração
-antiga não se refaz: para ter o dado de uma data, guarde a release dela.
+Os quatro dividem o país nas mesmas 27 UFs, pelos limites do IBGE, e publicam um `catalogo.json` com o `sha256` de
+cada arquivo e o `bbox` de cada UF em `[lat_min, lon_min, lat_max, lon_max]`, no WGS84. Carcará, Andorinha e Sabiá
+seguem o mesmo molde de catálogo e de release (`schema` 1, `build_id` como etiqueta da release, `release_url`,
+`base` e `states`); o catálogo do Pardal tem formato próprio (`ufs`) e um `bbox` aproximado. O banco SQLite do Pardal
+segue as convenções do Sabiá: coordenadas em inteiros × 100.000, latitude primeiro, e a mesma célula do zoom 13.
 
 ## English
 
 **Pardal** is an open dataset of **speed cameras in Brazil** (fixed cameras, average-speed
 sections, red-light cameras, with the enforced direction as a compass bearing) and **road speed limits**, with coordinates, as CSV, GeoJSON,
-KML and GPX, for the whole country (`brasil/`) and per state (`estados/<UF>/`). It merges
+KML and GPX, for the whole country (`brasil/`) and per state (`estados/<UF>/`), plus one SQLite database per
+state in the GitHub release (`pardal-<UF>.sqlite.zst`, from the next release on). It merges
 official Brazilian open data (DNIT, ANTT, Inmetro, state road agencies, city halls) with
 OpenStreetMap. Coordinates are WGS84; mind the order: CSV columns are `lat,lng`, GeoJSON is
-`[lng, lat]` and WKT is `lng lat`. Regenerated daily as a GitHub release (when anything changed);
+`[lng, lat]` and WKT is `lng lat`; the catalogue `bbox` is `[lat_min, lon_min, lat_max, lon_max]`. Regenerated daily as a GitHub release (when anything changed);
 the files in the repository are updated weekly; releases older than 90 days are pruned, except the
-weekly ones. Data licensed under the ODbL 1.0; the generator code (`gerador/`, Python) under
-MIT. Not an official source; road signs always prevail.
+weekly ones. Only the current generation is reproducible: dependencies are locked with hashes and actions
+pinned by commit SHA, but the live sources are not archived. Data licensed under the ODbL 1.0; the generator code (`gerador/`, Python) under
+MIT. Not an official source; road signs always prevail. Sister projects: basemap
+([Carcará](https://github.com/Murkiriel/carcara)), routing ([Andorinha](https://github.com/Murkiriel/andorinha)) and
+search ([Sabiá](https://github.com/Murkiriel/sabia)).
 
 <sub>Palavras-chave: radares Brasil, lista de radares, localização de radares, base de
 radares, radares fixos, pardais, lombada eletrônica, radar de trecho, avanço de sinal,
