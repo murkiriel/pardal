@@ -47,8 +47,8 @@ silêncio sobe `min_reader_version` e usa um nome de chave novo, nunca o mesmo n
 | `generator` | objeto | `repository`: a URL do repositório do gerador; `commit`: o SHA **completo** (40 dígitos) do commit que gerou a geração (`null` só fora de um checkout do git). |
 | `license` | objeto | `data`: a licença dos dados em SPDX; `code`: a do código do gerador em SPDX; `attribution`: o crédito que precisa aparecer junto dos dados. Um arquivo com licença própria a declara em `files[].license`. |
 | `coordinates` | objeto | `crs`: sempre `"EPSG:4326"` (WGS84); `bbox_order`: sempre `"lat_min,lon_min,lat_max,lon_max"`. |
-| `osm_snapshot` | objeto | A foto do OpenStreetMap por trás dos dados: `date` (texto ou `null`) e `md5` do extrato (texto ou `null`). É a chave para comparar a idade dos dados entre os geradores (ETD §7.7). |
-| `sources` | lista | As fontes de entrada que o gerador conhece, com data e checksums (ver [Fontes](#fontes-d-12)). |
+| `osm_snapshot` | objeto | A foto do OpenStreetMap por trás dos dados: `date` (texto ou `null`) e `md5` do extrato (texto ou `null`). É a chave para comparar a idade dos dados entre os geradores. |
+| `sources` | lista | As fontes de entrada que o gerador conhece, com data e checksums (ver [Fontes](#fontes)). |
 | `compatibility` | objeto | O que é preciso para abrir os dados (ver [Compatibilidade](#compatibilidade)). |
 | `files` | lista | Os arquivos da geração, todos no mesmo formato (ver [Arquivos](#arquivos)). |
 
@@ -93,7 +93,7 @@ estão nas particularidades.
 
 ## Níveis de cobertura
 
-Os níveis são os da ETD (§7.5). `PARTIAL` e `UNAVAILABLE` descrevem o que o aplicativo tem instalado num momento, não
+Os níveis são quatro: `DETAILED`, `BASE_HIGHWAYS_ONLY`, `PARTIAL` e `UNAVAILABLE`. `PARTIAL` e `UNAVAILABLE` descrevem o que o aplicativo tem instalado num momento, não
 um arquivo; por isso só os dois primeiros aparecem no catálogo.
 
 | Nível | Quando o catálogo usa |
@@ -105,9 +105,9 @@ O pacote leve do Carcará é `DETAILED`: cobre o estado inteiro, só que até um
 dele). As três bases (mapa até o zoom 9, rotas só no nível 0 do Valhalla, busca só com municípios e rodovias) são
 `BASE_HIGHWAYS_ONLY`: nas três, a base sozinha não basta para começar ou terminar uma viagem.
 
-## Fontes (D-12)
+## Fontes
 
-Só a geração corrente é reproduzível (decisão D-12 da ETD); o catálogo registra, de cada fonte de entrada que o
+Só a geração corrente é reproduzível; o catálogo registra, de cada fonte de entrada que o
 gerador conhece, o que permite conferir que a geração usou aquela entrada.
 
 | Chave | Tipo | Sentido |
@@ -134,7 +134,7 @@ o que o gerador não sabe.
 
 ## Como um leitor instala
 
-O fluxo é o da ETD (§7.6), igual para os quatro:
+O fluxo de instalação, igual para os quatro:
 
 1. Ler o `catalogo.json` e a chave `contract`. Sem ela, ou com `name` diferente de `catalogo-comum`, o catálogo não
    segue este contrato. Recusar se `min_reader_version` for maior que a versão do leitor.
@@ -147,11 +147,11 @@ O fluxo é o da ETD (§7.6), igual para os quatro:
 7. Validar o conjunto: os `requires` presentes e, se `mix_generations` for `false`, o mesmo `build_id` em tudo.
 8. Ativar por troca atômica e manter a versão anterior até a próxima ativação válida.
 
-## Diferenças em relação à ETD (§7.3)
+## Por que os campos têm estes nomes
 
-A ETD propõe nomes de campo; o contrato usa os dela, menos onde havia motivo para outro:
+Algumas escolhas de nome e de lugar, e o motivo:
 
-- **Uma chave nova (`contract`) em vez de campos soltos no topo.** A ETD sobe o `schema`; aqui o `schema` antigo não
+- **Uma chave nova (`contract`) em vez de campos soltos no topo.** O `schema` antigo não
   pode mudar (os leitores atuais recusam outro número), e `generator_commit`, `bbox` e `base_url` já existem com outro
   sentido ou outro formato. Uma chave nova não quebra ninguém.
 - **`dataset` em vez de `engine`.** "Motor", nos blocos de compatibilidade, é o programa que lê os dados (Valhalla,
@@ -165,10 +165,10 @@ A ETD propõe nomes de campo; o contrato usa os dela, menos onde havia motivo pa
 - **`files` em vez de `packages`, com `kind` em inglês** (`uf_light`, `resources`, em vez de `leve`, `recursos`),
   para valores e chaves ficarem na mesma língua. `size` e `size_unpacked` viraram `bytes` e `bytes_unpacked`, o nome
   que os catálogos já usam.
-- **`unpack`, `media_type` e `format` por arquivo**, que a ETD não tem: sem eles, o leitor genérico precisaria
+- **`unpack`, `media_type` e `format` por arquivo**: sem eles, o leitor genérico precisaria
   conhecer cada gerador para descompactar.
-- **`source_dates` virou `sources`**, uma lista com data e checksums, porque a D-12 pede o sha256 das entradas e a
-  data sozinha não basta.
+- **`source_dates` virou `sources`**, uma lista com data e checksums, porque a data sozinha não basta para conferir
+  uma entrada.
 - **O bloco de cada gerador fica dentro de `compatibility`**, em vez de no topo.
 - **O catálogo não traz o próprio sha256**: um arquivo não contém o próprio hash. A release publica o `catalogo.json`
   como anexo; assinatura fica para depois.
