@@ -57,6 +57,21 @@ interesse, e o limite é um valor da via, não um lugar.
 
 ## Formato
 
+> **Ordem das coordenadas: muda conforme o formato.** Todas estão em **WGS84** (EPSG:4326), em graus
+> decimais; os dados oficiais em SIRGAS 2000 entram sem conversão (a diferença para o WGS84 fica abaixo
+> de 1 m).
+>
+> | Formato | Ordem | Exemplo |
+> |---|---|---|
+> | **CSV** (colunas) | **`lat,lng`** (estruturas: `lat1,lng1,lat2,lng2`) | `-16.680000,-49.250000` |
+> | **GeoJSON** (`radares.geojson`, `ufs.geojson`, saída do `to_geojson.py`) | **`[lng, lat]`**, como manda o padrão (RFC 7946), inclusive o `end` dos radares de trecho | `[-49.25, -16.68]` |
+> | **WKT** (coluna `wkt` dos CSVs de trechos) | **`lng lat`** (x y), pontos separados por vírgula | `LINESTRING(-49.25000 -16.68000, -49.24800 -16.68100)` |
+> | KML | `lng,lat,altitude`, como manda o padrão | `<coordinates>-49.25,-16.68,0</coordinates>` |
+> | GPX | atributos `lat` e `lon` | `<wpt lat="-16.68" lon="-49.25">` |
+>
+> Num mesmo pacote há as duas ordens: o `radares.csv` traz `lat,lng` e o `limites_trechos.csv`, no WKT,
+> `lng lat`. Trocar a ordem põe o ponto em outro lugar do planeta sem dar erro.
+
 **Radares (CSV):** `lat,lng,kind,limit_kmh,source,active,end_lat,end_lng,direction_deg`
 
 | Coluna | Significado |
@@ -65,10 +80,33 @@ interesse, e o limite é um valor da via, não um lugar.
 | `limit_kmh` | Limite fiscalizado, quando a fonte informa (veículo leve) |
 | `source` | De onde veio o ponto (`OSM`, `DNIT`, `ANTT`, `DER-SP`, `RIO`, `INMETRO`, `PRF`…). Quando mais de uma fonte traz o mesmo radar, elas vêm juntas com `+` (ex.: `DNIT+OSM`, confirmado por duas fontes independentes). `INMETRO` sozinho é um radar que só o cadastro de aferições do Inmetro conhece, com a posição tirada do endereço (ver as perguntas frequentes) |
 | `active` | `0` quando o radar está desativado ou com a aferição do Inmetro vencida |
-| `direction_deg` | Sentido fiscalizado: rumo do trânsito que o radar fiscaliza, em graus a partir do norte (0 = norte, 90 = leste, 180 = sul, 270 = oeste). Vazio quando o radar fiscaliza os dois sentidos ou a fonte não informa |
+| `direction_deg` | Sentido fiscalizado: rumo do trânsito que o radar fiscaliza, inteiro de 0 a 359 em graus a partir do norte (0 = norte, 90 = leste, 180 = sul, 270 = oeste). **Vazio não quer dizer "os dois sentidos"**: ver "Sentido do radar" abaixo |
 
 No GPX e no KML entram só os radares ativos, com o nome no formato "Radar 60 km/h" e o
-sentido na descrição. O GeoJSON tem todos, com as mesmas informações nas propriedades.
+sentido na descrição ("sentido 92° (leste)"). O GeoJSON tem todos, com as mesmas informações nas
+propriedades (`direction_deg` vazio vira `null`).
+
+**Sentido do radar (`direction_deg`).** O que o arquivo traz é só o rumo do trânsito fiscalizado; não
+traz uma margem de tolerância. O sentido vem das fontes oficiais que o informam ("crescente/decrescente"
+do km no DNIT, na ANTT, na planilha das concessões da PRF e no DER-GO, Norte/Sul/Leste/Oeste na
+Artesp, faixas por sentido no DER-SP, centro/bairro na CET de São Paulo), convertido em rumo pela
+geometria da via no ponto do radar (SNV do DNIT, malha estadual da Goinfra e OpenStreetMap). A tag `direction` dos radares do OpenStreetMap não é
+usada: medida contra as fontes oficiais, ela aponta o sentido contrário na maioria das rodovias (muitos
+mapeadores marcam para onde a câmera olha). Na geração de 2026-11-08, 17,9% dos radares têm o campo
+preenchido.
+
+- **Vazio mistura dois casos que hoje não dá para separar:** o radar vale para os dois sentidos (a fonte
+  diz isso, ou duas fontes trazem o mesmo radar em sentidos opostos) **ou** o sentido é desconhecido (a
+  fonte não informa, ou informa mas o rumo não pôde ser calculado). Trate vazio como "pode valer para os
+  dois sentidos" e avise nos dois.
+- **90° é a regra do gerador, não a do app.** Ao juntar fontes, o gerador considera opostos dois
+  sentidos que diferem em mais de 90°: duas fontes com o radar no mesmo ponto e sentidos opostos viram
+  um radar sem sentido (os dois), e dois radares próximos (o do OpenStreetMap e o oficial, ou os de dois
+  órgãos) só viram um se os sentidos conhecidos diferirem em até 90°.
+- **No app, a recomendação é 60°** (ver "Para quem faz app de alerta"): com o campo preenchido, ignore o
+  radar só se o rumo do veículo diferir dele em mais de 60°, e só com GPS preciso e em movimento. É
+  uma sugestão, não uma propriedade do dado; a margem é mais estreita que os 90° porque, perto de 90°,
+  o veículo está atravessando a via do radar, não seguindo por ela.
 
 **Limites (CSV):** `lat,lng,limit_kmh,source,estimated,limit_low_kmh,direction_deg`. Cada ponto
 marca o limite naquele lugar da via; o valor vale até o próximo ponto. Onde há dado oficial
@@ -186,7 +224,8 @@ motocicleta, motoneta ou ciclomotor nos 12 meses mais novos publicados, juntados
 (`AAAA-MM/AAAA-MM`) e `wkt` a linha da rodovia pelo SNV. Só contagens por lugar, sem data, hora nem pessoa. No
 `catalogo.json`, a entrada `moto_accidents` (pacote no schema 8).
 
-Todos em UTF-8, coordenadas em graus decimais (WGS84/SIRGAS 2000).
+Todos em UTF-8, coordenadas em graus decimais WGS84, na ordem de cada formato (ver o quadro no começo
+desta seção: CSV `lat,lng`; GeoJSON `[lng, lat]`; WKT `lng lat`).
 
 ## Para quem faz app de alerta
 
@@ -201,7 +240,8 @@ que já existem:
   dispara. Sem rota, use um raio pequeno e só os radares à frente do veículo.
 - **Sentido.** Quando `direction_deg` vem preenchido, ignore o radar se o rumo do veículo diferir dele em mais de
   60°, mas só com o GPS preciso (precisão de 15 m ou melhor) e em movimento: parado ou com GPS ruim, o rumo não é
-  confiável. Vazio = avisar nos dois sentidos.
+  confiável. Vazio = avisar nos dois sentidos (vazio pode ser "os dois sentidos" ou "sentido desconhecido"; ver
+  "Sentido do radar").
 - **Escolha os pacotes pela posição.** O `brasil/ufs.geojson` traz o contorno de cada estado (simplificado: erra até ~3 km
   na divisa). Ache o estado pelo ponto dentro do polígono; a menos de ~5 km de uma divisa, ou fora de todos os polígonos (mar,
   ponte), tenha também os pacotes vizinhos. Em vez de baixar o `brasil/` inteiro, baixe só o estado onde o usuário está e os
@@ -264,15 +304,11 @@ com `estimated=1`. Pode estar errado. Para usar só limites sinalizados, descart
 `estimated=1` (no consolidado do Brasil eles já vêm num arquivo separado).
 
 **O radar vale para qual sentido?** Veja a coluna `direction_deg`: é o rumo do trânsito
-fiscalizado, em graus (0 = norte, 90 = leste, 180 = sul, 270 = oeste). Para saber se um radar
-vale para quem passa, compare com o rumo do veículo: se a diferença for de até 90°, vale. O
-sentido vem das fontes oficiais que o informam ("crescente/decrescente" do km na ANTT e no
-DER-GO, Norte/Sul/Leste/Oeste na Artesp, faixas por sentido no DER-SP, centro/bairro na CET de
-São Paulo), convertido em rumo
-pela geometria da rodovia (SNV do DNIT, malha estadual da Goinfra e OpenStreetMap). A tag
-`direction` dos radares do OpenStreetMap não é usada: medida contra as fontes oficiais, ela
-aponta o sentido contrário na maioria das rodovias (muitos mapeadores marcam para onde a câmera
-olha). Vazio quer dizer os dois sentidos ou sentido não informado.
+fiscalizado, em graus (0 = norte, 90 = leste, 180 = sul, 270 = oeste). Compare com o rumo do
+veículo: num app de alerta, ignore o radar só se a diferença passar de 60° (com GPS preciso e em
+movimento). Vazio quer dizer os dois sentidos **ou** sentido desconhecido, sem como separar: avise
+nos dois. De onde vem o sentido, e por que o gerador usa 90° e o app 60°: "Sentido do radar", na
+seção Formato.
 
 **Como sei se um radar ainda funciona?** A coluna `active` usa a situação informada pela
 ANTT e pelos DERs, nas rodovias federais a validade da aferição no Inmetro e, na cidade de São
@@ -374,7 +410,8 @@ antiga não se refaz: para ter o dado de uma data, guarde a release dela.
 sections, red-light cameras, with the enforced direction as a compass bearing) and **road speed limits**, with coordinates, as CSV, GeoJSON,
 KML and GPX, for the whole country (`brasil/`) and per state (`estados/<UF>/`). It merges
 official Brazilian open data (DNIT, ANTT, Inmetro, state road agencies, city halls) with
-OpenStreetMap. Data licensed under the ODbL 1.0; the generator code (`gerador/`, Python) under
+OpenStreetMap. Coordinates are WGS84; mind the order: CSV columns are `lat,lng`, GeoJSON is
+`[lng, lat]` and WKT is `lng lat`. Data licensed under the ODbL 1.0; the generator code (`gerador/`, Python) under
 MIT. Not an official source; road signs always prevail.
 
 <sub>Palavras-chave: radares Brasil, lista de radares, localização de radares, base de
