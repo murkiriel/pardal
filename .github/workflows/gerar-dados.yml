@@ -102,10 +102,19 @@ jobs:
             echo "disparado à mão: gera"; echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           today=$(date -u +%F)
-          # execuções deste workflow que terminaram bem hoje (fora esta); sem resposta da API, gera
-          n=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gerar-dados.yml --status success \
-                --created ">=$today" --limit 20 --json databaseId \
-                --jq "[.[] | select(.databaseId != $RUN_ID)] | length" 2>/dev/null || echo 0)
+          # Conta só as execuções AGENDADAS de hoje (fora esta) em que a geração rodou e terminou bem. Uma
+          # execução à mão (às vezes só de teste, sem publicar) ou uma agendada que pulou a geração não conta:
+          # em 2026-11-11 um teste à mão sem publicar fez a agendada da tarde pular, e o dia ficou sem dados.
+          # Sem resposta da API, gera.
+          n=0
+          ids=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow gerar-dados.yml --event schedule --status success \
+                  --created ">=$today" --limit 20 --json databaseId \
+                  --jq ".[] | select(.databaseId != $RUN_ID) | .databaseId" 2>/dev/null || true)
+          for id in $ids; do
+            gen=$(gh run view "$id" --repo "$GITHUB_REPOSITORY" --json jobs \
+                    --jq '[.jobs[] | select(.name == "generate") | .conclusion] | first // ""' 2>/dev/null || true)
+            if [ "$gen" = "success" ]; then n=$((n + 1)); fi
+          done
           if [ "${n:-0}" -gt 0 ]; then
             echo "run=false" >> "$GITHUB_OUTPUT"; echo "já houve uma geração bem-sucedida hoje ($today)"
           else

@@ -623,6 +623,30 @@ class ForkSchedule(unittest.TestCase):
         self.assertEqual(guard, ["if: github.event_name != 'schedule' || github.repository == 'murkiriel/pardal'"])
 
 
+class DailyIntervalCountsOnlyScheduledGenerations(unittest.TestCase):
+    """O segundo horário do dia só pula se uma execução AGENDADA de hoje já gerou de fato. Em 2026-11-11 um
+    teste à mão (sem publicar) terminou bem, a agendada da tarde contou esse teste como "já gerou hoje" e o
+    dia ficou sem dados publicados."""
+
+    def _interval_job(self):
+        path = os.path.join(os.path.dirname(__file__), "..", "..", "..", ".github", "workflows", "gerar-dados.yml")
+        with open(path, encoding="utf-8") as f:
+            text = f.read()
+        return text.split("\n  interval:\n", 1)[1].split("\n  generate:\n", 1)[0]
+
+    def test_only_scheduled_runs_are_listed(self):
+        job = self._interval_job()
+        listing = [ln for ln in job.splitlines() if "gh run list" in ln]
+        self.assertEqual(len(listing), 1, listing)
+        self.assertIn("--event schedule", listing[0])
+        self.assertIn("--status success", listing[0])
+
+    def test_a_run_counts_only_if_its_generate_job_succeeded(self):
+        job = self._interval_job()
+        self.assertIn('select(.name == "generate") | .conclusion', job)
+        self.assertIn('if [ "$gen" = "success" ]; then n=$((n + 1)); fi', job)
+
+
 class TunnelStepNeverFailsTheJob(unittest.TestCase):
     """O passo do túnel roda com bash -e: qualquer comando que falhe fora de um `|| down` derruba a geração
     inteira, quando a intenção é seguir sem o túnel (as fontes de TUNNEL_HOSTS caem nas cópias guardadas).
