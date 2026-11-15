@@ -7,7 +7,7 @@
 <wpt lat="-7.499483" lon="-34.985087"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-7.499378" lon="-34.984974"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-7.485109" lon="-34.981056"><name>Radar 100 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-7.455729" lon="-34.981179"><name>Radar 100 km/h</name><desc>Fonte: DNIT · sentido 191° (sul)</desc><type>FIXED</type></wpt>
+<wpt lat="-7.455729" lon="-34.981179"><name>Radar</name><desc>Fonte: DNIT · sentido 191° (sul)</desc><type>FIXED</type></wpt>
 <wpt lat="-7.439334" lon="-34.977218"><name>Radar 100 km/h</name><desc>Fonte: DNIT · sentido 13° (norte)</desc><type>FIXED</type></wpt>
 <wpt lat="-7.438894" lon="-34.977202"><name>Radar 100 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-7.410996" lon="-34.955521"><name>Radar 100 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -226,8 +226,11 @@
 <wpt lat="-6.907015" lon="-37.584341"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-6.905396" lon="-37.530572"><name>Radar 50 km/h</name><desc>Fonte: DNIT+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-6.904993" lon="-37.515927"><name>Radar 50 km/h</name><desc>Fonte: DNIT+OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-6.902370" lon="-38.565171"><name>Radar 50 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-6.902370" lon="-38.565171"><name>Radar 50 km/h</name><desc>Fonte: DNIT+OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-6.902331" lon="-38.565995"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-6.901416" lon="-38.559135"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-6.901211" lon="-38.558674"><name>Radar 50 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
+<wpt lat="-6.899159" lon="-38.548310"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-6.899027" lon="-38.548022"><name>Radar 50 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-6.894217" lon="-38.540369"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-6.893963" lon="-38.541111"><name>Radar 50 km/h</name><desc>Fonte: DNIT · sentido 274° (oeste)</desc><type>FIXED</type></wpt>

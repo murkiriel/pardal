@@ -159,14 +159,10 @@
 <wpt lat="-10.807461" lon="-37.556549"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.807389" lon="-37.140258"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.805755" lon="-37.181808"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
-<wpt lat="-10.802525" lon="-37.267780"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
-<wpt lat="-10.801922" lon="-37.268660"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.781369" lon="-37.141237"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.779813" lon="-37.139956"><name>Radar 40 km/h</name><desc>Fonte: DNIT · sentido 44° (nordeste)</desc><type>FIXED</type></wpt>
 <wpt lat="-10.772202" lon="-37.148714"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.765300" lon="-37.159340"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
-<wpt lat="-10.764504" lon="-37.322252"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
-<wpt lat="-10.761690" lon="-37.388349"><name>Radar 40 km/h</name><desc>Fonte: DNIT+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.760320" lon="-37.852390"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.752161" lon="-37.791062"><name>Radar 40 km/h</name><desc>Fonte: DER-SE+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.745006" lon="-37.502908"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
@@ -180,7 +176,6 @@
 <wpt lat="-10.701475" lon="-37.444184"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.697449" lon="-37.256286"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.688281" lon="-37.792500"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
-<wpt lat="-10.683809" lon="-37.440799"><name>Radar 40 km/h</name><desc>Fonte: DNIT+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-10.668400" lon="-37.311500"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.660592" lon="-36.894233"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.648598" lon="-36.905884"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
@@ -212,7 +207,6 @@
 <wpt lat="-10.371476" lon="-37.248651"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.360977" lon="-36.752347"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.360091" lon="-37.255687"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
-<wpt lat="-10.358370" lon="-37.699196"><name>Radar 60 km/h</name><desc>Fonte: DNIT</desc><type>FIXED</type></wpt>
 <wpt lat="-10.295263" lon="-37.032193"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.275514" lon="-37.115852"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>
 <wpt lat="-10.270556" lon="-37.301389"><name>Radar 50 km/h</name><desc>Fonte: DER-SE</desc><type>FIXED</type></wpt>

@@ -213,7 +213,7 @@
 <Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.390587,-25.575830,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.857539,-25.575074,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: ANTT · sentido 191° (sul)</description><Point><coordinates>-49.311944,-25.574639,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.311762,-25.574241,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.311769,-25.574238,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: OSM</description><Point><coordinates>-48.830698,-25.573859,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT · sentido 112° (leste)</description><Point><coordinates>-48.831300,-25.573700,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-49.171886,-25.571798,0</coordinates></Point></Placemark>
@@ -416,7 +416,7 @@
 <Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA</description><Point><coordinates>-49.319310,-25.486560,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 70 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.267088,-25.485942,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: CURITIBA</description><Point><coordinates>-49.292380,-25.485900,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.267761,-25.485402,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.267767,-25.485409,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 70 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.267515,-25.485373,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA+INMETRO+OSM</description><Point><coordinates>-49.246950,-25.484750,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 70 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.265940,-25.484488,0</coordinates></Point></Placemark>
@@ -596,7 +596,7 @@
 <Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA</description><Point><coordinates>-49.288890,-25.442690,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA</description><Point><coordinates>-49.275900,-25.442670,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 80 km/h</name><description>Fonte: ANTT · sentido 298° (noroeste)</description><Point><coordinates>-49.745526,-25.442485,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA+INMETRO+OSM</description><Point><coordinates>-49.282870,-25.442340,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA+OSM</description><Point><coordinates>-49.282870,-25.442340,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA</description><Point><coordinates>-49.282910,-25.442220,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA+OSM</description><Point><coordinates>-49.283080,-25.442180,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA+OSM</description><Point><coordinates>-49.307420,-25.442070,0</coordinates></Point></Placemark>
@@ -726,7 +726,7 @@
 <Placemark><name>Radar 40 km/h</name><description>Fonte: CURITIBA+INMETRO</description><Point><coordinates>-49.263370,-25.428720,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: CURITIBA+OSM</description><Point><coordinates>-49.263240,-25.428680,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: CURITIBA</description><Point><coordinates>-49.263190,-25.428540,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA+INMETRO+OSM</description><Point><coordinates>-49.284660,-25.428290,0</coordinates></Point></Placemark>
+<Placemark><name>Radar 50 km/h</name><description>Fonte: CURITIBA+OSM</description><Point><coordinates>-49.284660,-25.428290,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: CURITIBA+OSM</description><Point><coordinates>-49.284780,-25.428270,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-49.262001,-25.427790,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: CURITIBA+INMETRO+OSM</description><Point><coordinates>-49.262090,-25.427420,0</coordinates></Point></Placemark>
@@ -1407,7 +1407,6 @@
 <Placemark><name>Radar 60 km/h</name><description>Fonte: DNIT+ANTT · sentido 90° (leste)</description><Point><coordinates>-51.309259,-23.295155,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 70 km/h</name><description>Fonte: DNIT+ANTT+OSM · sentido 230° (sudoeste)</description><Point><coordinates>-51.269927,-23.294536,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 70 km/h</name><description>Fonte: OSM</description><Point><coordinates>-51.212310,-23.293738,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-51.277501,-23.293598,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 70 km/h</name><description>Fonte: OSM</description><Point><coordinates>-51.118369,-23.293194,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 70 km/h</name><description>Fonte: OSM</description><Point><coordinates>-51.117922,-23.293164,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 40 km/h</name><description>Fonte: OSM</description><Point><coordinates>-51.161529,-23.293064,0</coordinates></Point></Placemark>
@@ -1428,7 +1427,6 @@
 <Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-51.173065,-23.285083,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: OSM</description><Point><coordinates>-51.138737,-23.282641,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 70 km/h</name><description>Fonte: OSM</description><Point><coordinates>-51.251507,-23.282418,0</coordinates></Point></Placemark>
-<Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-51.262025,-23.281597,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 50 km/h</name><description>Fonte: INMETRO+OSM</description><Point><coordinates>-51.155966,-23.279787,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: OSM</description><Point><coordinates>-51.172653,-23.279283,0</coordinates></Point></Placemark>
 <Placemark><name>Radar 60 km/h</name><description>Fonte: INMETRO</description><Point><coordinates>-51.269085,-23.278449,0</coordinates></Point></Placemark>
