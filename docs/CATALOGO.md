@@ -219,6 +219,21 @@ igual nos quatro repositórios.
 - **Arquivos:** `base` (o nível 0 do Valhalla, só rodovias principais) e um `uf` por estado (níveis 1 e 2). `format`
   `valhalla-tiles`, `media_type` `application/zstd`, `unpack` `["zstd", "tar"]`; `bytes_unpacked` é a soma dos
   tiles.
+- **Municípios e pesos da moto:** nas gerações que os têm, um arquivo `auxiliary` por estado, `id`
+  `municipios-<UF>`, `region` a UF e `bbox` o dela, `coverage_level` `null`, sem `requires`: `format` `geojson`,
+  `media_type` `application/zstd`, `unpack` `["zstd"]` (sem tar); `bytes_unpacked` é o tamanho do GeoJSON. Traz o
+  contorno de cada município da UF (malha municipal do IBGE; GeoJSON, longitude primeiro) e, nas propriedades, o peso
+  do costing `motorcycle` (`use_highways`, `use_trails`) para a viagem que começa e termina naquele município, com a
+  geração dos tiles, a versão do Valhalla e o dia em que o peso foi calculado; município sem peso traz `null`. Fica
+  fora do pacote do estado, que só tem tiles. Chaves próprias do arquivo: `content` (`municipalities`),
+  `format_version` (1), `municipalities` (quantos são) e `weights`: `count` (quantos têm peso), `costing`,
+  `use_tolls`, `generations` (com que tiles os pesos do estado foram calculados: `tiles_build_id`,
+  `valhalla_version`, `date`, `count`) e `same_generation` (`true` só se todos são dos tiles deste `build_id`). Os
+  pesos não são refeitos a cada geração: o leitor decide se aceita os de uma geração anterior. Nas gerações que o
+  têm, o arquivo leva também o peso do estado, para a viagem com todos os pontos no mesmo estado, em municípios
+  diferentes: no cabeçalho do GeoJSON (`andorinha.state_weights`) e na chave própria `state_weights` do arquivo no
+  catálogo (`costing`, `use_tolls`, `use_highways`, `use_trails`, `tiles_build_id`, `valhalla_version`, `date` e
+  `same_generation`). O catálogo antigo descreve os mesmos arquivos na chave de topo `municipalities`.
 - **`requires`:** cada estado pede `base`.
 - **`mix_generations`:** `false`: nunca juntar `build_id` diferentes na pasta ativa.
 - **`compatibility.andorinha`:** `engine` `valhalla`, `valhalla_engine_version` (3.9.1), `valhalla_commit` (SHA
@@ -228,7 +243,9 @@ igual nos quatro repositórios.
   `required_config` (igual à chave `required_config` do topo, que continua valendo). Todos vêm de
   `gerador/andorinha/config.py`; um leitor recusa a geração se `tile_format_version` não for a do motor dele.
 - **`sources`:** o extrato do OpenStreetMap (`md5`), a cópia da malha das UFs do IBGE (`sha256`) e o zip de fusos do
-  timezone-boundary-builder (`sha256`).
+  timezone-boundary-builder (`sha256`); com os arquivos dos municípios, também a cópia da malha municipal do IBGE
+  (`ibge-malha-municipios`, sha256 do conteúdo descompactado) e as tabelas de pesos (`pesos-moto-municipios` e
+  `pesos-moto-estados`).
 
 <a id="sabia"></a>
 
@@ -287,3 +304,5 @@ igual nos quatro repositórios.
 | Versão | Data | O que mudou |
 |---|---|---|
 | 1 | 2026-11-11 | Primeira versão. |
+| 1 | 2026-11-14 | Andorinha: arquivos `auxiliary` por estado com os contornos dos municípios e os pesos da moto. Só acrescenta; a versão não muda. |
+| 1 | 2026-11-14 | Andorinha: o peso da moto por estado (`state_weights`) nos arquivos `auxiliary`. Só acrescenta; a versão não muda. |

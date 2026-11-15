@@ -19,7 +19,7 @@ SPEC_FILE = "CATALOGO.md"
 # O sha256 dos dois documentos, iguais nos quatro repositórios. Mudou um? Mude igual nos quatro e troque o hash aqui,
 # neste arquivo, que também é o mesmo nos quatro.
 SHARED_DOCS = {
-    SPEC_FILE: "37be72efc93617f407ef241925d48f23eadcd5e4eb33ed82c102b5783b2fe4b4",
+    SPEC_FILE: "ccecbc0f8f76a504b09af82022822ae2d34693c3d65d8e2f5c1c53b659a05349",
     SCHEMA_FILE: "c227cc7bc066bcc57940e90e38685fee8ba64f2344c115e939a3b80d0c3678a2",
 }
 
