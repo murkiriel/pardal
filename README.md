@@ -284,7 +284,7 @@ id e limitações em [`docs/FORMATO_SQLITE.md`](docs/FORMATO_SQLITE.md).
 **Catálogo (`catalogo.json`, `schema` 2):** `built_at` (a geração, em UTC), `source_dates` (a data do dado de cada
 fonte), `ufs_geojson` (o contorno dos estados) e `ufs`, com uma entrada por UF e uma `BR` (o Brasil inteiro). Cada
 entrada traz `name`, `bbox`, `built_at`, `coverage` (`level`: de que esfera vêm os radares, `federal`, `state` e
-`municipal`, juntos com `+`; `sources`: as fontes), `counts` e, para cada arquivo, `file`, `bytes`, `sha256` e
+`municipal`, juntos com `+`; `sources`: as fontes que entraram no pacote da UF, **inclusive as de órgão de um estado vizinho cujo radar está colado na divisa**, como o `SEINFRA-BA` em PE: o `level` só conta o órgão da própria UF, o `sources` não filtra por UF), `counts` e, para cada arquivo, `file`, `bytes`, `sha256` e
 `count`; os que só existem na release (`limit_lines`, `sqlite`) trazem `release_asset` no lugar de `file`. O `bbox` é
 `[lat_min, lon_min, lat_max, lon_max]`, **latitude primeiro**, no WGS84, ao contrário do GeoJSON. É um retângulo
 aproximado da UF: difere em até 0,07° do retângulo da malha do IBGE e deixa de fora as ilhas oceânicas de PE e do

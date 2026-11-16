@@ -594,6 +594,15 @@ O campo `coverage.level` do catálogo contava esses radares: SC, PR e MG saíam 
 estadual por causa de um radar do DER-SP cada, e o DF saía só como "federal" porque o Detran-DF
 não era contado. Agora o nível só conta órgão da própria UF, e o Detran-DF conta como estadual.
 
+`coverage.sources` não segue a regra do nível: lista toda fonte que tem pelo menos um radar no pacote da UF,
+da própria UF ou de fora. Conferido em 16/11/2026 no catálogo publicado de 08/11/2026: o `SEINFRA-BA` consta em PE
+porque 1 radar dele (FIXED, 50 km/h, -9,40037 -40,52278, na margem pernambucana do São Francisco, em frente a
+Juazeiro) cai dentro do polígono de PE, a 1,7 km do de BA (menos que os 5 km de `_drop_far_from_home`, então
+não é descartado como coordenada errada). Os outros 77 do SEINFRA-BA estão em BA (74 sozinhos e 3 juntados ao OSM), e
+os 78 da fonte fecham sem repetição. Não é defeito do montador do `coverage`: nada atribui fonte por bbox, ele só
+lê a coluna `source` do `radares.csv` da UF. Quem consome o `coverage.sources` para decidir "que fontes valem para
+este estado" deve ler como "fontes presentes no pacote" e usar o `level` para a esfera de cobertura própria da UF.
+
 ### Endereços do Inmetro geocodificados pelo CNEFE do IBGE (2026-10-01)
 
 O CNEFE do Censo 2022 (`ftp.ibge.gov.br/Cadastro_Nacional_de_Enderecos_para_Fins_Estatisticos/
