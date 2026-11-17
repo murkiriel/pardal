@@ -329,6 +329,18 @@ A rede semafórica (artigo 1386) é só a lista dos semáforos do DER, sem dizer
 local; 10 no 1383) viram um só. Dúvida em aberto: se o "misto" também autua avanço de sinal, o tipo certo
 seria `RED_LIGHT`; sem isso documentado, fica o fixo.
 
+### Rio — a lista da CET-Rio não chegava ao Actions (2026-11-17)
+
+Nas gerações do Actions (máquinas nos EUA) a fonte RIO falhava com "lista de radares do Rio não encontrada" e
+usava a edição publicada (dado de 06/10): `cetrio.prefeitura.rio` respondia sem o link da listagem. De
+uma conexão brasileira a página traz o PDF de 23/10/2026, então o host entrou em `TUNNEL_HOSTS` (túnel com saída
+no Brasil; o geocodificador e os trechos de rua, em `pgeo3.rio.rj.gov.br`, já funcionam do Actions: a geração
+de 17/11 leu 208.988 pontos de limite do Rio). O erro agora diz o que veio no lugar da página (status, endereço
+final, tamanho, título e o começo do texto). Leitura de 17/11 pela rede brasileira: 36 páginas, 1.064 itens
+(581 velocidade, 483 avanço de sinal), 798 com número de porta (457 consultas distintas), 637 localizados pelo
+geocodificador da prefeitura (374 pontos distintos). Contra os 344 radares RIO publicados (`estados/RJ/radares.csv`,
+lista de 06/10): 343 ficam a ≤ 50 m de um ponto da leitura nova, 28 pontos novos (> 200 m), 1 publicado some.
+
 ### Pontos de atenção do OSM (2026-11-08)
 
 Ideia tirada dos apps de alerta Super Tripper (Pod e Dash), que além dos radares avisam de perigos na via e de pontos de

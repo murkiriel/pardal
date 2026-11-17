@@ -108,6 +108,11 @@ def get_bytes(url: str, headers: Optional[dict] = None, timeout: float = HTTP_TI
     return guarded(url, lambda: _get(url, headers, None, timeout).content)
 
 
+def get_response(url: str, headers: Optional[dict] = None, timeout: float = HTTP_TIMEOUT) -> requests.Response:
+    """A resposta inteira (status, endereço final, texto), para a fonte que precisa descrever o que recebeu."""
+    return guarded(url, lambda: _get(url, headers, None, timeout))
+
+
 def get_text(url: str, headers: Optional[dict] = None, timeout: float = HTTP_TIMEOUT) -> str:
     return guarded(url, lambda: _get(url, headers, None, timeout).text)
 

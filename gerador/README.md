@@ -191,7 +191,7 @@ Aviso de falha: uma geração agendada que falha abre a issue "Geração falhand
 comenta nela, se já estiver aberta), com a data e o link da execução; a primeira que passar comenta
 e fecha a issue (job `notify`, `scripts/routine.py notify`). Disparos à mão não mexem nela.
 
-As máquinas do Actions ficam nos EUA, e o DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO e o DER-SE não aceitam conexão de fora do Brasil
+As máquinas do Actions ficam nos EUA, e o DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO, o DER-SE e a lista de radares do Rio (CET-Rio) não aceitam conexão de fora do Brasil
 (o portal da ANTT às vezes devolve uma página de bloqueio): o tráfego para esses servidores (`TUNNEL_HOSTS`),
 e só para eles, sai por um túnel WireGuard com saída no Brasil. A configuração do túnel fica no
 segredo `MULLVAD_WG_CONF` do repositório (Settings → Secrets and variables → Actions). Se o segredo

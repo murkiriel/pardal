@@ -30,7 +30,7 @@ name: Gerar dados
 # mão, só publica se "publish" for marcado; sem isso, gera e confere (o log e a auditoria ficam
 # nos artefatos).
 #
-# O DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO e o DER-SE não aceitam conexão de fora do
+# O DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO, o DER-SE e a lista de radares da CET-Rio não aceitam conexão de fora do
 # Brasil, e o portal de dados da ANTT às vezes devolve uma página de bloqueio em vez dos dados; as
 # máquinas do Actions ficam nos EUA. O tráfego para esses servidores (e só para eles; lista em
 # TUNNEL_HOSTS) sai por um túnel WireGuard com saída no Brasil,
@@ -132,10 +132,13 @@ jobs:
       ACCEPT_FAILURES: ${{ inputs.accept_failures == true }}
       ACCEPT_DROP: ${{ inputs.accept_drop == true }}
       # servidores que não aceitam conexão de fora do Brasil (medido no Actions em 2026-11-08: IBGE, AGETO-TO
-      # e DER-SE davam ConnectTimeout); am.i.mullvad.net só confere a saída do túnel
+      # e DER-SE davam ConnectTimeout); cetrio.prefeitura.rio (lista de radares do Rio) responde 200 daqui
+      # mas, das máquinas dos EUA, sem o link da listagem (RIO: "lista de radares do Rio não encontrada" nas
+      # gerações desde 2026-11-12, talvez desde 06/10; achado em 2026-11-17); am.i.mullvad.net só confere a saída
+      # do túnel
       TUNNEL_HOSTS: >-
         servicos.dnit.gov.br servicos.rbmlq.gov.br dados.antt.gov.br servicodados.ibge.gov.br
-        www.to.gov.br der.se.gov.br am.i.mullvad.net
+        www.to.gov.br der.se.gov.br cetrio.prefeitura.rio am.i.mullvad.net
       PYTHONUNBUFFERED: "1"
     steps:
       - name: Código e dados publicados
@@ -174,7 +177,7 @@ jobs:
           sudo mkswap /mnt/swap-pardal >/dev/null && sudo swapon /mnt/swap-pardal
           free -h
 
-      - name: Túnel para os servidores que só aceitam o Brasil (DNIT, Inmetro, ANTT, IBGE, AGETO-TO, DER-SE)
+      - name: Túnel para os servidores que só aceitam o Brasil (DNIT, Inmetro, ANTT, IBGE, AGETO-TO, DER-SE, CET-Rio)
         env:
           WG_CONF: ${{ secrets.MULLVAD_WG_CONF }}
         run: |

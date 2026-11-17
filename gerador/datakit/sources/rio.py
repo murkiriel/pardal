@@ -18,13 +18,14 @@ from __future__ import annotations
 import functools
 import io
 import re
+from html import unescape
 from typing import Callable, Iterable, List, Optional, Tuple
 
 from datakit import limit_lines
 from datakit.context import SourceData, BuildContext
 from datakit.common.geo import rdp, sample_polyline
 from datakit.common.model import Camera, CameraKind, Limit
-from datakit.sources._http import get_bytes, get_json, get_text
+from datakit.sources._http import get_bytes, get_json, get_response
 
 SEGMENTS_URL = ("https://pgeo3.rio.rj.gov.br/arcgis/rest/services/CadLog/"
                 "Trechos_Logradouros/MapServer/0/query")
@@ -206,12 +207,29 @@ def locate(items: List[Tuple[str, CameraKind, Optional[int]]],
     return out, error
 
 
-def _latest_pdf_url() -> str:
-    html = get_text(LIST_PAGE, timeout=60)
+def describe_page(status: int, url: str, html: str) -> str:
+    """O que veio no lugar da página da lista, para o erro dizer a que servidor/bloqueio se parece: status, endereço
+    final, tamanho, título e o começo do texto visível. Puro, testado."""
+    title = re.search(r"<title[^>]*>(.*?)</title>", html, re.S | re.I)
+    text = re.sub(r"<(script|style|head)\b.*?</\1>|<[^>]+>", " ", html, flags=re.S | re.I)
+    shown = re.sub(r"\s+", " ", unescape(text)).strip()[:50]
+    name = re.sub(r"\s+", " ", unescape(title.group(1))).strip()[:50] if title else "sem título"
+    return f"HTTP {status}, {len(html)} bytes, {url[:80]}, título «{name}», texto «{shown}»"
+
+
+def pdf_url(html: str) -> Optional[str]:
+    """Endereço da listagem mais nova (a de data maior no nome) na página, ou None. Puro, testado."""
     urls = re.findall(r"https?://[^\"'<> ]+ListagemSMTR\.pdf", html)
-    if not urls:
-        raise RuntimeError("lista de radares do Rio não encontrada")
-    return max(urls)
+    return max(urls) if urls else None
+
+
+def _latest_pdf_url() -> str:
+    page = get_response(LIST_PAGE, timeout=60)
+    url = pdf_url(page.text)
+    if url is None:
+        raise RuntimeError("lista de radares do Rio não encontrada; recebido: "
+                           + describe_page(page.status_code, page.url, page.text))
+    return url
 
 
 def load_cameras(raw_dir: str = "data/raw", cnefe_backup: bool = True) -> List[Camera]:

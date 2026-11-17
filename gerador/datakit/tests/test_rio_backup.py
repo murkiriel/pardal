@@ -58,6 +58,56 @@ class Locate(unittest.TestCase):
             rio.locate(ITEMS, city, backup)
 
 
+class ListPage(unittest.TestCase):
+    PAGE = ('<html><head><title>Fiscaliza&#231;&#227;o Eletr&#244;nica &#8211; CET-Rio</title></head><body>'
+            '<a href="https://cetrio.prefeitura.rio/wp-content/uploads/sites/36/2026/09/2026-09-01-ListagemSMTR.pdf">a</a>'
+            '<a href="https://cetrio.prefeitura.rio/wp-content/uploads/sites/36/2026/10/2026-10-23-ListagemSMTR.pdf">b</a>'
+            '</body></html>')
+
+    def test_pdf_url_is_the_newest_listing(self):
+        self.assertEqual("https://cetrio.prefeitura.rio/wp-content/uploads/sites/36/2026/10/2026-10-23-ListagemSMTR.pdf",
+                         rio.pdf_url(self.PAGE))
+        self.assertIsNone(rio.pdf_url("<html><title>x</title></html>"))
+
+    def test_describe_page_says_status_size_title_and_start_of_the_text(self):
+        html = ("<html><head><title>Just a moment...</title><script>var a = 1;</script></head>"
+                "<body><h1>Verificando se voc&#234; &eacute; humano</h1><p>Aguarde</p></body></html>")
+        got = rio.describe_page(403, "https://cetrio.prefeitura.rio/fiscalizacao-eletronica/", html)
+        self.assertIn("HTTP 403", got)
+        self.assertIn(f"{len(html)} bytes", got)
+        self.assertIn("https://cetrio.prefeitura.rio/fiscalizacao-eletronica/", got)
+        self.assertIn("«Just a moment...»", got)
+        self.assertIn("Verificando se você é humano Aguarde", got)
+        self.assertNotIn("var a", got)
+
+    def test_describe_page_without_title_and_with_a_huge_title_stays_short(self):
+        self.assertIn("sem título", rio.describe_page(200, "https://x/", ""))
+        long = rio.describe_page(200, "https://x/" + "a" * 200, f"<title>{'t' * 500}</title>" + "p" * 500)
+        self.assertLess(len(f"RIO: RuntimeError: lista de radares do Rio não encontrada; recebido: {long}"), 300)
+
+    def test_error_without_the_link_describes_the_page_received(self):
+        class Page:
+            status_code = 200
+            url = rio.LIST_PAGE
+            text = "<html><head><title>Manutenção</title></head><body>Voltamos já</body></html>"
+        with mock.patch.object(rio, "get_response", return_value=Page()):
+            with self.assertRaises(RuntimeError) as ctx:
+                rio._latest_pdf_url()
+        msg = str(ctx.exception)
+        self.assertIn("lista de radares do Rio não encontrada", msg)
+        self.assertIn("HTTP 200", msg)
+        self.assertIn("«Manutenção»", msg)
+        self.assertIn("Voltamos já", msg)
+
+    def test_page_with_the_link_gives_the_url(self):
+        class Page:
+            status_code = 200
+            url = rio.LIST_PAGE
+            text = ListPage.PAGE
+        with mock.patch.object(rio, "get_response", return_value=Page()):
+            self.assertTrue(rio._latest_pdf_url().endswith("2026-10-23-ListagemSMTR.pdf"))
+
+
 class FetchUsesCnefeOnlyWithoutCopy(unittest.TestCase):
     def _fetch(self, raw):
         with mock.patch.object(rio, "load", return_value=([], [])) as load:
