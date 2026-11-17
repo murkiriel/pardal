@@ -1,6 +1,6 @@
 """Testes puros das fontes de 2026-11-08 (AGETO-TO, Detran-MA, DER-SE, SEINFRA-BA, Transalvador,
-SEMTRAN Porto Velho) e da reserva da CET pelo CSV do GitHub. Os textos são trechos das
-publicações reais (o dos PDFs, como o pypdf os extrai).
+SEMTRAN Porto Velho), da de 2026-11-17 (Mogi das Cruzes) e da reserva da CET pelo CSV do GitHub. Os
+textos são trechos das publicações reais (o dos PDFs, como o pypdf os extrai).
 
     python -m unittest discover -s datakit/tests -t .
 """
@@ -12,7 +12,7 @@ from datetime import date
 from unittest import mock
 
 from datakit.common import CameraKind
-from datakit.sources import ageto_to, cet_sp, der_se, detran_ma, seinfra_ba, semtran_pvh, transalvador
+from datakit.sources import ageto_to, cet_sp, der_se, detran_ma, mogi_sp, seinfra_ba, semtran_pvh, transalvador
 
 
 def _rows(cams):
@@ -193,6 +193,70 @@ class SemtranPvh(unittest.TestCase):
         self.assertEqual(semtran_pvh.pdf_url(page), f"{base}Planilha%20Radares%20SEMTRAN%20-%20Atualizada%20%202026.2.pdf")
 
 
+class MogiSp(unittest.TestCase):
+    # como a prefeitura publica: Latin-1, ";", CRLF, `justificativa` entre aspas com quebra de linha
+    HEADER = "id_radar;logradouro2;numero;Logradouro;subtipo;latitude;longitude;Localizacao;Sentido;Faixas;Velocidade;Status;justificativa"
+    ROWS = (
+        '84;Av. Dr. Álvaro de Campos Carneiro;443 + 500m;"Av. Dr. Álvaro de Campos Carneiro, 443 + 500m";'
+        'REDUTOR DE VELOCIDADE;-23.560408;-46.191597;"-23.560408, -46.191597";Centro-Bairro;2;60;Em operação;'
+        '"A decisão de implantar um redutor\nfoi técnica; a consideração de pedestres, crianças e idosos.\n"\n'
+        '65;Av. Dr. Álvaro de Campos Carneiro;1155;"Av. Dr. Álvaro de Campos Carneiro, 1155";FIXO;-23.555434;-46.196599;'
+        '"-23.555434, -46.196599";Bairro-Centro;2;50;Em operação;\n'
+        '83;Rua Dr. Ricardo Vilela;;"Rua Dr. Ricardo Vilela X Rua Dom Antônio Candido Alvarenga,";AVANÇO DE SINAL;-23.52042;-46.18594;'
+        '"-23.52042, -46.18594";Bairro-Centro;4;;Em operação;\n'
+        '86;Av. João XXIII;;"Av. João XXIII x Av. Júlio Perotti,";AVANÇO DE SINAL;-23.515637;-46.169386;'
+        '"-23.515637, -46.169386";Bairro-Centro e Centro-Bairro;4;;Inativo;\n'
+        '89;Av. Kaoru Hiramatsu;2390;"Av. Kaoru Hiramatsu, 2390";REDUTOR DE VELOCIDADE;-23.57395;-46.216021;'
+        '"-23.57395, -46.216021";Centro-Bairro;2;40;Inativo;\n'
+        '90;Av. Sem Coordenada;;"Av. Sem Coordenada";FIXO;;;"-23.55, -46.2";Centro-Bairro;2;;Em operação;\n'
+        '91;Av. Repetida;;"Av. Repetida";FIXO;-23.555434;-46.196599;"";Centro-Bairro;2;50;Inativo;\n'
+        '92;Av. Outra Cidade;;"Av. Outra Cidade";FIXO;-23.5505;-46.6333;"";Centro-Bairro;2;60;Em operação;\n'
+        '93;Av. Faixa;;"Av. Faixa";FAIXA EXCLUSIVA;-23.54;-46.2;"";Centro-Bairro;2;;Em operação;\n'
+        '94;Av. Lenta;;"Av. Lenta";FIXO;-23.53;-46.19;"";Centro-Bairro;2;200;Em operação;\n'
+    )
+    TEXT = (HEADER + "\n" + ROWS).replace("\n", "\r\n")
+
+    def test_kinds_limits_and_status(self):
+        """FIXO e REDUTOR -> FIXED com a velocidade; AVANÇO DE SINAL -> RED_LIGHT sem limite; Inativo -> inativo;
+        coordenada só na coluna Localizacao vale; ponto repetido vira um (o ativo vence); subtipo que não é radar,
+        ponto fora de Mogi das Cruzes e limite absurdo (200) ficam de fora ou sem limite."""
+        got = mogi_sp.parse(self.TEXT)
+        self.assertEqual(_rows(got), [
+            (-23.560408, -46.191597, CameraKind.FIXED, 60, "MOGI-SP", True),
+            (-23.555434, -46.196599, CameraKind.FIXED, 50, "MOGI-SP", True),
+            (-23.52042, -46.18594, CameraKind.RED_LIGHT, None, "MOGI-SP", True),
+            (-23.515637, -46.169386, CameraKind.RED_LIGHT, None, "MOGI-SP", False),
+            (-23.57395, -46.216021, CameraKind.FIXED, 40, "MOGI-SP", False),
+            (-23.55, -46.2, CameraKind.FIXED, None, "MOGI-SP", True),
+            (-23.53, -46.19, CameraKind.FIXED, None, "MOGI-SP", True),
+        ])
+        self.assertEqual([c.direction_deg for c in got], [None] * 7)          # sentido só nominal
+        self.assertEqual(got[0].source_ref, ("MOGI-SP", "84"))
+
+    def test_bbox(self):
+        got = mogi_sp.parse(self.TEXT, bbox=(-23.565, -46.195, -23.52, -46.185))
+        self.assertEqual([(c.lat, c.lng) for c in got], [(-23.560408, -46.191597), (-23.52042, -46.18594), (-23.53, -46.19)])
+
+    def test_decode_latin1_and_utf8(self):
+        """O arquivo é Latin-1 hoje; se a prefeitura passar para UTF-8 (com ou sem BOM), lê igual."""
+        want = _rows(mogi_sp.parse(self.TEXT))
+        for raw in (self.TEXT.encode("latin-1"), self.TEXT.encode("utf-8"), b"\xef\xbb\xbf" + self.TEXT.encode("utf-8")):
+            self.assertEqual(_rows(mogi_sp.parse(mogi_sp.decode(raw))), want)
+        self.assertEqual(mogi_sp.parse(mogi_sp.decode(self.TEXT.encode("latin-1")))[2].kind, CameraKind.RED_LIGHT)
+
+    def test_unexpected_layout_reads_nothing(self):
+        self.assertEqual(mogi_sp.parse("<html>fora do ar</html>"), [])
+        self.assertEqual(mogi_sp.parse(""), [])
+
+    def test_load_without_radars_is_an_error(self):
+        with mock.patch.object(mogi_sp, "get_bytes", return_value=b"<html></html>"):
+            with self.assertRaises(RuntimeError):
+                mogi_sp.load("raw")
+        with mock.patch.object(mogi_sp, "get_bytes", return_value=self.TEXT.encode("latin-1")):
+            cams, limits = mogi_sp.load("raw")
+        self.assertEqual((len(cams), limits), (7, []))
+
+
 class CetGithubBackup(unittest.TestCase):
     CSV = ("﻿CÓDIGO LOCAL,ATIVAÇÃO,DESATIVAÇÃO,NÚMERO DE SÉRIE,DESCRIÇÃO DO LOCAL,LATITUDE,LONGITUDE,FAIXAS,"
            "TIPO,METROLÓGICO,VELOCIDADE,FISCALIZA FAIXA AZUL,CAPTURA,REDUTOR,ENQUADRAMENTO\n"
@@ -269,7 +333,7 @@ class CetGithubBackup(unittest.TestCase):
 
 class Registry(unittest.TestCase):
     NEW = {"AGETO-TO": "TO", "DETRAN-MA": "MA", "DER-SE": "SE", "SEINFRA-BA": "BA",
-           "TRANSALVADOR": "BA", "SEMTRAN-PVH": "RO"}
+           "TRANSALVADOR": "BA", "SEMTRAN-PVH": "RO", "MOGI-SP": "SP"}
 
     def test_new_sources_are_official_with_a_home_uf(self):
         from datakit.build import OFFICIAL
@@ -284,6 +348,7 @@ class Registry(unittest.TestCase):
         for sources, uf, level in ((["AGETO-TO", "OSM"], "TO", "state"), (["DETRAN-MA"], "MA", "state"),
                                    (["SEINFRA-BA", "TRANSALVADOR+OSM"], "BA", "state+municipal"),
                                    (["DER-SE"], "SE", "state"), (["SEMTRAN-PVH"], "RO", "municipal"),
+                                   (["MOGI-SP", "DER-SP"], "SP", "state+municipal"), (["MOGI-SP"], "MG", "none"),
                                    (["AGETO-TO"], "GO", "none")):
             with tempfile.NamedTemporaryFile("w", suffix=".csv", delete=False, encoding="utf-8") as f:
                 f.write("lat,lng,source\n" + "".join(f"-10,-48,{s}\n" for s in sources))

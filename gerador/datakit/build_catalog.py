@@ -30,7 +30,7 @@ from datakit.common.ufs import SOURCE_HOME_UF, uf_name
 SCHEMA = 2
 
 _FEDERAL = {"DNIT", "ANTT"}
-_MUNICIPAL = {"PMF", "PCR", "PMJP", "CET-SP", "RIO", "BHTRANS", "CURITIBA", "EPTC", "TRANSALVADOR", "SEMTRAN-PVH"}
+_MUNICIPAL = {"PMF", "PCR", "PMJP", "CET-SP", "RIO", "BHTRANS", "CURITIBA", "EPTC", "TRANSALVADOR", "SEMTRAN-PVH", "MOGI-SP"}
 # Órgãos estaduais que não se chamam DER-*.
 _STATE = {"DETRAN-DF", "AGETO-TO", "DETRAN-MA", "SEINFRA-BA"}
 

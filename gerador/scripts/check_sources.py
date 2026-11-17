@@ -24,7 +24,7 @@ import requests  # noqa: E402
 from datakit.common import ufpoly  # noqa: E402
 from datakit.sources import (  # noqa: E402
     _powerbi, ageto_to, antt, antt_placas, bh, cet_sp, cnefe, der_go, der_pe, der_se, der_sp, detran_ma,
-    df_detran, dnit, inmetro, municipal, osm_pbf, rio, seinfra_ba, semtran_pvh, snv, transalvador,
+    df_detran, dnit, inmetro, mogi_sp, municipal, osm_pbf, rio, seinfra_ba, semtran_pvh, snv, transalvador,
 )
 from datakit.sources._http import UA  # noqa: E402
 
@@ -89,6 +89,7 @@ SOURCES = [
     ("CET-SP (reserva)", "CSV da CET no GitHub (HEAD)", lambda: _req("HEAD", cet_sp.GITHUB_CSV)),
     ("Salvador (Transalvador)", "página do mapa", lambda: _req("GET", transalvador.PAGE)),
     ("Porto Velho (SEMTRAN)", "página com a planilha em PDF", lambda: _req("GET", semtran_pvh.PAGE)),
+    ("Mogi das Cruzes (Prefeitura)", "CSV da lista de radares (portal CKAN)", lambda: _req("GET", mogi_sp.CSV_URL)),
     ("CET-SP (limites)", "GeoSampa WFS", lambda: _req("GET", cet_sp.WFS, params={"service": "WFS", "request": "GetCapabilities"})),
     ("OpenStreetMap", "Geofabrik (HEAD do extrato)", lambda: _req("HEAD", f"{osm_pbf.GEOFABRIK_BASE}/norte-latest.osm.pbf")),
     ("IBGE (malha das UFs)", "API de malhas v3", lambda: _req("GET", ufpoly.MESH_URL)),

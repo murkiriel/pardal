@@ -575,12 +575,14 @@ class SourceRefs(unittest.TestCase):
     """O id da fonte nos leitores que o têm (o resto fica nulo: docs/FORMATO_SQLITE.md)."""
 
     def test_der_se_detran_ma_and_cet(self):
-        from datakit.sources import cet_sp, der_se, detran_ma
-        from datakit.tests.test_state_sources import CetGithubBackup, DerSe, DetranMa
+        from datakit.sources import cet_sp, der_se, detran_ma, mogi_sp
+        from datakit.tests.test_state_sources import CetGithubBackup, DerSe, DetranMa, MogiSp
         self.assertEqual([c.source_ref for c in der_se.parse(DerSe.CSV)][:2],
                          [("DER-SE", "SE001R"), ("DER-SE", "SE348L")])
         self.assertEqual([c.source_ref for c in detran_ma.parse(DetranMa.TEXT)],
                          [("DETRAN-MA", "MA301R"), ("DETRAN-MA", "MA349R")])
+        self.assertEqual([c.source_ref for c in mogi_sp.parse(MogiSp.TEXT)][:2],
+                         [("MOGI-SP", "84"), ("MOGI-SP", "65")])
         rows = cet_sp.csv_rows(CetGithubBackup.CSV)
         self.assertEqual([c.source_ref for c in cet_sp.rows_to_cameras(rows)], [("CET-SP", "100"), ("CET-SP", "200")])
         self.assertEqual({c.source_ref for c in cet_sp.rows_to_enforcement_cameras(rows)}, {("CET-SP:CAM", "200")})

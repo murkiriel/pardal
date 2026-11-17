@@ -68,6 +68,7 @@ SOURCE_HOME_UF: Dict[str, str] = {
     "DER-SP": "SP", "DER-GO": "GO", "DER-PE": "PE", "DER-MG": "MG", "DETRAN-DF": "DF",
     "CET-SP": "SP", "RIO": "RJ", "BHTRANS": "MG", "PMF": "CE", "PCR": "PE", "PMJP": "PB", "CURITIBA": "PR", "EPTC": "RS",
     "AGETO-TO": "TO", "DETRAN-MA": "MA", "DER-SE": "SE", "SEINFRA-BA": "BA", "TRANSALVADOR": "BA", "SEMTRAN-PVH": "RO",
+    "MOGI-SP": "SP",
 }
 
 

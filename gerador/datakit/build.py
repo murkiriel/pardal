@@ -6,7 +6,7 @@
 
 Fontes ligadas: OSM (extrato Geofabrik) + DNIT + ANTT + órgãos estaduais (DERs, AGETO-TO,
 Detran-MA, SEINFRA-BA) + capitais (JP, Fortaleza, Recife, Curitiba, BH, Rio, São Paulo, Porto
-Alegre, Salvador, Porto Velho) + Detran-DF; limites oficiais das placas da ANTT e dos trechos do Rio (têm
+Alegre, Salvador, Porto Velho, Mogi das Cruzes) + Detran-DF; limites oficiais das placas da ANTT e dos trechos do Rio (têm
 prioridade sobre o OSM no mesmo lugar); situação ativo/inativo pelo Inmetro nas BRs (SNV).
 Fonte que falha (rede/portal) é tratada como ausente. Cada ponto vai para exatamente uma UF pelo
 polígono do IBGE (ou o mais perto a até 5 km: pontes, orla, ilhas — common/ufassign.py) quando
@@ -31,7 +31,7 @@ from datakit.common.ufassign import UfAssigner
 from datakit.common.ufs import SOURCE_HOME_UF, UF_BBOX, geofabrik_region, uf_bbox
 from datakit.context import BuildContext
 from datakit.sources import dnit, antt, der_go, der_sp, der_pe, der_mg, municipal, bh, df_detran, rio, cet_sp, eptc
-from datakit.sources import ageto_to, der_se, detran_ma, seinfra_ba, semtran_pvh, transalvador
+from datakit.sources import ageto_to, der_se, detran_ma, mogi_sp, seinfra_ba, semtran_pvh, transalvador
 from datakit.sources import prf_concessions
 
 # Fontes oficiais de radares, na ordem do manifest. Cada módulo expõe fetch(ctx) -> SourceData
@@ -41,7 +41,7 @@ OFFICIAL = {
     "DER-GO": der_go, "DER-SP": der_sp, "DER-PE": der_pe, "DER-MG": der_mg,
     "capitais": municipal, "BHTRANS": bh, "DETRAN-DF": df_detran, "RIO": rio, "CET-SP": cet_sp, "EPTC": eptc,
     "AGETO-TO": ageto_to, "DETRAN-MA": detran_ma, "DER-SE": der_se, "SEINFRA-BA": seinfra_ba,
-    "TRANSALVADOR": transalvador, "SEMTRAN-PVH": semtran_pvh,
+    "TRANSALVADOR": transalvador, "SEMTRAN-PVH": semtran_pvh, "MOGI-SP": mogi_sp,
 }
 
 # Gravado em data/dist no início do build e apagado só no fim: enquanto existir (build rodando,

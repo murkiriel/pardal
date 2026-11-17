@@ -36,7 +36,7 @@ endereços (geocodificador).
 | **Belo Horizonte — redutor de velocidade** | 4.748 lombadas físicas | CSV mensal, CC-BY |
 | **DF — Detran (ArcGIS `Base_DETRAN`)** | 1.125 radares (lat/lng, limite) + 1.230 lombadas eletrônicas | ArcGIS REST, dados de 2019 |
 | **DF — portal de dados abertos** | versão atual do mesmo cadastro | CSV; o portal bloqueia download automático (baixar no navegador) |
-| Mogi das Cruzes (ArcGIS `radares`) | 14 radares | ArcGIS REST |
+| **Mogi das Cruzes — lista de radares da Prefeitura** (`dados.mogidascruzes.sp.gov.br`, conjunto "Dados sobre radar", desde 2026-11-17) | 39 equipamentos (33 em operação): coordenada, tipo, limite, situação, sentido nominal | CSV Latin-1 (`;`); o CKAN diz "Nenhuma Licença Fornecida" |
 | **Curitiba — fiscalização eletrônica da Setran** (`transito.curitiba.pr.gov.br/fiscalizacaoeletronica`, desde 2026-10-05) | 308 pontos em operação: coordenada, identificação, o que fiscaliza (velocidade, avanço de sinal, parada na faixa, conversão), limite | Página HTML (a lista inteira numa página só) |
 | **Porto Alegre — EPTC, medidores eletrônicos de velocidade** (relatório Power BI público ligado à página da EPTC, desde 2026-10-05) | 155 medidores: coordenada, sentido, limite, tipo (pardal, lombada, DAS, portátil), situação | Power BI "publicar na web", como o da CET-SP |
 | **DER-SE** (`der.se.gov.br/localizacao-de-radares-fixos`, desde 2026-11-08) | 129 radares e lombadas das rodovias estaduais: coordenada, limite | Planilha Google publicada na web (CSV) |
@@ -250,6 +250,51 @@ lombadas, rodovia + km), DER-ES (392, rodovia + km), DER-RJ (radar portátil, ro
 pontos num mapa do Google My Maps ligado pela prefeitura; candidata, não medida), Joinville-SC (PDF bienal,
 parte dos itens com GPS; candidata, não medida). Campo Grande, Macapá, Boa Vista, Cuiabá, Teresina e
 Belém só têm notícia ou portaria, sem lista.
+
+### Mogi das Cruzes — lista da Prefeitura (2026-11-17)
+
+A linha antiga desta tabela ("Mogi das Cruzes (ArcGIS `radares`), 14 radares") nunca foi implementada; a lista
+em CSV do portal de dados abertos é mais completa e vale no lugar dela. Fonte: conjunto "Dados sobre radar" da
+Secretaria Municipal de Mobilidade Urbana (`dados.mogidascruzes.sp.gov.br/dataset/b93af036-8ed9-4442-82e4-7bc8c3d6c64f`),
+recurso `localizacao_radares2.csv` (`sources/mogi_sp.py`, código `MOGI-SP`, UF do órgão SP, cobertura municipal).
+Latin-1, `;`, CRLF, `justificativa` entre aspas com quebras de linha; colunas `id_radar`, `logradouro2`, `numero`,
+`Logradouro`, `subtipo`, `latitude`, `longitude`, `Localizacao`, `Sentido`, `Faixas`, `Velocidade`, `Status`,
+`justificativa`. O leitor aceita também UTF-8, tira o acento do `subtipo` antes de comparar e usa a coluna
+`Localizacao` se `latitude`/`longitude` vierem vazias; ponto fora da caixa de Mogi das Cruzes sai.
+
+**Licença (conferida em 2026-11-17):** o CKAN não declara nenhuma. A página do conjunto mostra "Nenhuma Licença
+Fornecida" e a API traz `license_id` vazio e `isopen: false`. É dado que a Prefeitura publica de propósito no
+portal de dados abertos (e no de transparência, segundo a descrição), mas sem licença escrita; entra como "dado
+aberto municipal" e fica anotado no README principal, como a tabela das concessões da PRF. Metadados: conjunto
+atualizado em 2024-06-03; o arquivo é um upload de 2023-12-28, que o portal não renova.
+
+Leitura de 2026-11-17: 39 linhas, 39 pontos únicos (o `id_radar` é único, de 63 a 134). Situação: 33 "Em
+operação" e 6 "Inativo". Tipo: 17 FIXO, 16 REDUTOR DE VELOCIDADE (lombada eletrônica) e 6 AVANÇO DE SINAL. Velocidade:
+40 km/h em 15, 50 em 8, 60 em 10 e vazia em 6 (justo os de avanço de sinal). Sentido: só nominal ("Centro-Bairro",
+"Bairro-Centro e Centro-Bairro"), sem `direction_deg`, como a Transalvador.
+
+Regras: FIXO e REDUTOR -> FIXED com a `Velocidade` como limite (20 a 130); AVANÇO DE SINAL -> RED_LIGHT sem limite
+(como o BHTRANS e a CET: o limite vale para o radar de velocidade); `Status` com "inativ", "desativ", "inoperante" ou
+"suspens" -> `active=0` (os 6 inativos entram assim, como na SEMTRAN-PVH), qualquer outro valor -> ativo; subtipo
+que não é radar nem avanço de sinal (faixa exclusiva, por exemplo) fica de fora; dois equipamentos no mesmo ponto
+viram um (vale o ativo). O `id_radar` vai como `source_id` do SQLite (`docs/FORMATO_SQLITE.md`).
+
+Distância de cada ponto ao radar mais perto de `brasil/radares.csv` publicado em 2026-11-15 (sem as linhas do
+próprio `MOGI-SP`):
+
+| Conjunto | Pontos | Já no pacote a ≤ 50 m | De 50 a 200 m | Novos (> 200 m) |
+|---|---|---|---|---|
+| Todos | 39 | 18 | 5 | 16 |
+| Em operação | 33 | 18 | 4 | 11 |
+| Em operação, FIXED | 28 | 16 | 4 | 8 |
+| Em operação, RED_LIGHT | 5 | 2 | 0 | 3 |
+
+A leitura passou pelo parser do repositório (download direto do CSV, sem `build`): 39 radares, 33 ativos, 33 FIXED
+(5 inativos) e 6 RED_LIGHT (1 inativo). O build de SP com a fonte ainda não foi rodado.
+
+O conjunto traz também um recurso de datastore (JSON, "Lista de radares de Mogi das Cruzes", 43 registros, um por
+sentido e faixa, 21 FIXO, 16 REDUTOR e 6 AVANÇO DE SEMÁFORO, 40 em operação e 3 "Instalado"). Não é lido: as
+colunas são outras (o ponto vem num texto "lat, lng") e os dados anuais são de 2022; a lista de referência é o CSV.
 
 ### Pontos de atenção do OSM (2026-11-08)
 

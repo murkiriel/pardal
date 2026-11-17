@@ -181,6 +181,7 @@ acidentes e multas, o mês do levantamento, as datas.
 | CET-SP: radares e câmeras sem velocidade | o "CÓDIGO LOCAL" |
 | DER-SE | o código do equipamento (`SE001R`, `SE348L`) |
 | Detran-MA | o código do equipamento (`MA301R`) |
+| MOGI-SP | o `id_radar` da lista da Prefeitura de Mogi das Cruzes (`84`) |
 
 Nulo nas outras fontes. Para a maioria, o leitor não tem um código de equipamento confiável: DNIT, ANTT, DER-SP, DER-GO,
 DER-MG, DER-PE, Rio, BH, Detran-DF, Fortaleza, Recife, João Pessoa, Curitiba, EPTC, Transalvador, SEMTRAN-PVH, AGETO-TO,

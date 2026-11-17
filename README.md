@@ -483,6 +483,7 @@ O **código** (pastas `gerador/` e `scripts/`) é **MIT** ([`gerador/LICENSE`](g
 | EPTC (Porto Alegre) | Radares fixos, lombadas eletrônicas e detectores de avanço de sinal, com limite (relatório público da EPTC) | Dado aberto municipal |
 | Transalvador (Salvador) | Radares fixos, com limite (mapa de equipamentos da Transalvador) | Dado aberto municipal |
 | SEMTRAN (Porto Velho) | Radares fixos, com a validade da aferição (planilha publicada pela SEMTRAN) | Dado aberto municipal |
+| Prefeitura de Mogi das Cruzes (Secretaria de Mobilidade Urbana) | Radares fixos, lombadas eletrônicas e detectores de avanço de sinal, com limite e situação (lista do portal de dados abertos) | Dado aberto municipal (o portal não declara licença) |
 
 ## Projetos irmãos
 
