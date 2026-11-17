@@ -296,6 +296,39 @@ O conjunto traz também um recurso de datastore (JSON, "Lista de radares de Mogi
 sentido e faixa, 21 FIXO, 16 REDUTOR e 6 AVANÇO DE SEMÁFORO, 40 em operação e 3 "Instalado"). Não é lido: as
 colunas são outras (o ponto vem num texto "lat, lng") e os dados anuais são de 2022; a lista de referência é o CSV.
 
+### DER-PE — lista de lombadas e equipamentos mistos (2026-11-17)
+
+A geração de 17/11/2026 caiu para a cópia de 12/11 (`HTTPError: 404`): o DER-PE reorganizou o site e o
+endereço antigo do artigo 1392 ("Equipamentos velocidade", 28 radares lidos, sem limite) deixou de existir. O
+mesmo artigo abre em `/component/content/article/<id>`, que não muda quando o menu muda; o gerador usa esse
+endereço e, se ele falhar ou vier sem a tabela, o do menu. Licença: dado aberto governamental, sem texto de
+licença na página (como as outras listas estaduais).
+
+| Artigo | Conteúdo | Pontos | Já no pacote a ≤ 50 m | Novos (> 200 m) |
+|---|---|---|---|---|
+| 1382, lista de trechos monitorados — lombadas (`sources/der_pe.py`) | EQUIPAMENTO, PROCESSADOR, SÉRIE, TIPO (CEV 74, REV 45), ENDEREÇO, SENTIDO, MUNICÍPIO, VELOCIDADE (60 km/h nos CEV, 40 nos REV), LATITUDE, LONGITUDE | 119 | 53 | 59 |
+| 1383, equipamentos mistos | EQP, ENDEREÇO, COORDENADAS | 61 linhas, 51 coordenadas distintas | 0 | 49 |
+
+Leitura de 17/11/2026 e distância ao radar mais perto de `brasil/radares.csv` (publicação de 15/11; os 7 do
+1382 e os 2 do 1383 que faltam para o total ficam entre 50 e 200 m). Os 31 equipamentos do 1392 (pelo número)
+estão todos no 1382, então o 1392 deixou de ser lido; a leitura antiga só tirava 28 deles (3 vinham sem
+coordenada ou com "°"). O 1382 ainda corrige a longitude do EQP 1588 (-35,466325 no 1392, -35,436325 no 1382, onde
+o OSM também tem um radar): a leitura antiga punha esse radar a ~3 km do lugar. O limite chega a 8 radares do pacote
+que não tinham nenhum. A tabela do 1382 repete o equipamento por sentido/faixa em linhas de continuação
+(`rowspan`) que só trazem o processador e o sentido; essas linhas não têm coordenada e são puladas. O sentido
+é nominal (a cidade para onde a pista segue), então não vira rumo.
+
+**Equipamentos mistos (1383).** O site não explica o termo. O que mostra que medem velocidade: o DER publica, em
+"Levantamento técnico" (equipamentos de fiscalização eletrônica, 2025 e 2026), um levantamento por equipamento
+instalado em semáforo, e os 24 deles cujo número consta do 1383 (mesmo número, mesma coordenada, p. ex. EQP 8372)
+são todos o formulário "Levantamento técnico — controlador de velocidade", com 60 km/h regulamentados. Nenhum
+menciona avanço de sinal ("semáforo" aparece só no nome do ponto). Entram como radar fixo, sem limite (o 1383 não
+o traz). Os outros 37 não têm levantamento publicado; seguem a mesma numeração e o mesmo formato, e entram junto.
+A rede semafórica (artigo 1386) é só a lista dos semáforos do DER, sem dizer quais fiscalizam, e as câmeras dome
+(1391) são monitoramento: ambos fora. Os pontos de coordenada repetida (um equipamento por sentido no mesmo
+local; 10 no 1383) viram um só. Dúvida em aberto: se o "misto" também autua avanço de sinal, o tipo certo
+seria `RED_LIGHT`; sem isso documentado, fica o fixo.
+
 ### Pontos de atenção do OSM (2026-11-08)
 
 Ideia tirada dos apps de alerta Super Tripper (Pod e Dash), que além dos radares avisam de perigos na via e de pontos de
