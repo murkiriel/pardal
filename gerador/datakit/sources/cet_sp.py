@@ -251,7 +251,7 @@ def _rows_with_fallback(raw_dir: str) -> List[Dict]:
             raise pbi_error or RuntimeError("CET-SP: Power BI e CSV do GitHub sem dados")
         when = date.fromtimestamp(os.path.getmtime(path)).isoformat()
         failures.warn("CET-SP (radares)", f"Power BI e CSV do GitHub falharam ({type(pbi_error).__name__}); "
-                      f"usada a cópia de {when}")
+                      f"usada a cópia de {when}", copy_date=when, reason="Power BI e CSV do GitHub falharam")
         with open(path, encoding="utf-8") as f:
             return json.load(f)
     if why:

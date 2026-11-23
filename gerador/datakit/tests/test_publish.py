@@ -364,6 +364,71 @@ class OsmDatedFallback(unittest.TestCase):
                 self.osm._dated_urls("norte")
 
 
+class StaleRecord(unittest.TestCase):
+    """Fonte que caiu numa cópia antiga: além do aviso, vai para o campo `stale` (fonte, data da cópia, motivo),
+    que o notify do workflow lê (scripts/routine.py stale)."""
+
+    def test_warn_with_a_copy_date_is_recorded_once_per_source(self):
+        from datakit import failures
+        failures.warn("Teste fonte-a", "download falhou; usada a cópia de 2026-11-19", copy_date="2026-11-19",
+                      reason="download falhou (ConnectTimeout)")
+        failures.warn("Teste fonte-a", "outro", copy_date="2026-11-18", reason="de novo")
+        failures.warn("Teste fonte-b", "aviso sem cópia antiga")
+        mine = [s for s in failures.stale() if s["source"] in ("Teste fonte-a", "Teste fonte-b")]
+        self.assertEqual(mine, [{"source": "Teste fonte-a", "copy_date": "2026-11-18", "reason": "de novo"}])
+        self.assertIn("Teste fonte-b: aviso sem cópia antiga", failures.warnings())
+
+    def test_the_date_is_cut_to_the_day(self):
+        from datakit import failures
+        failures.warn("Teste fonte-c", "x", copy_date="2026-11-19T04:00:00Z")
+        self.assertIn({"source": "Teste fonte-c", "copy_date": "2026-11-19", "reason": ""}, failures.stale())
+
+    def test_source_cache_records_the_copy_it_used(self):
+        import tempfile
+        from datakit import failures, source_cache
+        raw = tempfile.mkdtemp()
+        source_cache.load("Teste cache", raw, lambda: [1, 2], [])          # leitura boa: grava a cópia
+        source_cache.load("Teste cache", raw, lambda: (_ for _ in ()).throw(requests.ConnectTimeout("x")), [])
+        mine = [s for s in failures.stale() if s["source"] == "Teste cache"]
+        self.assertEqual(len(mine), 1)
+        self.assertRegex(mine[0]["copy_date"], r"^\d{4}-\d{2}-\d{2}$")
+        self.assertIn("ConnectTimeout", mine[0]["reason"])
+
+    def test_the_build_catalog_gets_the_field_and_the_published_one_does_not(self):
+        import json
+        import tempfile
+        from datakit import build, failures
+        failures.warn("Teste fonte-d", "usada a cópia", copy_date="2026-11-01", reason="fora do ar")
+        dist = tempfile.mkdtemp()
+        with open(os.path.join(dist, "catalogo.json"), "w", encoding="utf-8") as f:
+            json.dump({"ufs": {}}, f)
+        build._record_failures(dist)
+        with open(os.path.join(dist, "catalogo.json"), encoding="utf-8") as f:
+            cat = json.load(f)
+        self.assertIn({"source": "Teste fonte-d", "copy_date": "2026-11-01", "reason": "fora do ar"}, cat["stale"])
+        self.assertNotIn("stale", pub.rewrite_catalog(cat))
+
+    def test_osm_records_the_stored_file_date_from_its_last_modified(self):
+        from unittest import mock
+        import tempfile
+        from datakit import failures
+        from datakit.sources import osm_pbf
+        self.assertEqual(osm_pbf._stamp_day("Fri, 20 Nov 2026 02:10:00 GMT"), "2026-11-20")
+        self.assertIsNone(osm_pbf._stamp_day("sem data"))
+        raw = tempfile.mkdtemp()
+        with open(os.path.join(raw, "norte-latest.osm.pbf"), "wb") as f:
+            f.write(b"guardado")
+        with open(os.path.join(raw, "norte.last-modified"), "w") as f:
+            f.write("Fri, 20 Nov 2026 02:10:00 GMT")
+        with mock.patch.object(osm_pbf, "_remote_last_modified", side_effect=requests.ConnectionError("fora")), \
+                mock.patch.object(osm_pbf, "get_text", side_effect=requests.ConnectionError("fora")), \
+                mock.patch.object(_http.time, "sleep"):      # as esperas da listagem são de minutos
+            osm_pbf.ensure_extract("norte", raw)
+        mine = [s for s in failures.stale() if s["source"] == "OSM norte"]
+        self.assertEqual([m["copy_date"] for m in mine], ["2026-11-20"])
+        self.assertIn("conferir a versão falhou", mine[0]["reason"])
+
+
 class PublishedNames(unittest.TestCase):
     """Todo arquivo de dado do pacote vai para o repositório ou para o zip da release (só um dos
     dois): o catálogo aponta para ele."""

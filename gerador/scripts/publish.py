@@ -115,8 +115,8 @@ def drops(published: dict, new: dict, max_drop: float = MAX_DROP) -> List[str]:
 
 
 def rewrite_catalog(cat: dict) -> dict:
-    """O catálogo publicado: o do build sem as listas de falhas e avisos (só servem para barrar
-    ou avisar na publicação; não vão para o repositório). Entrada de arquivo que vai só na release
+    """O catálogo publicado: o do build sem as listas de falhas, avisos e fontes com cópia antiga (só servem
+    para barrar ou avisar na publicação; não vão para o repositório). Entrada de arquivo que vai só na release
     (_RELEASE_ONLY_NAME) troca "file" por "release_asset" (o zip do estado na release) e "asset_path"
     (o caminho dentro dele); contagem, bytes e sha256 continuam os do CSV. Entrada de anexo próprio da release
     (_RELEASE_ASSET_NAME, o banco SQLite) troca "file" por "release_asset" (o nome do anexo); bytes e sha256 são os
@@ -124,6 +124,7 @@ def rewrite_catalog(cat: dict) -> dict:
     out = json.loads(json.dumps(cat))
     out.pop("failures", None)
     out.pop("warnings", None)
+    out.pop("stale", None)
     for uf, entry in (out.get("ufs") or {}).items():
         for value in entry.values():
             path = value.get("file") if isinstance(value, dict) else None

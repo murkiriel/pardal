@@ -70,7 +70,8 @@ def _rows_with_fallback(raw_dir: str) -> List[Dict]:
             raise
         from datakit import failures
         when = date.fromtimestamp(os.path.getmtime(path)).isoformat()
-        failures.warn("EPTC (radares)", f"Power BI falhou ({type(e).__name__}); usada a cópia de {when}")
+        failures.warn("EPTC (radares)", f"Power BI falhou ({type(e).__name__}); usada a cópia de {when}",
+                      copy_date=when, reason=f"Power BI falhou ({type(e).__name__})")
         with open(path, encoding="utf-8") as f:
             return json.load(f)
     os.makedirs(raw_dir, exist_ok=True)

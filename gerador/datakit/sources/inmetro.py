@@ -76,7 +76,8 @@ def load(raw_dir: str, today: Optional[date] = None) -> List[Meter]:
                 failures.record(f"Inmetro {uf}", e)
                 continue
             when = date.fromtimestamp(os.path.getmtime(path)).isoformat()
-            failures.warn(f"Inmetro {uf}", f"download falhou ({type(e).__name__}); usada a cópia de {when}")
+            failures.warn(f"Inmetro {uf}", f"download falhou ({type(e).__name__}); usada a cópia de {when}",
+                          copy_date=when, reason=f"download falhou ({type(e).__name__})")
         try:
             with open(path, encoding="utf-8-sig") as f:
                 records = json.load(f)

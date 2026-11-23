@@ -195,6 +195,13 @@ Aviso de falha: uma geração agendada que falha abre a issue "Geração falhand
 comenta nela, se já estiver aberta), com a data e o link da execução; a primeira que passar comenta
 e fecha a issue (job `notify`, `scripts/routine.py notify`). Disparos à mão não mexem nela.
 
+Alerta de fonte parada: quando uma fonte cai numa cópia antiga, o build grava no `catalogo.json` do
+build (`data/dist/`, não vai para o repositório) o campo `stale`, `[{"source", "copy_date", "reason"}]`,
+junto do aviso (`failures.warn(..., copy_date=...)`). O job `generate` lê esse campo (`routine.py stale`)
+e passa ao `notify` as fontes com cópia de 3 dias ou mais (`STALE_DAYS`); com elas a issue abre ou recebe
+comentário mesmo com a geração verde, e só fecha quando não há falha nem fonte parada. As notas da
+release já traziam os avisos, mas só nos dias com release.
+
 As máquinas do Actions ficam nos EUA, e o DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO, o DER-SE e a lista de radares do Rio (CET-Rio) não aceitam conexão de fora do Brasil
 (o portal da ANTT às vezes devolve uma página de bloqueio): o tráfego para esses servidores (`TUNNEL_HOSTS`),
 e só para eles, sai por um túnel WireGuard com saída no Brasil. A configuração do túnel fica no

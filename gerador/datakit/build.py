@@ -326,6 +326,7 @@ def _record_failures(dist_dir: str) -> None:
         cat = json.load(f)
     cat["failures"] = failures.recorded()
     cat["warnings"] = failures.warnings()
+    cat["stale"] = failures.stale()   # fontes que usaram cópia antiga: [{source, copy_date, reason}]
     # a data do dado de cada fonte: a próxima edição que cair nesta herda a data, não a renova
     cat["source_dates"] = source_cache.dates()
     with open(path, "w", encoding="utf-8") as f:

@@ -11,7 +11,7 @@ fim do build e no publish.py, e não bloqueiam a publicação.
 """
 from __future__ import annotations
 
-from typing import List
+from typing import Dict, List, Optional
 
 _FAILURES: List[str] = []
 
@@ -45,13 +45,25 @@ def discard(messages: List[str]) -> None:
 
 
 _WARNINGS: List[str] = []
+_STALE: Dict[str, Dict[str, str]] = {}
 
 
-def warn(source: str, message: str) -> None:
+def warn(source: str, message: str, copy_date: Optional[str] = None, reason: str = "") -> None:
+    """Aviso (campo `warnings`). Quando a fonte caiu numa cópia antiga, `copy_date` (AAAA-MM-DD, o dia
+    do dado) também a põe em `stale`, com o `reason` curto: o notify do workflow lê a lista para avisar de
+    fonte parada nos dias em que não sai release, que é quando ninguém lê as notas."""
     msg = f"{source}: {message}"[:300]
     print(f"[build] {source}: AVISO — {message}")
     if msg not in _WARNINGS:
         _WARNINGS.append(msg)
+    if copy_date:
+        _STALE[source] = {"source": source, "copy_date": copy_date[:10], "reason": reason[:200]}
+
+
+def stale() -> List[Dict[str, str]]:
+    """Fontes que usaram cópia antiga nesta execução, uma entrada por fonte (a idade se calcula depois,
+    com a data da geração)."""
+    return sorted(_STALE.values(), key=lambda s: s["source"])
 
 
 def warnings() -> List[str]:

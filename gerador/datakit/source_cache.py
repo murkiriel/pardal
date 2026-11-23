@@ -136,13 +136,15 @@ def load(label: str, raw_dir: str, fn: Callable[[], Any], default: Any,
             print(f"[build] {label}: {type(error).__name__}: {error}"[:300])
         _DATES[label] = published[1]
         failures.warn(label, f"atualização {reason}; sem cópia guardada, usados os dados da edição "
-                             f"publicada (dado de {published[1]}){_age_note(published[1])}")
+                             f"publicada (dado de {published[1]}){_age_note(published[1])}",
+                      copy_date=published[1], reason=f"atualização {reason}; dados da edição publicada")
         return published[0]
     failures.discard(partial)
     if error is not None:
         print(f"[build] {label}: {type(error).__name__}: {error}"[:300])
     _DATES[label] = cached[1]
-    failures.warn(label, f"atualização {reason}; usada a cópia de {cached[1]}{_age_note(cached[1])}")
+    failures.warn(label, f"atualização {reason}; usada a cópia de {cached[1]}{_age_note(cached[1])}",
+                  copy_date=cached[1], reason=f"atualização {reason}")
     return cached[0]
 
 

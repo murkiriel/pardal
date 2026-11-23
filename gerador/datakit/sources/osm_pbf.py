@@ -138,7 +138,8 @@ def ensure_extract(region: str, raw_dir: str, refresh: bool = True) -> Extract:
         except Exception as e:  # noqa: BLE001
             from datakit import failures
             failures.warn(f"OSM {region}", f"conferir a versão falhou ({type(e).__name__}); "
-                                           f"usado o arquivo guardado ({_read_or(stamp, 'sem data')})")
+                                           f"usado o arquivo guardado ({_read_or(stamp, 'sem data')})",
+                          copy_date=_stamp_day(_read_or(stamp, "")), reason=f"conferir a versão falhou ({type(e).__name__})")
     if download:
         print(f"[osm_pbf] baixando {url}")
         try:
@@ -148,7 +149,8 @@ def ensure_extract(region: str, raw_dir: str, refresh: bool = True) -> Extract:
                 raise
             from datakit import failures
             failures.warn(f"OSM {region}", f"baixar a versão nova falhou ({type(e).__name__}); "
-                                           f"usado o arquivo guardado ({_read_or(stamp, 'sem data')})")
+                                           f"usado o arquivo guardado ({_read_or(stamp, 'sem data')})",
+                          copy_date=_stamp_day(_read_or(stamp, "")), reason=f"baixar a versão nova falhou ({type(e).__name__})")
         else:
             with open(stamp, "w") as m:
                 m.write(last_mod)
@@ -865,6 +867,15 @@ def needs_update(stored: str, remote: str) -> bool:
         return parsedate_to_datetime(remote) > parsedate_to_datetime(stored)
     except (TypeError, ValueError, IndexError):
         return True
+
+
+def _stamp_day(stamp: str) -> Optional[str]:
+    """Last-Modified (`Sun, 22 Nov 2026 08:25:23 GMT`) -> AAAA-MM-DD; None se não der para ler."""
+    from email.utils import parsedate_to_datetime
+    try:
+        return parsedate_to_datetime(stamp).date().isoformat()
+    except (TypeError, ValueError, IndexError):
+        return None
 
 
 def _remote_last_modified(url: str) -> str:

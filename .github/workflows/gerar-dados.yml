@@ -10,6 +10,9 @@ name: Gerar dados
 #     que passar a partir do domingo (se o domingo falhar, segunda tenta de novo; scripts/routine.py).
 #   - Releases com mais de 90 dias são apagadas, menos as semanais (as do commit) e a mais nova.
 #   - Falha de uma geração agendada abre a issue "Geração falhando"; a primeira que passar a fecha.
+#     Fonte parada (usando cópia de 3 dias ou mais, STALE_DAYS em scripts/routine.py) também abre
+#     ou comenta a issue, mesmo com a geração verde: nos dias sem release ninguém lê os avisos das
+#     notas. A issue só fecha quando não há falha nem fonte parada.
 # O link releases/latest/download/pardal-<UF>.zip traz sempre o dado mais novo (até 1 dia); o
 # repositório, o da semana.
 #
@@ -126,6 +129,10 @@ jobs:
     if: needs.interval.outputs.run == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 240
+    outputs:
+      # fontes paradas há STALE_DAYS dias ou mais (JSON, [] se nenhuma): lido do catálogo do build pelo
+      # scripts/routine.py stale; o notify repassa ao aviso
+      stale: ${{ steps.stale.outputs.stale }}
     env:
       PUBLISH: ${{ github.event_name == 'schedule' || inputs.publish == true }}
       EVENT: ${{ github.event_name }}
@@ -217,6 +224,16 @@ jobs:
           mkdir -p data
           python run.py datakit.build --all 2>&1 | tee data/build.log
 
+      # sem catálogo (o build nem chegou a gravá-lo) a lista sai vazia: o job já terá falhado e avisado
+      - name: Fontes paradas (cópia de 3 dias ou mais)
+        id: stale
+        if: always()
+        working-directory: pardal/gerador
+        run: |
+          stale=$(python scripts/routine.py stale --catalog data/dist/catalogo.json 2>/dev/null || echo '[]')
+          echo "stale=$stale"
+          echo "stale=$stale" >> "$GITHUB_OUTPUT"
+
       - name: Guarda as cópias das fontes (mesmo se o build ou a publicação falharem)
         if: always() && hashFiles('pardal/gerador/data/raw/**') != ''
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
@@ -292,8 +309,9 @@ jobs:
           retention-days: 30
 
   notify:
-    # Aviso de falha: geração agendada que falhou abre a issue "Geração falhando" (ou comenta nela); a
-    # primeira que passar comenta e fecha (scripts/routine.py notify). Disparo à mão não mexe na issue.
+    # Aviso de falha: geração agendada que falhou, ou que passou com fonte parada (cópia de 3 dias ou mais),
+    # abre a issue "Geração falhando" (ou comenta nela); a primeira que passar sem fonte parada comenta e
+    # fecha (scripts/routine.py notify). Disparo à mão não mexe na issue.
     needs: [interval, generate]
     if: always() && github.event_name == 'schedule' && github.repository == 'murkiriel/pardal'
     runs-on: ubuntu-latest
@@ -312,13 +330,16 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           INTERVAL: ${{ needs.interval.result }}
           GENERATE: ${{ needs.generate.result }}
+          STALE: ${{ needs.generate.outputs.stale }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          echo "interval=$INTERVAL generate=$GENERATE"
+          echo "interval=$INTERVAL generate=$GENERATE stale=${STALE:-[]}"
           if [ "$INTERVAL" = "failure" ] || [ "$GENERATE" = "failure" ]; then
-            python3 gerador/scripts/routine.py notify --repo "$GITHUB_REPOSITORY" --failed --run-url "$RUN_URL"
+            python3 gerador/scripts/routine.py notify --repo "$GITHUB_REPOSITORY" --failed --run-url "$RUN_URL" \
+              --stale "${STALE:-[]}"
           elif [ "$GENERATE" = "success" ]; then
-            python3 gerador/scripts/routine.py notify --repo "$GITHUB_REPOSITORY" --run-url "$RUN_URL"
+            python3 gerador/scripts/routine.py notify --repo "$GITHUB_REPOSITORY" --run-url "$RUN_URL" \
+              --stale "${STALE:-[]}"
           else
             echo "nada a fazer (não gerou: já havia geração hoje, ou foi cancelada)"
           fi

@@ -105,5 +105,146 @@ class Notify(unittest.TestCase):
         self.assertEqual(rt.notify("x/y", True, self.URL, utc("2026-11-09T06:30:00"), gh), "opened")
 
 
+def _stale(source, copy_date, days, reason="download falhou (ConnectTimeout)"):
+    return {"source": source, "copy_date": copy_date, "days": days, "reason": reason}
+
+
+class StaleSources(unittest.TestCase):
+    """Fonte parada: o campo `stale` do catálogo do build vira a lista do alerta."""
+    BUILT_AT = "2026-11-22T06:30:00Z"
+
+    def _catalog(self, *entries):
+        return {"built_at": self.BUILT_AT, "stale": [
+            {"source": s, "copy_date": d, "reason": r} for s, d, r in entries]}
+
+    def test_only_copies_of_three_days_or_more_count_and_the_oldest_comes_first(self):
+        cat = self._catalog(("OSM sul", "2026-11-19", "baixar a versão nova falhou (HTTPError)"),   # 3 dias
+                            ("Inmetro GO", "2026-11-21", "download falhou"),                         # 1
+                            ("EPTC (radares)", "2026-11-20", "Power BI falhou"),                     # 2
+                            ("CET-SP (radares)", "2026-11-10", "Power BI e CSV falharam"))           # 12
+        found = rt.stale_sources(cat)
+        self.assertEqual([(e["source"], e["days"]) for e in found], [("CET-SP (radares)", 12), ("OSM sul", 3)])
+        self.assertEqual(found[1], {"source": "OSM sul", "copy_date": "2026-11-19", "days": 3,
+                                    "reason": "baixar a versão nova falhou (HTTPError)"})
+
+    def test_the_limit_is_three_days(self):
+        self.assertEqual(rt.STALE_DAYS, 3)
+
+    def test_no_field_or_unreadable_entries_give_nothing(self):
+        self.assertEqual(rt.stale_sources({"built_at": self.BUILT_AT}), [])
+        self.assertEqual(rt.stale_sources(self._catalog(("X", "ontem", ""), ("Y", "", ""))), [])
+        self.assertEqual(rt.stale_sources({"built_at": self.BUILT_AT, "stale": [{"copy_date": "2026-11-01"}, "x"]}), [])
+
+    def test_the_command_prints_compact_json_and_survives_a_missing_catalog(self):
+        import contextlib
+        import io
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            path = os.path.join(tmp, "catalogo.json")
+            with open(path, "w", encoding="utf-8") as f:
+                json.dump(self._catalog(("OSM sul", "2026-11-18", "x")), f)
+            for catalog, expected in ((path, [_stale("OSM sul", "2026-11-18", 4, "x")]),
+                                      (os.path.join(tmp, "nao-existe.json"), [])):
+                out = io.StringIO()
+                with contextlib.redirect_stdout(out):
+                    self.assertEqual(rt.main(["stale", "--catalog", catalog]), 0)
+                self.assertEqual(json.loads(out.getvalue()), expected)
+                self.assertEqual(len(out.getvalue().strip().splitlines()), 1)
+
+
+class NotifyStale(unittest.TestCase):
+    URL = "https://github.com/x/y/actions/runs/1"
+    NOW = utc("2026-11-22T06:30:00")
+    PARADA = [_stale("OSM sul", "2026-11-19", 3, "baixar a versão nova falhou (HTTPError)")]
+
+    def _open(self):
+        return FakeGh({("issue", "list"): json.dumps([{"number": 7, "title": rt.ISSUE_TITLE}])})
+
+    def test_a_source_stopped_for_three_days_opens_the_issue_even_if_the_job_is_green(self):
+        gh = FakeGh({("issue", "list"): "[]"})
+        self.assertEqual(rt.notify("x/y", False, self.URL, self.NOW, gh, stale=self.PARADA), "opened")
+        create = [c for c in gh.calls if c[:2] == ["issue", "create"]][0]
+        body = create[create.index("--body") + 1]
+        self.assertIn(rt.ISSUE_TITLE, create)
+        self.assertIn("22/11/2026 03:30", body)
+        self.assertIn("- OSM sul: cópia de 2026-11-19 (3 dias) — baixar a versão nova falhou (HTTPError)", body)
+        self.assertIn(self.URL, body)
+
+    def test_it_comments_if_the_issue_is_already_open(self):
+        gh = self._open()
+        self.assertEqual(rt.notify("x/y", False, self.URL, self.NOW, gh, stale=self.PARADA), "commented")
+        self.assertEqual(gh.calls[-1][:3], ["issue", "comment", "7"])
+        self.assertIn("OSM sul", gh.calls[-1][gh.calls[-1].index("--body") + 1])
+        self.assertFalse([c for c in gh.calls if c[:2] in (["issue", "close"], ["issue", "create"])])
+
+    def test_copies_of_one_or_two_days_do_nothing(self):
+        recent = [_stale("Inmetro GO", "2026-11-21", 1), _stale("EPTC (radares)", "2026-11-20", 2)]
+        gh = FakeGh({("issue", "list"): "[]"})
+        self.assertEqual(rt.notify("x/y", False, self.URL, self.NOW, gh, stale=recent), "nothing")
+        self.assertEqual([c[:2] for c in gh.calls], [["issue", "list"]])
+        # com a issue aberta, cópia recente conta como normal: fecha
+        gh = self._open()
+        self.assertEqual(rt.notify("x/y", False, self.URL, self.NOW, gh, stale=recent), "closed")
+
+    def test_it_closes_when_there_is_no_failure_and_no_stopped_source(self):
+        gh = self._open()
+        self.assertEqual(rt.notify("x/y", False, self.URL, self.NOW, gh, stale=[]), "closed")
+        self.assertEqual(gh.calls[-1], ["issue", "close", "7", "--repo", "x/y"])
+        self.assertIn("sem fonte parada", gh.calls[-2][gh.calls[-2].index("--body") + 1])
+
+    def test_a_stopped_source_keeps_the_issue_open(self):
+        gh = self._open()
+        rt.notify("x/y", False, self.URL, self.NOW, gh, stale=self.PARADA)
+        self.assertFalse([c for c in gh.calls if c[:2] == ["issue", "close"]])
+
+    def test_a_failed_job_still_opens_and_lists_the_sources_too(self):
+        gh = FakeGh({("issue", "list"): "[]"})
+        self.assertEqual(rt.notify("x/y", True, self.URL, self.NOW, gh), "opened")
+        body = gh.calls[-1][gh.calls[-1].index("--body") + 1]
+        self.assertIn("falhou", body)
+        self.assertNotIn("Fontes que usaram", body)
+        gh = FakeGh({("issue", "list"): "[]"})
+        self.assertEqual(rt.notify("x/y", True, self.URL, self.NOW, gh, stale=self.PARADA), "opened")
+        body = gh.calls[-1][gh.calls[-1].index("--body") + 1]
+        self.assertIn("falhou", body)
+        self.assertIn("OSM sul", body)
+
+    def test_the_command_takes_the_json_of_the_stale_command(self):
+        import contextlib
+        import io
+        from unittest import mock
+        calls = []
+
+        def fake_notify(*args, **kw):
+            calls.append((args, kw))
+            return "opened"
+        with mock.patch.object(rt, "notify", fake_notify), contextlib.redirect_stdout(io.StringIO()):
+            rt.main(["notify", "--repo", "x/y", "--run-url", self.URL, "--stale", json.dumps(self.PARADA)])
+            rt.main(["notify", "--repo", "x/y", "--run-url", self.URL, "--stale", "isto não é json"])
+            rt.main(["notify", "--repo", "x/y", "--run-url", self.URL])
+        self.assertEqual([kw["stale"] for _, kw in calls], [self.PARADA, [], []])
+
+
+class WorkflowWiring(unittest.TestCase):
+    """O notify só tem o script: a lista de fontes paradas passa pela saída do job generate."""
+    PATH = os.path.join(os.path.dirname(__file__), "..", "..", "..", ".github", "workflows", "gerar-dados.yml")
+
+    def setUp(self):
+        with open(self.PATH, encoding="utf-8") as f:
+            self.text = f.read()
+
+    def test_generate_exposes_the_list_read_from_the_build_catalog(self):
+        generate = self.text.split("\n  generate:\n", 1)[1].split("\n  notify:\n", 1)[0]
+        self.assertIn("stale: ${{ steps.stale.outputs.stale }}", generate)
+        self.assertIn("routine.py stale --catalog data/dist/catalogo.json", generate)
+        self.assertIn("id: stale", generate)
+
+    def test_notify_hands_it_to_both_calls(self):
+        notify = self.text.split("\n  notify:\n", 1)[1]
+        self.assertIn("STALE: ${{ needs.generate.outputs.stale }}", notify)
+        self.assertEqual(notify.count('--stale "${STALE:-[]}"'), 2)
+        self.assertIn("github.event_name == 'schedule'", notify)   # disparo à mão não mexe na issue
+
+
 if __name__ == "__main__":
     unittest.main()
