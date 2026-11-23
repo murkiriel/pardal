@@ -92,7 +92,7 @@ SOURCES = [
     ("Porto Velho (SEMTRAN)", "página com a planilha em PDF", lambda: _req("GET", semtran_pvh.PAGE)),
     ("Mogi das Cruzes (Prefeitura)", "CSV da lista de radares (portal CKAN)", lambda: _req("GET", mogi_sp.CSV_URL)),
     ("CET-SP (limites)", "GeoSampa WFS", lambda: _req("GET", cet_sp.WFS, params={"service": "WFS", "request": "GetCapabilities"})),
-    ("OpenStreetMap", "Geofabrik (HEAD do extrato)", lambda: _req("HEAD", f"{osm_pbf.GEOFABRIK_BASE}/norte-latest.osm.pbf")),
+    ("OpenStreetMap", "Geofabrik (HEAD do extrato)", lambda: _req("HEAD", f"{osm_pbf.GEOFABRIK_BASE}/norte/norte-latest.osm.pbf")),
     ("IBGE (malha das UFs)", "API de malhas v3", lambda: _req("GET", ufpoly.MESH_URL)),
     ("IBGE (CNEFE)", "pasta dos endereços do Acre", lambda: _req("GET", f"{cnefe.BASE}/12_AC/")),
 ]

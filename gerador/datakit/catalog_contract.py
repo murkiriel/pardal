@@ -128,7 +128,7 @@ def _sources(cat: Mapping, extracts: Sequence[Mapping]) -> List[dict]:
     for extract in extracts:
         region = str(extract["name"]).split(" ", 1)[1]
         sources.append({"id": "openstreetmap-geofabrik-" + _slug(region), "name": str(extract["name"]),
-                        "url": f"https://download.geofabrik.de/south-america/brazil/{region}-latest.osm.pbf",
+                        "url": f"https://download.geofabrik.de/south-america/brazil/{region}/{region}-latest.osm.pbf",
                         "date": _iso(str(extract.get("file_date") or "")), "license": "ODbL-1.0",
                         "checksums": {"sha256": extract["sha256"]}})
     seen = {s["id"] for s in sources}

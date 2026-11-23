@@ -200,7 +200,8 @@ class Resilience(unittest.TestCase):
 
 
 class OsmDatedFallback(unittest.TestCase):
-    """O <região>-latest.osm.pbf da Geofabrik em laço de redirecionamento (301 para si mesmo)."""
+    """O <região>-latest.osm.pbf da Geofabrik em laço de redirecionamento (301 para si mesmo).
+    Os casos da mudança para subpastas e do datado do dia em 404 estão em test_osm_pbf_geofabrik.py."""
     BASE = "https://download.geofabrik.de/south-america/brazil"
     LISTING = ('<a href="sudeste-260929.osm.pbf">sudeste-260929.osm.pbf</a>'
                '<a href="sudeste-260930.osm.pbf">sudeste-260930.osm.pbf</a>'
@@ -217,13 +218,13 @@ class OsmDatedFallback(unittest.TestCase):
         self.raw = tempfile.mkdtemp()
         self.asked = []
         self.waits = []
-        osm_pbf._LISTING = None          # a listagem fica guardada pela execução inteira
+        osm_pbf._LISTINGS.clear()        # a listagem de cada região fica guardada pela execução inteira
         self._sleep = mock.patch.object(_http.time, "sleep", self.waits.append)
         self._sleep.start()
 
     def tearDown(self):
         self._sleep.stop()
-        self.osm._LISTING = None
+        self.osm._LISTINGS.clear()
 
     def _urlopen(self, latest_loops=True, dated_ok=True):
         """urlopen simulado: o -latest em laço (como o urllib relata) e o datado respondendo."""
@@ -255,7 +256,7 @@ class OsmDatedFallback(unittest.TestCase):
         with self.mock.patch.object(self.osm, "urlopen", self._urlopen()), \
                 self.mock.patch.object(self.osm, "get_text", return_value=self.LISTING) as listing:
             ex = self.osm.ensure_extract("sudeste", self.raw)
-        listing.assert_called_once_with(self.BASE + "/")
+        listing.assert_called_once_with(self.BASE + "/sudeste/")
         self.assertEqual(self.asked, ["sudeste-latest.osm.pbf"] * _http.ATTEMPTS + ["sudeste-260930.osm.pbf"])
         self.assertEqual((ex.bytes, ex.file_date), (3, self.STAMP))
         self.assertTrue(ex.path.endswith("sudeste-latest.osm.pbf"))       # o nome guardado não muda
@@ -346,20 +347,21 @@ class OsmDatedFallback(unittest.TestCase):
         self.assertEqual((listing.call_count, ex.bytes), (3, 3))
         self.assertEqual(self.waits[-2:], [self.osm.FALLBACK_WAIT_S, 2 * self.osm.FALLBACK_WAIT_S])
 
-    def test_listing_is_read_once_for_all_regions(self):
+    def test_listing_is_read_once_per_region(self):
         with self.mock.patch.object(self.osm, "urlopen", self._urlopen()), \
                 self.mock.patch.object(self.osm, "get_text", return_value=self.LISTING) as listing:
             self.osm.ensure_extract("sudeste", self.raw)
             self.osm.ensure_extract("sul", self.raw)
-        self.assertEqual(listing.call_count, 1)
+        self.assertEqual(listing.call_count, 2)
         self.assertEqual(self.asked[-1], "sul-261001.osm.pbf")
 
-    def test_newest_dated_file_of_the_region_only(self):
+    def test_dated_files_of_the_region_only_newest_first(self):
         with self.mock.patch.object(self.osm, "get_text", return_value=self.LISTING):
-            self.assertEqual(self.osm._dated_url("sudeste"), self.BASE + "/sudeste-260930.osm.pbf")
-            self.assertEqual(self.osm._dated_url("sul"), self.BASE + "/sul-261001.osm.pbf")
+            self.assertEqual(self.osm._dated_urls("sudeste"),
+                             [self.BASE + "/sudeste/sudeste-260930.osm.pbf", self.BASE + "/sudeste/sudeste-260929.osm.pbf"])
+            self.assertEqual(self.osm._dated_urls("sul"), [self.BASE + "/sul/sul-261001.osm.pbf"])
             with self.assertRaises(RuntimeError):
-                self.osm._dated_url("norte")
+                self.osm._dated_urls("norte")
 
 
 class PublishedNames(unittest.TestCase):

@@ -17,11 +17,13 @@ O que captura:
 """
 from __future__ import annotations
 
+import functools
 import hashlib
 import os
 import re
 from dataclasses import dataclass, replace
 from typing import Callable, Dict, List, Optional, Tuple, TypeVar
+from urllib.error import HTTPError
 from urllib.request import urlopen, Request
 
 import osmium
@@ -44,13 +46,21 @@ from datakit.common import (
 T = TypeVar("T")
 
 GEOFABRIK_BASE = "https://download.geofabrik.de/south-america/brazil"
+# Desde 20/11/2026 os extratos regionais ficam em subpastas: <BASE>/<região>/<região>-latest.osm.pbf
+# (o endereço antigo, <BASE>/<região>-latest.osm.pbf, responde 301 para o novo) e a listagem de
+# cada região é <BASE>/<região>/. A listagem de <BASE>/ só traz o brazil-AAMMDD.
 # Contorno do -latest (ver _with_dated_fallback): a listagem e o arquivo datado são pedidos com
 # mais paciência que o resto (30 s, 60 s, 90 s entre as tentativas). Em 01/10/2026 a listagem
 # da Geofabrik respondeu com erro por até 45 s, duas vezes no mesmo build, e as tentativas
 # comuns (5 s e 10 s de espera) não bastaram.
 FALLBACK_ATTEMPTS = 4
 FALLBACK_WAIT_S = 30.0
-_LISTING: Optional[str] = None   # listagem da pasta, lida uma vez por execução
+# Quantos datados, do mais novo ao mais velho, o plano B tenta. Em 22/11/2026 o datado do dia
+# aparecia na listagem mas respondia 404 o dia todo; o do dia anterior abria normal.
+DATED_TRIES = 3
+# Resposta definitiva: repetir não muda nada, então passa direto ao próximo arquivo.
+GONE_CODES = (404, 410)
+_LISTINGS: Dict[str, str] = {}   # listagem da pasta de cada região, lida uma vez por execução
 SAMPLE_M = 0           # legado (sem reamostragem fixa; ver _limit_points). Mantido p/ index.sample_m
 RDP_EPSILON_M = 15.0    # simplifica a geometria do way (Douglas-Peucker)
 LIMIT_MAX_GAP_M = 1500.0  # só preenche vértices do RDP se ficarem mais longe que isso
@@ -110,12 +120,14 @@ def ensure_extract(region: str, raw_dir: str, refresh: bool = True) -> Extract:
     a data da versão publicada (HEAD) e baixa de novo se for mais nova que a guardada. Sem
     refresh (build --osm-local), usa o arquivo guardado se existir. Se a consulta ou o download
     da versão nova falharem, usa o guardado e avisa (failures.warn, com a data dele): fica como
-    estava. Consulta e download caem para o arquivo datado quando o -latest falha (ver
-    _with_dated_fallback). Sem arquivo guardado, a falha do download sobe."""
+    estava. Consulta e download caem para os arquivos datados quando o -latest falha (ver
+    _with_dated_fallback). Sem arquivo guardado, a falha do download sobe. O nome do arquivo
+    guardado e o do .last-modified não dependem da pasta da Geofabrik: o cache do Actions os
+    reconhece pelo nome."""
     os.makedirs(raw_dir, exist_ok=True)
     path = os.path.join(raw_dir, f"{region}-latest.osm.pbf")
     stamp = os.path.join(raw_dir, f"{region}.last-modified")
-    url = f"{GEOFABRIK_BASE}/{region}-latest.osm.pbf"
+    url = f"{GEOFABRIK_BASE}/{region}/{region}-latest.osm.pbf"
     download = not os.path.exists(path)
     if not download and refresh:
         try:
@@ -147,43 +159,98 @@ def ensure_extract(region: str, raw_dir: str, refresh: bool = True) -> Extract:
     )
 
 
+def _status(e: BaseException) -> Optional[int]:
+    """Código HTTP do erro, venha ele do requests (HEAD, listagem) ou do urllib (download)."""
+    if isinstance(e, HTTPError):
+        return e.code
+    response = getattr(e, "response", None)
+    return getattr(response, "status_code", None)
+
+
+class _Gone(Exception):
+    """404/410: resposta definitiva. Fora de OSError de propósito, para o with_retries não
+    esperar por ela."""
+
+    def __init__(self, original: BaseException):
+        super().__init__(str(original))
+        self.original = original
+
+
+def _patient(fn: Callable[[], T], url: str, **kw) -> T:
+    """with_retries que não gasta espera com 404/410 (urllib relata HTTPError como OSError, que
+    o with_retries tem por transitório). O erro que sobe é o original."""
+    def once() -> T:
+        try:
+            return fn()
+        except Exception as e:  # noqa: BLE001
+            if _status(e) in GONE_CODES:
+                raise _Gone(e) from e
+            raise
+    try:
+        return with_retries(once, url, **kw)
+    except _Gone as g:
+        raise g.original from None
+
+
 def _with_dated_fallback(region: str, url: str, fn: Callable[[str], T]) -> Tuple[T, str]:
     """fn(url) e a URL que respondeu. O <region>-latest.osm.pbf é só um redirecionamento para o
-    <region>-AAMMDD.osm.pbf do dia, e já ficou em laço (301 para si mesmo, só no sudeste): se
-    ele falhar, tenta o datado mais recente da listagem da Geofabrik. É o mesmo arquivo, então
-    vira aviso e não falha. Sem listagem, sobe o erro do -latest; se o datado também falhar, o
-    dele."""
+    <region>-AAMMDD.osm.pbf do dia, e já ficou em laço (301 para si mesmo, só no sudeste, em
+    setembro de 2026); em 22/11/2026, com os extratos já em subpastas, o datado do dia ficou em
+    404 enquanto o do dia anterior abria. Se o -latest falhar, tenta os datados da listagem da
+    região, do mais novo ao mais velho, no máximo DATED_TRIES, e para no primeiro que responder:
+    é o mesmo arquivo, com um dia a menos, então vira aviso e não falha. 404/410 passa ao
+    próximo sem esperar; erro de conexão, 5xx e tempo esgotado repetem com paciência. Sem
+    listagem, sobe o erro do -latest; se todos os datados falharem, o do mais novo."""
     try:
-        return with_retries(lambda: fn(url), url), url
+        return _patient(lambda: fn(url), url), url
     except Exception as e:  # noqa: BLE001 — decide abaixo se há por onde contornar
         if not url.endswith("-latest.osm.pbf"):
             raise
         try:
-            dated = _dated_url(region)
+            candidates = _dated_urls(region)[:DATED_TRIES]
         except Exception as listing_error:  # noqa: BLE001
             print(f"[osm_pbf] {region}: listagem da Geofabrik também falhou ({type(listing_error).__name__})")
             raise e from listing_error
-        from datakit import failures
-        failures.warn(f"OSM {region}", f"-latest falhou ({type(e).__name__}); usado {dated.rsplit('/', 1)[-1]}")
-        return with_retries(lambda: fn(dated), dated, attempts=FALLBACK_ATTEMPTS, wait_s=FALLBACK_WAIT_S), dated
+        skipped: List[str] = []
+        first_error: Optional[Exception] = None
+        for dated in candidates:
+            name = dated.rsplit("/", 1)[-1]
+            try:
+                result = _patient(functools.partial(fn, dated), dated, attempts=FALLBACK_ATTEMPTS, wait_s=FALLBACK_WAIT_S)
+            except Exception as dated_error:  # noqa: BLE001
+                print(f"[osm_pbf] {region}: {name} falhou ({type(dated_error).__name__}"
+                      f"{'' if _status(dated_error) is None else f' {_status(dated_error)}'})")
+                first_error = first_error or dated_error
+                skipped.append(name)
+                continue
+            from datakit import failures
+            note = f"; pulado {', '.join(skipped)}" if skipped else ""
+            failures.warn(f"OSM {region}", f"-latest falhou ({type(e).__name__}); usado {name}{note}")
+            return result, dated
+        if first_error is None:
+            raise e
+        raise first_error from e
 
 
-def _listing() -> str:
-    """Listagem da pasta da Geofabrik. Uma leitura boa serve a todas as regiões do build."""
-    global _LISTING
-    if _LISTING is None:
-        url = f"{GEOFABRIK_BASE}/"
-        _LISTING = with_retries(lambda: get_text(url), url, attempts=FALLBACK_ATTEMPTS, wait_s=FALLBACK_WAIT_S)
-    return _LISTING
+def _listing(region: str) -> str:
+    """Listagem da pasta da região na Geofabrik. Uma leitura boa por região serve ao build inteiro
+    (a consulta e o download da mesma região usam a mesma)."""
+    if region not in _LISTINGS:
+        url = f"{GEOFABRIK_BASE}/{region}/"
+        _LISTINGS[region] = with_retries(lambda: get_text(url), url,
+                                         attempts=FALLBACK_ATTEMPTS, wait_s=FALLBACK_WAIT_S)
+    return _LISTINGS[region]
 
 
-def _dated_url(region: str) -> str:
-    """URL do <region>-AAMMDD.osm.pbf mais recente na listagem da pasta da Geofabrik."""
-    listing = _listing()
-    dates = re.findall(rf"(?<![\w-]){re.escape(region)}-(\d{{6}})\.osm\.pbf", listing)
+def _dated_urls(region: str) -> List[str]:
+    """URLs dos <region>-AAMMDD.osm.pbf da listagem da pasta da região, do mais novo ao mais
+    velho."""
+    listing = _listing(region)
+    dates = sorted(set(re.findall(rf"(?<![\w-]){re.escape(region)}-(\d{{6}})\.osm\.pbf(?![\w.])", listing)),
+                   reverse=True)
     if not dates:
         raise RuntimeError(f"nenhum {region}-AAMMDD.osm.pbf na listagem da Geofabrik")
-    return f"{GEOFABRIK_BASE}/{region}-{max(dates)}.osm.pbf"
+    return [f"{GEOFABRIK_BASE}/{region}/{region}-{d}.osm.pbf" for d in dates]
 
 
 # traffic_calming do OSM que faz a moto pular -> tipo no lombadas.csv. chicane, choker, island, painted_table e o resto

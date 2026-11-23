@@ -10,7 +10,7 @@ from typing import Dict, Tuple
 
 BBox = Tuple[float, float, float, float]  # (min_lat, min_lng, max_lat, max_lng)
 
-# Região Geofabrik em south-america/brazil/<região>-latest.osm.pbf
+# Região Geofabrik em south-america/brazil/<região>/<região>-latest.osm.pbf
 GEOFABRIK_REGION: Dict[str, str] = {
     **{uf: "norte" for uf in ("AC", "AP", "AM", "PA", "RO", "RR", "TO")},
     **{uf: "nordeste" for uf in ("AL", "BA", "CE", "MA", "PB", "PE", "PI", "RN", "SE")},

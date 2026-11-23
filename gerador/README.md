@@ -63,9 +63,13 @@ CSV; o `scripts/to_geojson.py` (na raiz do repositório) converte qualquer um pa
 
 Os extratos do OSM ficam em `data/raw/`. A cada build o gerador confere na Geofabrik se há
 versão mais nova e só então baixa de novo; `--osm-local` usa os guardados sem conferir (útil
-para repetir um build com os mesmos dados). Se o link `<região>-latest.osm.pbf` falhar, o
-gerador usa o `<região>-AAMMDD.osm.pbf` mais recente da listagem da Geofabrik e registra um
-aviso (é o mesmo arquivo; não bloqueia a publicação).
+para repetir um build com os mesmos dados). Desde 20/11/2026 a Geofabrik guarda cada região em
+subpasta (`brazil/<região>/<região>-latest.osm.pbf`); os arquivos guardados em `data/raw/` mantêm os
+nomes de sempre. Se o link `<região>-latest.osm.pbf` falhar, o gerador tenta os
+`<região>-AAMMDD.osm.pbf` da listagem da subpasta, do mais novo ao mais velho (no máximo 3), e usa o
+primeiro que responder; um 404 passa ao próximo sem esperar (em 22/11/2026 o datado do dia estava na
+listagem mas dava 404). Registra um aviso (é o mesmo arquivo; não bloqueia a publicação). Se nenhum
+abrir, fica o arquivo guardado, também com aviso.
 
 ## Como funciona
 
