@@ -773,7 +773,7 @@
 <wpt lat="-25.425180" lon="-49.273850"><name>Radar 40 km/h</name><desc>Fonte: CURITIBA+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.425120" lon="-49.259550"><name>Radar 50 km/h</name><desc>Fonte: CURITIBA</desc><type>FIXED</type></wpt>
 <wpt lat="-25.425090" lon="-49.273960"><name>Radar 40 km/h</name><desc>Fonte: CURITIBA</desc><type>FIXED</type></wpt>
-<wpt lat="-25.424477" lon="-49.301601"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-25.424451" lon="-49.301584"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.424310" lon="-49.281700"><name>Radar 40 km/h</name><desc>Fonte: CURITIBA+INMETRO+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.423730" lon="-49.325120"><name>Radar 40 km/h</name><desc>Fonte: CURITIBA</desc><type>FIXED</type></wpt>
 <wpt lat="-25.423620" lon="-49.267950"><name>Avanço de sinal</name><desc>Fonte: CURITIBA</desc><type>RED_LIGHT</type></wpt>
@@ -785,9 +785,9 @@
 <wpt lat="-25.422871" lon="-49.241271"><name>Radar de trecho 60 km/h</name><desc>Fonte: OSM</desc><type>SECTION</type></wpt>
 <wpt lat="-25.422493" lon="-49.240965"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.421980" lon="-49.240710"><name>Radar 50 km/h</name><desc>Fonte: CURITIBA</desc><type>FIXED</type></wpt>
-<wpt lat="-25.421641" lon="-49.323602"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-25.421603" lon="-49.323617"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.421550" lon="-52.032161"><name>Radar 60 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-25.421395" lon="-49.322342"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-25.421357" lon="-49.322358"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.421105" lon="-49.202250"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.420918" lon="-49.224992"><name>Radar 70 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.420675" lon="-49.225331"><name>Radar 70 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
@@ -866,7 +866,7 @@
 <wpt lat="-25.400340" lon="-49.334470"><name>Radar 50 km/h</name><desc>Fonte: CURITIBA+INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-25.400305" lon="-49.247117"><name>Radar 50 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.400241" lon="-49.246883"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
-<wpt lat="-25.399671" lon="-49.313977"><name>Radar</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-25.399671" lon="-49.313977"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.399621" lon="-51.453648"><name>Radar 30 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.399359" lon="-51.458307"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-25.398730" lon="-49.273740"><name>Radar 50 km/h</name><desc>Fonte: CURITIBA</desc><type>FIXED</type></wpt>
@@ -1170,7 +1170,7 @@
 <wpt lat="-24.924146" lon="-53.437653"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-24.923586" lon="-53.417877"><name>Radar 60 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-24.919878" lon="-53.421751"><name>Radar 40 km/h</name><desc>Fonte: INMETRO</desc><type>FIXED</type></wpt>
-<wpt lat="-24.912275" lon="-50.086630"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-24.912361" lon="-50.086727"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-24.912029" lon="-50.086731"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-24.874918" lon="-50.443423"><name>Radar 60 km/h</name><desc>Fonte: ANTT · sentido 188° (sul)</desc><type>FIXED</type></wpt>
 <wpt lat="-24.868500" lon="-50.038000"><name>Radar 60 km/h</name><desc>Fonte: ANTT+OSM</desc><type>FIXED</type></wpt>

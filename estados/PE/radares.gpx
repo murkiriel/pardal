@@ -318,7 +318,7 @@
 <wpt lat="-8.067404" lon="-34.927845"><name>Radar 40 km/h</name><desc>Fonte: PCR+INMETRO</desc><type>FIXED</type></wpt>
 <wpt lat="-8.067065" lon="-34.927726"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-8.064882" lon="-37.283033"><name>Radar 60 km/h</name><desc>Fonte: DER-PE</desc><type>FIXED</type></wpt>
-<wpt lat="-8.064120" lon="-34.871841"><name>Radar 30 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
+<wpt lat="-8.064145" lon="-34.871792"><name>Radar 30 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-8.064071" lon="-34.935626"><name>Radar 60 km/h</name><desc>Fonte: PCR+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-8.063998" lon="-34.935763"><name>Radar 60 km/h</name><desc>Fonte: PCR+OSM</desc><type>FIXED</type></wpt>
 <wpt lat="-8.063733" lon="-34.934835"><name>Radar 40 km/h</name><desc>Fonte: OSM</desc><type>FIXED</type></wpt>
