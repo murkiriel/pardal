@@ -107,6 +107,13 @@ jobs:
             echo "disparado à mão: gera"; echo "run=true" >> "$GITHUB_OUTPUT"; exit 0
           fi
           today=$(date -u +%F)
+          # A release do dia já existe (uma geração à mão que publicou, por exemplo): a etiqueta dados-<dia> não
+          # pode ser criada de novo. Em 2026-11-23 a agendada da tarde gerou depois de uma publicação à mão e
+          # falhou no fim ("a release dados-2026-11-23 já existe"). Teste à mão sem publicar não cria release e
+          # não faz pular.
+          if gh release view "dados-$today" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            echo "run=false" >> "$GITHUB_OUTPUT"; echo "a release dados-$today já existe: não gera de novo hoje"; exit 0
+          fi
           # Conta só as execuções AGENDADAS de hoje (fora esta) em que a geração rodou e terminou bem. Uma
           # execução à mão (às vezes só de teste, sem publicar) ou uma agendada que pulou a geração não conta:
           # em 2026-11-11 um teste à mão sem publicar fez a agendada da tarde pular, e o dia ficou sem dados.
