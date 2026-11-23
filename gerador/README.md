@@ -203,7 +203,8 @@ comentário mesmo com a geração verde, e só fecha quando não há falha nem f
 release já traziam os avisos, mas só nos dias com release.
 
 As máquinas do Actions ficam nos EUA, e o DNIT, o Inmetro, a API de malhas do IBGE, a AGETO-TO, o DER-SE e a lista de radares do Rio (CET-Rio) não aceitam conexão de fora do Brasil
-(o portal da ANTT às vezes devolve uma página de bloqueio): o tráfego para esses servidores (`TUNNEL_HOSTS`),
+(o portal da ANTT às vezes devolve uma página de bloqueio, e a página da Setran de Curitiba deixa a conexão
+sem resposta em dias alternados): o tráfego para esses servidores (`TUNNEL_HOSTS`),
 e só para eles, sai por um túnel WireGuard com saída no Brasil. A configuração do túnel fica no
 segredo `MULLVAD_WG_CONF` do repositório (Settings → Secrets and variables → Actions). Se o segredo
 faltar ou o túnel não responder (chave revogada, servidor desativado), o job avisa e segue sem
