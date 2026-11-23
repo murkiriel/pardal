@@ -142,7 +142,9 @@ jobs:
       # e DER-SE davam ConnectTimeout); cetrio.prefeitura.rio (lista de radares do Rio) responde 200 daqui
       # mas, das máquinas dos EUA, sem o link da listagem (RIO: "lista de radares do Rio não encontrada" nas
       # gerações desde 2026-11-12, talvez desde 06/10; achado em 2026-11-17); am.i.mullvad.net só confere a saída
-      # do túnel
+      # do túnel. Fora de propósito: goias.gov.br e cdn.goinfra.go.gov.br (DER-GO, lista e malha da GOINFRA)
+      # respondem 200 de nós dos EUA e do Canadá (check-host.net, 2026-11-22), e o IP do cdn muda a cada ~20 s
+      # (GSLB), que não cabe no AllowedIPs fixo do túnel; se o Actions der ConnectTimeout, ver gerador/FONTES.md
       TUNNEL_HOSTS: >-
         servicos.dnit.gov.br servicos.rbmlq.gov.br dados.antt.gov.br servicodados.ibge.gov.br
         www.to.gov.br der.se.gov.br cetrio.prefeitura.rio am.i.mullvad.net

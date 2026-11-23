@@ -45,6 +45,7 @@ endereços (geocodificador).
 | **SEINFRA-BA** (`ba.gov.br/infraestrutura/12046/mapas`, desde 2026-11-08) | 78 radares das rodovias estaduais: coordenada, limite, rodovia + km | PDF (o KML vem num RAR) |
 | **Transalvador** (mapa de pórticos do transonline, desde 2026-11-08) | 102 radares de Salvador: coordenada, limite, série | Página HTML (marcadores do Google Maps) |
 | **SEMTRAN Porto Velho** (página "radares fixos", desde 2026-11-08) | 39 radares: coordenada, validade da aferição | PDF |
+| **DER-GO / GOINFRA — lista de equipamentos ativos** (`goias.gov.br/goinfra/relatorio-de-equipamentos-de-monitoramento-da-goinfra`, desde 2026-11-22; antes, dois FeatureServers ArcGIS) | 1.102 linhas (uma por faixa) de radares fixos e lombadas eletrônicas das rodovias estaduais: coordenada, limite, sentido Crescente/Decrescente, rodovia, km e SRE; viram 864 radares | PDF; publicação oficial sem licença nem termo de reuso declarado |
 
 ## B — Rodovia + km (precisam de referência linear)
 
@@ -341,6 +342,116 @@ final, tamanho, título e o começo do texto). Leitura de 17/11 pela rede brasil
 geocodificador da prefeitura (374 pontos distintos). Contra os 344 radares RIO publicados (`estados/RJ/radares.csv`,
 lista de 06/10): 343 ficam a ≤ 50 m de um ponto da leitura nova, 28 pontos novos (> 200 m), 1 publicado some.
 
+### DER-GO — lista oficial de equipamentos ativos (2026-11-22)
+
+Desde 19/11/2026 os dois FeatureServers da GOINFRA que o gerador lia (`Controle_de_Subst_de_Radares`, os radares, e
+`MalhaEstadual_gdb`, a malha do sentido) pedem token (erro 499); o build usava a cópia guardada. A fonte nova são os
+documentos públicos da própria GOINFRA (`sources/der_go.py`):
+
+* **Radares: a lista de equipamentos ativos em PDF.** A página "Relatório de equipamentos de monitoramento da GOINFRA"
+  liga duas listas: a de "vigentes a partir de abril de 2026" (`Lista_de_Equipamento_03_11_2026.xlsx-Equipamentos-Ativos.pdf`,
+  emitida em 03/11/2026) e a de "vigentes até 30/05/2026" (edição de 11/2025, outra ordem de colunas). O endereço muda a
+  cada edição (a pasta do WordPress tem o mês, o nome tem a data), então o gerador pega, entre os links `.pdf` cujo nome
+  fala em "equipamento" e em "ativos", o de data mais nova no nome (e, de desempate, na pasta). O PDF avisa que
+  coordenadas e km "possuem caráter referencial".
+* **Malha: o KMZ do mapa rodoviário** (`cdn.goinfra.go.gov.br/site/assets/paginas/images/SRE-GO_2025.kmz`, 30 MB, 80 MB de KML;
+  a página do mapa o liga, e o endereço conhecido fica de reserva): 2.065 Placemarks com `sre`, `km_inicial`, `km_final`
+  (1.812 SREs; 48 Placemarks têm duas linhas, e o intervalo de km é repartido entre elas pelo comprimento).
+  Cobre 292 dos 321 SREs da lista (115 das 1.096 linhas ficam em SRE que a malha não tem; esses radares saem sem sentido).
+* **Camada de conferência (`Pontos_REV_CEM_CEV`, pública, 983 pontos): não é fonte.** 440 deles são `Ponto` = "Novo"
+  (estudo, equipamento planejado) e só 62 desses estão na lista oficial (a até 30 m); dos 543 "Existente", 358. A cópia
+  anterior da fonte (as 1.026 posições do ArcGIS antigo) era essa mesma camada: 982 dos 983 pontos a menos de 30 m.
+
+**Leitor de PDF: pypdf, `extraction_mode="layout"`.** O `pdftotext -layout` (poppler) dá o mesmo texto (1.102 linhas de
+equipamento nos dois), mas é um binário a mais: o `requirements.txt` já fixa o pypdf com hash, as outras listas em PDF (Rio,
+AGETO, SEINFRA-BA…) o usam, e instalar o poppler no workflow seria mais um `apt-get` (que já falhou aqui, em 11/11). O modo
+padrão do pypdf cola as células ("060EGO0230-16412382-5117987960"); o modo `layout` mantém a tabela no desenho da página
+(2,7 s para as 11 páginas), e a linha é lida por âncoras (tipo, código, faixa, Crescente/Decrescente, local, SRE, latitude,
+longitude, velocidade), não por posição de coluna. Se a lista mudar de desenho (menos de 300 linhas lidas, ou mais de 10% das
+linhas de equipamento fora do formato), a fonte falha em vez de publicar um pedaço, e o build usa a cópia.
+
+**O que a lista de 03/11/2026 tem, e o que o parser faz** (1.102 linhas de equipamento, 1.096 lidas):
+
+| Problema | Linhas | Tratamento |
+|---|---|---|
+| Coordenada em inteiro de micrograus ("-16412382"), e não em decimal como na edição de 11/2025; algumas com ponto de milhar ("-16.791.786") | todas | `parse_coordinate`: decimal fica como está, inteiro e milhar viram micrograus; dá o mesmo valor nos três jeitos |
+| Longitude igual à latitude, ou sem sinal ("49465963") | 6 (3 equipamentos: 010L3B185, 070L4B031, 070L4B041) | fora da caixa de Goiás: descartadas e contadas no log |
+| Velocidade 39 e 1362 | 2 | radar mantido, sem limite (só vale 20 a 120 km/h e múltiplo de 10) |
+| `Sentido-CD` contradiz a letra da faixa ("1D" com "Crescente") | 1 | radar mantido, sem sentido |
+| SRE com 3 dígitos no fim ("221EGO095"), km sem "KM" ou ausente, série com letras, "GO-" ou "GO " | várias | a regex aceita; o SRE ganha o zero |
+| Ponto sobre a rodovia errada: o SRE ou a rodovia da lista não é o do lugar da coordenada, ou a coordenada tem erro (um grau de longitude a mais em 174L5R021) | 7 equipamentos (9 pontos) | descartados: a mais de 1,5 km do trecho do próprio SRE e a mais de 150 m de qualquer outro SRE da mesma rodovia |
+
+A distância ao trecho do próprio SRE (972 linhas com SRE na malha): mediana 5,6 m, p90 19 m, p95 36 m, p98 249 m, p99 706 m. Por
+isso o corte em 1,5 km: abaixo dele ficam 16 pontos entre 150 m e 1,5 km (6 em `572EGO0010`, 5 em `164EGO0550`, onde a malha
+parece desviar de trechos urbanos), que mantêm o radar mas ficam sem sentido. Outro SRE da mesma rodovia a até 150 m e com o km impresso a até 500 m do km da malha
+(o SRE da lista está trocado, p. ex. `164L1B128`, km 488,269, que cai no km 488,27 do SRE `164EGO0540`) mantém o radar e o
+sentido; sem o km batendo, mantém o radar sem sentido.
+
+**Faixas.** A lista traz uma linha por faixa, e a mesma faixa aparece de novo quando o equipamento é trocado (série nova).
+Linhas do mesmo local (rodovia), do mesmo sentido e a até 40 m uma da outra viram um radar, na posição média: as faixas de
+uma pista ficam a 1 a 15 m (uma única, a 33 m: 347L1R103/104). Raio de 5, 10, 20, 40 e 60 m: 886, 883, 875, 873 e 873 pontos; fica 40 m. 1.096 linhas viram 873 pontos (674 de uma faixa, 178 de duas, 18 de três, 3 de quatro). Fica um por sentido, como no
+resto do Pardal e como a cópia anterior tinha: 137 coordenadas têm os dois sentidos no mesmo ponto exato, e ali a mescla
+(`merge_cameras`) junta os dois e apaga o sentido, como num equipamento dos dois sentidos. `LOMBADA ELET` e `RADAR FIXO` viram
+`FIXED` (o Pardal não tem tipo à parte para a lombada eletrônica; ver DER-PE, AGETO-TO, Rio).
+
+**Sentido.** Igual ao anterior, com a malha do KMZ. A regra "desenhado do km inicial ao final" vale de novo: dos 655 pontos
+com trecho a até 150 m e km impresso, o km impresso cai a até 500 m do km projetado em 599 (91%), só a até 500 m da posição
+espelhada em 5, e em nenhuma das duas em 51 (km referencial; mediana do erro 17 m, p90 377 m): 599 de 604 (99,2%) onde dá
+para decidir. A inversão pelo km impresso agora só vale se a posição espelhada bate (até 500 m) e a direta não; antes,
+bastava a espelhada estar mais perto, e isso invertia 3 pontos (507EGO0014, 507EGO0020 e 050EGO0250 com km muito longe das
+duas) com mais risco de errar que de acertar. Conferência do sentido, nos 873 pontos: 768 saem com sentido (89%); sem
+sentido ficam 77 em SRE fora da malha, 16 a mais de 150 m do trecho, 3 em outro SRE com km que não bate e 1 de sentido
+contraditório.
+
+* contra a cópia anterior (1.026 posições do ArcGIS, calculadas com a malha do ArcGIS), pareando um a um os pontos a até 30 m:
+  438 pares, 280 com sentido nos dois: 260 iguais (±20°, 93%), 19 opostos, 1 em outro ângulo. Seis dos 19 são pares de
+  sentidos opostos no mesmo ponto (o pareamento pode trocar um pelo outro); o resto é discordância entre a lista de hoje e a
+  camada antiga sobre qual é o sentido do equipamento, que a malha não resolve;
+* lado da pista (no Brasil se anda pela direita; o radar do sentido dado fica à direita do eixo): 96% (27 de 28) a 25-80 m do
+  eixo, 91% (59 de 65) a 15-80 m, 71% (498 de 701) a menos de 15 m, onde o eixo da malha, a 4 m do ponto na mediana, não
+  distingue as pistas.
+
+**Comparação com o que estava publicado** (lista de 03/11/2026, 864 radares, contra os 1.026 da cópia anterior e os 1.018
+pontos `DER-GO` e `DER-GO+OSM` de `estados/GO/radares.csv` de 22/11, mesmo ponto = a até 100 m; a 30 m a conta muda pouco):
+
+| | Cópia guardada (1.026) | Publicado (1.018) |
+|---|---|---|
+| Ficam (há ponto da lista a ≤ 100 m) | 516 | 512 |
+| Saem | 510 | 506 |
+| … dos que saem, `Novo` na camada de conferência (≤ 30 m) | 372 | 368 |
+| … `Existente` | 125 | 125 |
+| … fora da camada | 13 | 13 |
+| Entram (864 − os que casam) | 217 | 217 |
+| Mudam de velocidade (os dois com limite) | 25 de 515 | 24 de 511 |
+
+Ou seja, mais de dois terços do que sai é o que a camada de estudo trazia a mais (planejado, não instalado). Os 125 `Existente`
+que saem não estão na lista de equipamentos ativos de 03/11; dos 217 que entram, 43 ficam a mais de 10 km de qualquer ponto
+antigo, então a lista nova não é só a antiga com as coordenadas revistas. Limites da lista nova:
+40 km/h em 386 radares, 60 em 308, 80 em 146, 50 em 14, 110 em 6, 70 em 2, 2 sem limite.
+
+**Cópia guardada e transição.** A cópia de `data/raw/fontes/der_go.pickle` é a lista de `Camera` que a fonte devolve (o
+`SourceData`), não o arquivo lido: a cópia da época do ArcGIS tem o mesmo formato e vale como reserva da fonte nova. Se a
+página, o PDF (não achado, ou com outro desenho) ou o KMZ falharem, a fonte falha, o `source_cache` usa a última cópia boa com
+o aviso "usada a cópia de AAAA-MM-DD" (e "ATENÇÃO" depois de 60 dias) e, sem cópia, a edição publicada. A falha do KMZ
+(`DER-GO (malha estadual, sentido)`) também cai na cópia, em vez de publicar radares sem sentido. Sem os dois, vira falha
+como as outras fontes. Cuidado na primeira geração: se a leitura nova falhar, a cópia antiga traz de volta os pontos de estudo.
+**Trava de queda:** o `publish.py` barra a publicação se um estado perder mais de 5% (e 50 itens) em alguma contagem em relação ao
+publicado. Os 154 pontos a menos do DER-GO (1.018 → 864) já são 10% dos 1.521 radares de Goiás, e o OSM só repõe os poucos que
+estavam juntados a ele (76); a primeira publicação com a fonte nova deve, portanto, ser barrada, e precisa de `accept_drop`
+(Actions, "Run workflow", `publish` e `accept_drop`). As gerações seguintes já comparam com a edição nova.
+
+**Túnel (TUNNEL_HOSTS): não precisa.** `goias.gov.br` (45.183.244.245 e 45.183.245.245, TTL de 1 h) e `cdn.goinfra.go.gov.br`
+(CNAME `webproxygoias05.gslb.go.gov.br`, 45.183.244.105, TTL de 19 s, balanceador GSLB) estão no bloco do governo de
+Goiás (45.183.244.0/22). Medido em 2026-11-22 pelo check-host.net, em 6 nós do Canadá e dos EUA: a página e o PDF responderam 200 em todos, e o KMZ (30 MB)
+chegou à resposta "mensagem grande demais" do próprio verificador, depois de abrir a conexão. A página também respondeu 200 de
+nós da Rússia, Suécia, Sérvia, Turquia e Irã (os outros nós não devolveram resultado). Sem bloqueio geográfico visível e
+com o IP do CDN mudando a cada poucos segundos, o `AllowedIPs` fixo do túnel só atrapalharia. Sem teste real em máquina do
+Actions (IPs da Azure): se a primeira geração cair na cópia com `ConnectTimeout`, o host entra em `TUNNEL_HOSTS`.
+
+**Licença.** A lista e o mapa são publicação oficial da GOINFRA, sem licença nem termo de reuso declarados (a página não
+traz, só a nota sobre coordenadas referenciais); entra como "dado aberto governamental", como as outras listas estaduais, e fica
+na pendência de autorização escrita das fontes (`PENDENCIAS.md`).
+
 ### Pontos de atenção do OSM (2026-11-08)
 
 Ideia tirada dos apps de alerta Super Tripper (Pod e Dash), que além dos radares avisam de perigos na via e de pontos de
@@ -510,7 +621,7 @@ vazio = os dois sentidos ou desconhecido. Como cada fonte informa o sentido e co
 |---|---|---|---|
 | ANTT — Radar | `sentido` Crescente/Decrescente (+ `rodovia`, `uf`) | Rota do SNV da BR: direção em que o km cresce no ponto (±50 m), +180° no decrescente | km da ANTT cresce no mesmo sentido do SNV em todas as concessões; lado da pista confirma o sentido em 96% dos radares a 25-80 m do eixo |
 | DNIT — PNCV | `Faixas` (`P-C-n` crescente, `P-D-n` decrescente) | Idem, SNV | 927 de 1.774 com um sentido só; lado da pista confirma em 95-100% a > 15 m do eixo |
-| DER-GO | `SENTIDO`, `SRE`, `COMPLEMENT` (km) | Malha estadual da Goinfra (`MalhaEstadual_gdb`): trechos por SRE com km inicial/final, km de cada vértice pelo comprimento | Trecho desenhado do km inicial ao final em 1.002 de 1.010 radares; km do radar a 4 m da posição (mediana); lado da pista confirma em 94-100% a > 15 m |
+| DER-GO | `Sentido-CD` (Crescente/Decrescente), `Código SRE`, `Complemento` (km), da lista de equipamentos em PDF | Malha estadual da Goinfra (KMZ do mapa rodoviário, `SRE-GO_2025.kmz`): trechos por SRE com km inicial/final, km de cada vértice pelo comprimento (até 2026-11-19, o FeatureServer `MalhaEstadual_gdb`, com os mesmos campos). Ver "DER-GO — lista oficial" abaixo | Trecho desenhado do km inicial ao final em 599 de 604 pontos (km impresso a até 500 m de um dos dois lados); sentido igual ao da cópia anterior em 260 de 280 pares; lado da pista confirma em 96% a 25-80 m do eixo (27 de 28) e 91% a 15-80 m |
 | Artesp (concessões SP) | `Sentido` Norte/Sul/Leste/Oeste (nominal da rodovia) | Só com o radar claramente sobre uma pista de mão única do OSM (a pista do outro sentido 6 m ou mais além), e o nominal não pode contrariar essa pista; em via de mão dupla, vazio (ver a conferência abaixo) | — |
 | DER-SP (rede própria) | `Faixas` (`N-1`, `S-1`, `L-1`, `O-1`) | Idem Artesp; "N-1, S-1" = os dois sentidos | Ver "Conferência do sentido em SP" abaixo |
 | CET-SP (radares da capital) | Descrição "(CENTRO/BAIRRO)" ou "(BAIRRO/CENTRO)"; pares de lugares ("RAPOSO/MARGINAL") sem sentido utilizável | Mesma regra da Artesp: sentido da pista de mão única em que o radar está; centro/bairro (rumo que se afasta ou se aproxima do marco zero) só confere. Com par de lugares, vale a pista sozinha | Ver a conferência abaixo |

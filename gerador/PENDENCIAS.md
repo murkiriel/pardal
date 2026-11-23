@@ -24,6 +24,23 @@ Situação em 2026-09-30, com as fontes travadas conferidas de novo em 2026-10-0
 | **Radares da CET pela API do Power BI** | A fonte é um relatório Power BI público, lido pela API que o próprio relatório usa (não documentada). Se a Microsoft ou a CET mudarem o relatório, a fonte falha (o build registra e o publicar barra). | Feito em parte: desde 2026-10-27 a CET publica a mesma base em CSV no GitHub (`cetsp-dados/dados-fiscalizacao-eletronica`), usada como reserva quando o Power BI falha ou fica mais velho que ela (`cet_sp._rows_with_fallback`). O CSV é atualizado à mão e estava duas semanas atrás do Power BI em 2026-11-08. |
 | **Limites estimados nas estradas rurais** (`unclassified`) | Eram 75% do volume dos estimados (em Goiás, 135 mil km) e é onde a regra por tipo de via mais erra (40/60 km/h em estrada de terra). | Uma estimativa mais confiável (por exemplo, usando o tipo de superfície) e um formato que caiba no limite de 100 MB por arquivo. |
 
+## Fontes sem licença declarada
+
+Autorização escrita dos órgãos: **pendente** para as fontes que publicam sem licença nem termo de reuso (a tabela "Fontes" do
+`README.md` da raiz marca cada uma com "Sem licença escrita" ou "o portal não declara licença"). Entram como dado aberto
+governamental, por serem publicação oficial de propósito. A mais nova é a **Goinfra** (lista de equipamentos ativos em PDF e o KMZ do
+mapa rodoviário, desde 2026-11-22): a página não traz licença nem termo, só uma nota de que coordenadas e km são referenciais. Quando
+o dono pedir a autorização, a lista dos órgãos é a dessa tabela.
+
+## Pendências do DER-GO (2026-11-22)
+
+| Item | Situação |
+|---|---|
+| **Primeira publicação com a fonte nova** | Goiás perde ~150 pontos (os de estudo da camada antiga) e a trava de queda do `publish.py` deve barrar: disparar à mão com `publish` e `accept_drop` uma vez. |
+| **Sentido dos radares em SRE fora da malha** | 77 pontos (29 SREs, 9%) ficam sem sentido: a malha do KMZ (de março de 2025) não tem esses SREs. Dá para usar o trecho de outro SRE da mesma rodovia com o km impresso batendo (já vale para o SRE trocado); falta medir a taxa de acerto antes de ligar. |
+| **Coordenadas quebradas da lista** | 3 equipamentos (010L3B185, 070L4B031, 070L4B041) saem por coordenada fora de Goiás e 7 por cair longe da rodovia; se a GOINFRA corrigir a lista, voltam sozinhos. Com o sinal da longitude posto, 070L4B031 e 070L4B041 cairiam a 24 m e 4 m do trecho do SRE; o gerador não corrige coordenada de órgão e os descarta. |
+| **Formato do PDF** | Se a lista mudar de desenho (menos de 300 linhas lidas, ou mais de 10% sem casar), a fonte falha e o build usa a cópia: ajustar `der_go._ROW`. A edição de 11/2025 tem outra ordem de colunas e não é lida. |
+
 ## Publicação
 
 Os dados e este gerador ficam em github.com/Murkiriel/pardal. O código é MIT (`LICENSE`

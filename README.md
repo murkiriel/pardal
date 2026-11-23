@@ -468,12 +468,13 @@ O **código** (pastas `gerador/` e `scripts/`) é **MIT** ([`gerador/LICENSE`](g
 | ANTT — Radar | Radares das concessões federais, com situação e sentido | CC-BY |
 | ANTT — Sinalização | Placas de velocidade máxima das concessões federais, por sentido | CC-BY |
 | Inmetro — PSIE, medidores de velocidade | Situação da aferição (ativo/inativo) e, nas rodovias federais e nas estaduais de SP (DER-SP), o limite do radar que não trazia nenhum; nos medidores com endereço urbano, a confirmação do radar, o limite e os radares que nenhuma outra fonte tem | Creative Commons |
-| DER-SP / Artesp, DER-GO (Goinfra) | Radares das rodovias estaduais, com o sentido fiscalizado | Dado aberto governamental |
+| DER-SP / Artesp | Radares das rodovias estaduais, com o sentido fiscalizado | Dado aberto governamental |
+| Goinfra (DER-GO) — lista de equipamentos de fiscalização eletrônica ativos | Radares fixos e lombadas eletrônicas das rodovias estaduais de Goiás, com limite e o sentido fiscalizado (PDF da página "Relatório de equipamentos de monitoramento") | Sem licença escrita: publicação oficial da Goinfra, sem termo de reuso (ver `gerador/FONTES.md`) |
 | DER-PE | Lombadas e redutores eletrônicos (limite 40 ou 60 km/h) e equipamentos mistos das rodovias estaduais de Pernambuco, em duas listas do site do DER | Dado aberto governamental |
 | DER-SE, AGETO-TO, Detran-MA, SEINFRA-BA | Radares e lombadas eletrônicas das rodovias estaduais de Sergipe, Tocantins, Maranhão e Bahia, com limite | Dado aberto governamental |
 | DER-MG | Radares fixos das rodovias estaduais e federais delegadas de Minas Gerais (rodovia + km, postos na via pela malha estadual da IDE-Sisema e pelo SNV, conferidos pelo município) | Dado aberto governamental |
 | IDE-Sisema (SEMAD-MG) — rodovias estaduais e federais de Minas Gerais | Quilometragem das MG, para pôr os radares do DER-MG na via | Dado aberto governamental |
-| Goinfra — malha rodoviária estadual | Quilometragem das rodovias de Goiás, para converter o sentido em rumo | Dado aberto governamental |
+| Goinfra — malha rodoviária estadual (KMZ do mapa rodoviário) | Quilometragem das rodovias de Goiás, para converter o sentido em rumo | Sem licença escrita: publicação oficial da Goinfra, sem termo de reuso |
 | IBGE — malha das unidades da federação (API de malhas) | Contorno de cada estado, para decidir em que estado fica cada ponto | Dado aberto governamental |
 | IBGE — CNEFE, cadastro de endereços do Censo 2022 | Coordenada do endereço dos medidores do Inmetro que só informam rua e número ou um cruzamento | Dado aberto governamental |
 | Prefeitura do Rio de Janeiro (IPP, SMTR/CET-Rio) | Limite por trecho de rua e radares da cidade | CC-BY 4.0 |
